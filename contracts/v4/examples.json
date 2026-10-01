@@ -1,0 +1,1980 @@
+{
+  "surfaceVersion": "4.0",
+  "tools": [
+    {
+      "name": "changes_since",
+      "request": {},
+      "response": {
+        "cursor": "cursor~ABCDEFGHJK",
+        "changes": [
+          {
+            "scope": "example",
+            "kind": "example",
+            "ref": "character:aurora~ABCDEFGHJK",
+            "action": "example",
+            "timelineAffected": false
+          }
+        ],
+        "heartbeat": false,
+        "cursorExpired": false,
+        "observedRevision": "cursor~ABCDEFGHJK"
+      }
+    },
+    {
+      "name": "character_age",
+      "request": {
+        "character": "character:aurora~ABCDEFGHJK"
+      },
+      "response": {
+        "character": {
+          "ref": "character:aurora~ABCDEFGHJK",
+          "kind": "Continuity",
+          "label": "example"
+        },
+        "status": "example",
+        "asOf": "example",
+        "referenceTimeZoneId": "America/Vancouver",
+        "calendar": {
+          "status": "example",
+          "exactYears": 1,
+          "minimumYears": 1,
+          "maximumYears": 1
+        },
+        "legal": {
+          "status": "example",
+          "exactYears": 1,
+          "minimumYears": 1,
+          "maximumYears": 1
+        },
+        "biological": {
+          "status": "example",
+          "exactYears": 1,
+          "minimumYears": 1,
+          "maximumYears": 1
+        },
+        "experienced": {
+          "status": "example",
+          "exactYears": 1,
+          "minimumYears": 1,
+          "maximumYears": 1
+        },
+        "appliedEffects": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "warnings": [
+          "example"
+        ],
+        "observedRevision": "cursor~ABCDEFGHJK"
+      }
+    },
+    {
+      "name": "character_relationship_create",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "sourceCharacter": "example",
+        "targetCharacter": "example",
+        "relationshipType": "example",
+        "period": "example"
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "character_residence_add",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "character": "character:aurora~ABCDEFGHJK",
+        "location": "character:aurora~ABCDEFGHJK",
+        "period": "example"
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "character_residence_transition",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "residenceRef": "example",
+        "expectedVersion": 1,
+        "newLocation": "example",
+        "effectiveAt": "2026-09-28"
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "character_temporal_effect_create",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "character": "character:aurora~ABCDEFGHJK",
+        "name": "Example name",
+        "period": "example",
+        "biologicalRate": 0,
+        "experiencedRate": 0
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "character_temporal_effect_update",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "effectRef": "example",
+        "expectedVersion": 1,
+        "changes": {
+          "name": "Example name"
+        }
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "character_temporal_profile_set",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "character": "character:aurora~ABCDEFGHJK",
+        "expectedVersion": 1,
+        "enabled": false
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "claim_create",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "claimText": "example",
+        "targets": [
+          "example"
+        ],
+        "evidence": [
+          {
+            "source": "character:aurora~ABCDEFGHJK"
+          }
+        ]
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "claim_update",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "claimRef": "example",
+        "expectedVersion": 1,
+        "changes": {
+          "claimText": "example"
+        }
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "continuity_clock_set",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "expectedVersion": 1,
+        "currentTime": "2026-09-28T12:00:00-07:00",
+        "referenceTimeZoneId": "America/Vancouver"
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "continuity_create",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "name": "Example name",
+        "defaultTimeZoneId": "example"
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "continuity_list",
+      "request": {},
+      "response": {
+        "items": [
+          {
+            "name": "Example name",
+            "description": "example",
+            "defaultTimeZoneId": "example",
+            "clock": {
+              "status": "example",
+              "currentTime": "2026-09-28T12:00:00-07:00",
+              "referenceTimeZoneId": "America/Vancouver",
+              "source": "character:aurora~ABCDEFGHJK"
+            },
+            "version": 1,
+            "isDeleted": false,
+            "observedRevision": "cursor~ABCDEFGHJK"
+          }
+        ],
+        "nextCursor": "example",
+        "hasMore": false,
+        "observedRevision": "cursor~ABCDEFGHJK"
+      }
+    },
+    {
+      "name": "continuity_update",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "expectedVersion": 1,
+        "changes": {
+          "name": "Example name"
+        }
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "entity_alias_add",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "entity": "character:aurora~ABCDEFGHJK",
+        "alias": "example"
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "entity_create",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "entityKind": "Project",
+        "name": "Example name"
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "entity_duplicate_to_continuity",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "sourceRef": "example",
+        "targetContinuityName": "Lostville"
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "entity_event_add",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "entity": "character:aurora~ABCDEFGHJK",
+        "title": "Example title",
+        "occurred": "example"
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "entity_local_time",
+      "request": {
+        "ref": "character:aurora~ABCDEFGHJK"
+      },
+      "response": {
+        "target": {
+          "ref": "character:aurora~ABCDEFGHJK",
+          "kind": "Continuity",
+          "label": "example"
+        },
+        "status": "example",
+        "localDateTime": "example",
+        "timeZoneId": "America/Vancouver",
+        "timeZoneSource": "example",
+        "observedRevision": "cursor~ABCDEFGHJK"
+      }
+    },
+    {
+      "name": "entity_source_link",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "entity": "character:aurora~ABCDEFGHJK",
+        "source": "character:aurora~ABCDEFGHJK"
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "entity_source_unlink",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "entity": "character:aurora~ABCDEFGHJK",
+        "source": "character:aurora~ABCDEFGHJK"
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "entity_update",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "ref": "character:aurora~ABCDEFGHJK",
+        "expectedVersion": 1,
+        "changes": {
+          "name": "Example name"
+        }
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "entity_variant_group_set",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "entityRef": "example",
+        "expectedVersion": 1,
+        "variantGroupRef": "example"
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "event_project_apply",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "event": "example",
+        "projects": [
+          "example"
+        ],
+        "action": "Add"
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "event_record",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "title": "Example title",
+        "occurred": "example"
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "get",
+      "request": {},
+      "response": {
+        "summary": {
+          "ref": "character:aurora~ABCDEFGHJK",
+          "kind": "Continuity",
+          "label": "example"
+        },
+        "fields": {},
+        "sections": {},
+        "observedRevision": "cursor~ABCDEFGHJK"
+      }
+    },
+    {
+      "name": "history_get",
+      "request": {},
+      "response": {
+        "items": [
+          {
+            "changedAtUtc": "2026-09-28T12:00:00-07:00",
+            "clientLabel": "example",
+            "action": "example",
+            "recordKind": "example",
+            "recordRef": "example",
+            "versionBefore": 1,
+            "versionAfter": 1
+          }
+        ],
+        "nextCursor": "example",
+        "hasMore": false,
+        "observedRevision": "cursor~ABCDEFGHJK"
+      }
+    },
+    {
+      "name": "image_attach",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "entity": "character:aurora~ABCDEFGHJK",
+        "image": {
+          "mediaType": "image/png",
+          "dataBase64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAAB"
+        }
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "image_list",
+      "request": {
+        "target": "character:aurora~ABCDEFGHJK"
+      },
+      "response": {
+        "items": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "owner": {
+              "ref": "character:aurora~ABCDEFGHJK",
+              "kind": "Continuity",
+              "label": "example"
+            },
+            "title": "Example title",
+            "caption": "example",
+            "altText": "example",
+            "role": "example",
+            "canonStatus": "example",
+            "isPrimary": false,
+            "mediaType": "image/png",
+            "width": 1,
+            "height": 1,
+            "byteCount": 1,
+            "version": 1,
+            "isDeleted": false,
+            "observedRevision": "cursor~ABCDEFGHJK"
+          }
+        ],
+        "nextCursor": "example",
+        "hasMore": false,
+        "observedRevision": "cursor~ABCDEFGHJK"
+      }
+    },
+    {
+      "name": "image_replace",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "imageRef": "example",
+        "expectedVersion": 1,
+        "image": null
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "image_revision_history",
+      "request": {
+        "imageRef": "example"
+      },
+      "response": {
+        "imageRef": "example",
+        "currentRevision": 1,
+        "revisions": [
+          {
+            "revision": 1,
+            "isCurrent": false,
+            "mediaType": "image/png",
+            "width": 1,
+            "height": 1,
+            "byteCount": 1,
+            "archivedAtUtc": "example"
+          }
+        ],
+        "hasMore": false,
+        "nextBeforeRevision": 1,
+        "observedRevision": "cursor~ABCDEFGHJK"
+      }
+    },
+    {
+      "name": "image_search",
+      "request": {},
+      "response": {
+        "items": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "owner": {
+              "ref": "character:aurora~ABCDEFGHJK",
+              "kind": "Continuity",
+              "label": "example"
+            },
+            "title": "Example title",
+            "caption": "example",
+            "altText": "example",
+            "role": "example",
+            "canonStatus": "example",
+            "isPrimary": false,
+            "mediaType": "image/png",
+            "width": 1,
+            "height": 1,
+            "byteCount": 1,
+            "version": 1,
+            "isDeleted": false,
+            "observedRevision": "cursor~ABCDEFGHJK"
+          }
+        ],
+        "nextCursor": "example",
+        "hasMore": false,
+        "observedRevision": "cursor~ABCDEFGHJK"
+      }
+    },
+    {
+      "name": "image_update",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "imageRef": "example",
+        "expectedVersion": 1,
+        "changes": {
+          "title": "Example title"
+        }
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "image_view",
+      "request": {
+        "imageRef": "example"
+      },
+      "response": {
+        "image": {
+          "ref": "character:aurora~ABCDEFGHJK",
+          "owner": {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          },
+          "title": "Example title",
+          "caption": "example",
+          "altText": "example",
+          "role": "example",
+          "canonStatus": "example",
+          "isPrimary": false,
+          "mediaType": "image/png",
+          "width": 1,
+          "height": 1,
+          "byteCount": 1,
+          "version": 1,
+          "isDeleted": false,
+          "observedRevision": "cursor~ABCDEFGHJK"
+        },
+        "size": "Thumbnail",
+        "mediaType": "image/png",
+        "width": 1,
+        "height": 1,
+        "byteCount": 1,
+        "observedRevision": "cursor~ABCDEFGHJK"
+      }
+    },
+    {
+      "name": "list_related",
+      "request": {
+        "ref": "character:aurora~ABCDEFGHJK",
+        "relation": "example"
+      },
+      "response": {
+        "items": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "nextCursor": "example",
+        "hasMore": false,
+        "observedRevision": "cursor~ABCDEFGHJK"
+      }
+    },
+    {
+      "name": "location_move",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "location": "character:aurora~ABCDEFGHJK",
+        "expectedVersion": 1,
+        "parentLocation": "example"
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "note_add",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "target": "character:aurora~ABCDEFGHJK",
+        "body": "## Example\n\nMarkdown note."
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "note_source_link",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "note": "character:aurora~ABCDEFGHJK",
+        "source": "character:aurora~ABCDEFGHJK"
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "note_update",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "noteRef": "example",
+        "expectedVersion": 1,
+        "changes": {
+          "title": "Example title"
+        }
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "object_custody_add",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "object": "character:aurora~ABCDEFGHJK",
+        "period": "example",
+        "custodianState": "example"
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "object_location_add",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "object": "character:aurora~ABCDEFGHJK",
+        "location": "character:aurora~ABCDEFGHJK",
+        "period": "example"
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "object_ownership_add",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "object": "character:aurora~ABCDEFGHJK",
+        "state": "example",
+        "period": "example",
+        "owners": [
+          {
+            "principal": "example"
+          }
+        ]
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "object_ownership_replace_owners",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "ownershipRef": "example",
+        "expectedVersion": 1,
+        "owners": [
+          {
+            "principal": "example"
+          }
+        ]
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "object_ownership_transfer",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "ownershipRef": "example",
+        "expectedVersion": 1,
+        "effectiveAt": "2026-09-28",
+        "newState": "example",
+        "newOwners": [
+          {
+            "principal": "example"
+          }
+        ]
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "organization_location_add",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "organization": "character:aurora~ABCDEFGHJK",
+        "location": "character:aurora~ABCDEFGHJK",
+        "period": "example"
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "organization_membership_add",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "organization": "character:aurora~ABCDEFGHJK",
+        "character": "character:aurora~ABCDEFGHJK"
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "organization_membership_transition",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "membershipRef": "example",
+        "expectedVersion": 1,
+        "effectiveAt": "2026-09-28",
+        "createReplacement": false
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "organization_membership_transitions_set",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "membershipRef": "example",
+        "expectedVersion": 1,
+        "joined": "example",
+        "left": "example"
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "ownership_principal_create",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "kind": "example"
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "project_entity_link",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "project": "character:aurora~ABCDEFGHJK",
+        "entity": "character:aurora~ABCDEFGHJK"
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "record_delete_preview",
+      "request": {
+        "ref": "character:aurora~ABCDEFGHJK"
+      },
+      "response": {
+        "target": {
+          "ref": "character:aurora~ABCDEFGHJK",
+          "kind": "Continuity",
+          "label": "example"
+        },
+        "canDelete": false,
+        "blockers": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "observedRevision": "cursor~ABCDEFGHJK"
+      }
+    },
+    {
+      "name": "record_locate",
+      "request": {
+        "ref": "character:aurora~ABCDEFGHJK"
+      },
+      "response": {
+        "ref": "character:aurora~ABCDEFGHJK",
+        "kind": "Continuity",
+        "label": "example"
+      }
+    },
+    {
+      "name": "record_restore",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "ref": "character:aurora~ABCDEFGHJK",
+        "expectedVersion": 1
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "record_snapshot_get",
+      "request": {
+        "ref": "character:aurora~ABCDEFGHJK",
+        "snapshotVersion": 1
+      },
+      "response": {
+        "overview": {
+          "summary": {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          },
+          "fields": {},
+          "sections": {},
+          "observedRevision": "cursor~ABCDEFGHJK"
+        },
+        "notes": {},
+        "snapshotVersion": 1,
+        "savedAtUtc": "example",
+        "isBaseline": false,
+        "latestRef": "example"
+      }
+    },
+    {
+      "name": "record_snapshot_list",
+      "request": {
+        "ref": "character:aurora~ABCDEFGHJK"
+      },
+      "response": {
+        "items": [
+          {
+            "snapshotVersion": 1,
+            "savedAtUtc": "example",
+            "isBaseline": false
+          }
+        ],
+        "nextBeforeVersion": 1,
+        "hasMore": false
+      }
+    },
+    {
+      "name": "record_soft_delete",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "ref": "character:aurora~ABCDEFGHJK",
+        "expectedVersion": 1
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "relationship_create",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "characters": [
+          "example"
+        ],
+        "relationshipType": "example"
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "relationship_event_add",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "relationshipRef": "example",
+        "title": "Example title",
+        "occurred": "example"
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "relationship_membership_period_add",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "relationshipRef": "example",
+        "character": "character:aurora~ABCDEFGHJK",
+        "expectedVersion": 1,
+        "period": {
+          "kind": "ExactDate",
+          "value": "2026-09-28"
+        }
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "relationship_membership_period_update",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "periodRef": "example",
+        "expectedVersion": 1,
+        "period": "example"
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "relationship_membership_transitions_set",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "periodRef": "example",
+        "expectedVersion": 1,
+        "joined": "example",
+        "left": "example"
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "relationship_merge_apply",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "sourceRef": "example",
+        "targetRef": "example",
+        "reviewToken": "example"
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "relationship_merge_preview",
+      "request": {
+        "sourceRef": "example",
+        "targetRef": "example"
+      },
+      "response": {
+        "canMerge": false,
+        "reviewToken": "example",
+        "conflicts": [
+          "example"
+        ],
+        "source": {
+          "ref": "character:aurora~ABCDEFGHJK",
+          "type": "example",
+          "characters": [
+            "example"
+          ],
+          "notes": "example",
+          "periods": [
+            {
+              "ref": "character:aurora~ABCDEFGHJK",
+              "characterRef": "example",
+              "period": {
+                "kind": "Unknown",
+                "display": "example",
+                "lower": "2026-09-28",
+                "upper": "2026-09-28",
+                "lowerInclusive": false,
+                "upperInclusive": false,
+                "calendarId": "Gregorian"
+              },
+              "notes": "example",
+              "isDeleted": false
+            }
+          ],
+          "events": [
+            {
+              "ref": "character:aurora~ABCDEFGHJK",
+              "title": "Example title",
+              "description": "example",
+              "occurred": {
+                "kind": "Unknown",
+                "display": "example",
+                "lower": "2026-09-28",
+                "upper": "2026-09-28",
+                "lowerInclusive": false,
+                "upperInclusive": false,
+                "calendarId": "Gregorian"
+              },
+              "isDeleted": false,
+              "worldEventRef": "example",
+              "projects": [
+                "example"
+              ]
+            }
+          ],
+          "claims": [
+            "example"
+          ],
+          "historyEntries": 1,
+          "images": [
+            "example"
+          ]
+        },
+        "target": {
+          "ref": "character:aurora~ABCDEFGHJK",
+          "type": "example",
+          "characters": null,
+          "notes": "example",
+          "periods": null,
+          "events": null,
+          "claims": null,
+          "historyEntries": 1,
+          "images": null
+        },
+        "preservation": "example"
+      }
+    },
+    {
+      "name": "relationship_notes_set",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "relationshipRef": "example",
+        "expectedVersion": 1,
+        "notes": "example"
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "relationship_participant_add",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "relationshipRef": "example",
+        "character": "character:aurora~ABCDEFGHJK",
+        "expectedVersion": 1
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "relationship_type_create",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "name": "Example name",
+        "isDirected": false
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "search",
+      "request": {},
+      "response": {
+        "items": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "nextCursor": "example",
+        "hasMore": false,
+        "observedRevision": "cursor~ABCDEFGHJK"
+      }
+    },
+    {
+      "name": "session_get",
+      "request": {},
+      "response": {
+        "continuityName": "Lostville",
+        "clock": {
+          "status": "example",
+          "currentTime": "2026-09-28T12:00:00-07:00",
+          "referenceTimeZoneId": "America/Vancouver",
+          "source": "character:aurora~ABCDEFGHJK"
+        }
+      }
+    },
+    {
+      "name": "session_set",
+      "request": {},
+      "response": {
+        "continuityName": "Lostville",
+        "clock": {
+          "status": "example",
+          "currentTime": "2026-09-28T12:00:00-07:00",
+          "referenceTimeZoneId": "America/Vancouver",
+          "source": "character:aurora~ABCDEFGHJK"
+        }
+      }
+    },
+    {
+      "name": "source_create",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "title": "Example title"
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "source_snapshot_add",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "sourceRef": "example",
+        "content": "Cached source text."
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "source_snapshot_view",
+      "request": {
+        "snapshotRef": "example"
+      },
+      "response": {
+        "snapshotRef": "example",
+        "text": "example",
+        "nextCursor": "example",
+        "hasMore": false,
+        "mediaType": "image/png",
+        "retrievedAtUtc": "2026-09-28T12:00:00-07:00",
+        "byteSize": 1,
+        "observedRevision": "cursor~ABCDEFGHJK"
+      }
+    },
+    {
+      "name": "source_update",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "sourceRef": "example",
+        "expectedVersion": 1,
+        "changes": {
+          "title": "Example title"
+        }
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "story_image_attach",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "owner": "example",
+        "image": {
+          "mediaType": "image/png",
+          "dataBase64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAAB"
+        }
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "tag_apply",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "tag": "example",
+        "targets": [
+          "example"
+        ],
+        "action": "Add"
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "tag_create",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "name": "Example name"
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "tag_targets",
+      "request": {
+        "tag": "example"
+      },
+      "response": {
+        "items": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "nextCursor": "example",
+        "hasMore": false,
+        "observedRevision": "cursor~ABCDEFGHJK"
+      }
+    },
+    {
+      "name": "tag_update",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "tagRef": "example",
+        "expectedVersion": 1,
+        "changes": {
+          "name": "Example name"
+        }
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "temporal_effect_preview",
+      "request": {
+        "character": "character:aurora~ABCDEFGHJK",
+        "period": "example",
+        "biologicalRate": 0,
+        "experiencedRate": 0
+      },
+      "response": {
+        "valid": false,
+        "conflicts": [
+          {
+            "code": "example",
+            "message": "example"
+          }
+        ],
+        "projectedAge": {
+          "character": {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          },
+          "status": "example",
+          "asOf": "example",
+          "referenceTimeZoneId": "America/Vancouver",
+          "calendar": {
+            "status": "example",
+            "exactYears": 1,
+            "minimumYears": 1,
+            "maximumYears": 1
+          },
+          "legal": {
+            "status": "example",
+            "exactYears": 1,
+            "minimumYears": 1,
+            "maximumYears": 1
+          },
+          "biological": {
+            "status": "example",
+            "exactYears": 1,
+            "minimumYears": 1,
+            "maximumYears": 1
+          },
+          "experienced": {
+            "status": "example",
+            "exactYears": 1,
+            "minimumYears": 1,
+            "maximumYears": 1
+          },
+          "appliedEffects": [
+            null
+          ],
+          "warnings": [
+            "example"
+          ],
+          "observedRevision": "cursor~ABCDEFGHJK"
+        },
+        "observedRevision": "cursor~ABCDEFGHJK"
+      }
+    },
+    {
+      "name": "timeline_get",
+      "request": {},
+      "response": {
+        "items": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "example",
+            "title": "Example title",
+            "summary": "example",
+            "lane": "WorldEvents",
+            "occurred": {
+              "kind": "Unknown",
+              "display": "example",
+              "lower": "2026-09-28",
+              "upper": "2026-09-28",
+              "lowerInclusive": false,
+              "upperInclusive": false,
+              "calendarId": "Gregorian"
+            },
+            "related": [
+              {
+                "ref": "character:aurora~ABCDEFGHJK",
+                "kind": "Continuity",
+                "label": "example"
+              }
+            ]
+          }
+        ],
+        "nextCursor": "example",
+        "hasMore": false,
+        "undated": [
+          null
+        ],
+        "clock": {
+          "status": "example",
+          "currentTime": "2026-09-28T12:00:00-07:00",
+          "referenceTimeZoneId": "America/Vancouver",
+          "source": "character:aurora~ABCDEFGHJK"
+        },
+        "observedRevision": "cursor~ABCDEFGHJK"
+      }
+    },
+    {
+      "name": "variant_group_create",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "entityKind": "Project"
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "variant_group_update",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "variantGroupRef": "example",
+        "expectedVersion": 1,
+        "changes": {
+          "name": "Example name"
+        }
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "vault_backup_create",
+      "request": {
+        "mutationToken": "example-20260928-001"
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "vault_health",
+      "request": {},
+      "response": {
+        "ready": false,
+        "toolSurfaceVersion": "example",
+        "schemaMigration": "example",
+        "pendingWrites": 1,
+        "databaseCapacityBand": "example",
+        "imageRenditionBytes": 1,
+        "lastSuccessfulBackupUtc": "example",
+        "issues": [
+          {
+            "code": "example",
+            "message": "example"
+          }
+        ],
+        "observedRevision": "cursor~ABCDEFGHJK"
+      }
+    },
+    {
+      "name": "world_event_location_add",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "worldEvent": "character:aurora~ABCDEFGHJK",
+        "location": "character:aurora~ABCDEFGHJK"
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
+      "name": "world_event_participant_add",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "worldEvent": "character:aurora~ABCDEFGHJK",
+        "participant": "character:aurora~ABCDEFGHJK"
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    }
+  ]
+}

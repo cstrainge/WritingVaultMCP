@@ -1,0 +1,30 @@
+{
+  "manifestVersion": 1,
+  "status": "template-only",
+  "sourceCommit": null,
+  "builtAtUtc": null,
+  "toolSurfaceVersion": "4.0",
+  "schemaMigrationId": null,
+  "artifacts": {
+    "server": { "relativePath": "bin/Release/net10.0-windows/WritingVaultMcp.dll", "sha256": null },
+    "client": { "relativePath": "WritingVault.Client/bin/Release/net10.0-windows/WritingVault.Client.dll", "sha256": null },
+    "viewer": { "relativePath": "WritingVault.Web/bin/Release/net10.0-windows/WritingVault.Web.dll", "sha256": null },
+    "viewerScript": { "relativePath": "WritingVault.Web/bin/Release/net10.0-windows/wwwroot/app.js", "sha256": null },
+    "viewerStyles": { "relativePath": "WritingVault.Web/bin/Release/net10.0-windows/wwwroot/app.css", "sha256": null },
+    "viewerHtml": { "relativePath": "WritingVault.Web/bin/Release/net10.0-windows/wwwroot/index.html", "sha256": null },
+    "tray": { "relativePath": "WritingVault.Tray/bin/Release/net10.0-windows/WritingVault.Tray.exe", "sha256": null },
+    "trayIcon": { "relativePath": "WritingVault.Tray/bin/Release/net10.0-windows/Assets/WritingVault.ico", "sha256": null },
+    "startupController": { "relativePath": "tools/Configure-WritingVaultStartup.ps1", "sha256": null },
+    "viewerLauncher": { "relativePath": "tools/Run-WritingVaultWeb.ps1", "sha256": null },
+    "tunnelLauncher": { "relativePath": "tools/Run-WritingVaultTunnel.ps1", "sha256": null },
+    "v4Contract": { "relativePath": "contracts/v4/tool-schemas.json", "sha256": null },
+    "v3CompatibilityContract": { "relativePath": "contracts/v3/tool-schemas.json", "sha256": null }
+  },
+  "verification": {
+    "debugTestsPassed": null,
+    "releaseTestsPassed": null,
+    "schemaAndIntegrityPassed": null,
+    "backupRestorePassed": null,
+    "productionSmokePassed": null
+  }
+}

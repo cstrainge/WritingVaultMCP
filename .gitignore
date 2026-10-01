@@ -1,0 +1,35 @@
+# Build and test output
+**/bin/
+**/obj/
+**/TestResults/
+.test-output/
+artifacts/
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+
+# Local configuration and downloaded tunnel clients
+appsettings.json
+.tunnel-client/
+mcp-tunnel/
+
+# User-authored story/feedback and local recovery evidence pending staging review
+timeline.md
+feedback.md
+PHASE_0_BASELINE.md
+
+# Live and disposable Access files, including the unused historical template
+*.accdb
+*.laccdb
+*.ldb
+*.mdb
+*.writingvault.owner.lock
+usability/
+
+# Local runtime files
+*.log
+*.pid
+*.tmp
+*.bak

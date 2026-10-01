@@ -1,0 +1,1527 @@
+{
+  "surfaceVersion": "4.0",
+  "schemas": {
+    "referenceSummary": {
+      "type": "object",
+      "properties": {
+        "ref": {
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "Continuity",
+            "Project",
+            "Location",
+            "Character",
+            "Organization",
+            "Object",
+            "WorldEvent",
+            "Source",
+            "SourceSnapshot",
+            "Claim",
+            "Tag",
+            "Note",
+            "Image",
+            "VariantGroup",
+            "Relationship",
+            "RelationshipType",
+            "Residence",
+            "Membership",
+            "OrganizationLocation",
+            "Ownership",
+            "OwnershipPrincipal",
+            "Custody",
+            "ObjectLocation",
+            "EntityEvent",
+            "TemporalEffect",
+            "RelationshipEvent",
+            "RelationshipMembershipPeriod",
+            "RelationshipParticipant"
+          ]
+        },
+        "label": {
+          "type": "string",
+          "maxLength": 255
+        },
+        "context": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null
+        },
+        "continuityName": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null
+        },
+        "version": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "default": null
+        },
+        "isDeleted": {
+          "type": "boolean",
+          "default": false
+        },
+        "associationRole": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null
+        },
+        "associationNotes": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "ref",
+        "kind",
+        "label"
+      ],
+      "additionalProperties": false
+    },
+    "page": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ref": {
+                "type": "string"
+              },
+              "kind": {
+                "enum": [
+                  "Continuity",
+                  "Project",
+                  "Location",
+                  "Character",
+                  "Organization",
+                  "Object",
+                  "WorldEvent",
+                  "Source",
+                  "SourceSnapshot",
+                  "Claim",
+                  "Tag",
+                  "Note",
+                  "Image",
+                  "VariantGroup",
+                  "Relationship",
+                  "RelationshipType",
+                  "Residence",
+                  "Membership",
+                  "OrganizationLocation",
+                  "Ownership",
+                  "OwnershipPrincipal",
+                  "Custody",
+                  "ObjectLocation",
+                  "EntityEvent",
+                  "TemporalEffect",
+                  "RelationshipEvent",
+                  "RelationshipMembershipPeriod",
+                  "RelationshipParticipant"
+                ]
+              },
+              "label": {
+                "type": "string",
+                "maxLength": 255
+              },
+              "context": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
+              },
+              "continuityName": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
+              },
+              "version": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "default": null
+              },
+              "isDeleted": {
+                "type": "boolean",
+                "default": false
+              },
+              "associationRole": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
+              },
+              "associationNotes": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
+              }
+            },
+            "required": [
+              "ref",
+              "kind",
+              "label"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 100
+        },
+        "nextCursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "hasMore": {
+          "type": "boolean"
+        },
+        "observedRevision": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "items",
+        "nextCursor",
+        "hasMore",
+        "observedRevision"
+      ],
+      "additionalProperties": false
+    },
+    "section": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ref": {
+                "type": "string"
+              },
+              "kind": {
+                "enum": [
+                  "Continuity",
+                  "Project",
+                  "Location",
+                  "Character",
+                  "Organization",
+                  "Object",
+                  "WorldEvent",
+                  "Source",
+                  "SourceSnapshot",
+                  "Claim",
+                  "Tag",
+                  "Note",
+                  "Image",
+                  "VariantGroup",
+                  "Relationship",
+                  "RelationshipType",
+                  "Residence",
+                  "Membership",
+                  "OrganizationLocation",
+                  "Ownership",
+                  "OwnershipPrincipal",
+                  "Custody",
+                  "ObjectLocation",
+                  "EntityEvent",
+                  "TemporalEffect",
+                  "RelationshipEvent",
+                  "RelationshipMembershipPeriod",
+                  "RelationshipParticipant"
+                ]
+              },
+              "label": {
+                "type": "string",
+                "maxLength": 255
+              },
+              "context": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
+              },
+              "continuityName": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
+              },
+              "version": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "default": null
+              },
+              "isDeleted": {
+                "type": "boolean",
+                "default": false
+              },
+              "associationRole": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
+              },
+              "associationNotes": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
+              }
+            },
+            "required": [
+              "ref",
+              "kind",
+              "label"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 100
+        },
+        "nextCursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "hasMore": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "items",
+        "nextCursor",
+        "hasMore"
+      ],
+      "additionalProperties": false
+    },
+    "storyDateInput": {
+      "description": "A compact exact date string, compact year object, or full timezone-free fuzzy story-date object.",
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "Year"
+            },
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9]{4}$"
+            },
+            "calendarId": {
+              "type": "string",
+              "default": "Gregorian"
+            }
+          },
+          "required": [
+            "kind",
+            "value"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "Unknown",
+                "ExactInstant",
+                "ExactDate",
+                "Month",
+                "Year",
+                "Circa",
+                "KnownRange",
+                "UncertainRange",
+                "Before",
+                "After"
+              ]
+            },
+            "value": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "lower": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "upper": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "lowerInclusive": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "upperInclusive": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "originalText": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 4000
+            },
+            "calendarId": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "default": "Gregorian"
+            }
+          },
+          "required": [
+            "kind"
+          ]
+        }
+      ]
+    },
+    "storyDateView": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "enum": [
+            "Unknown",
+            "ExactInstant",
+            "ExactDate",
+            "Month",
+            "Year",
+            "Circa",
+            "Range",
+            "KnownRange",
+            "UncertainRange",
+            "Before",
+            "After"
+          ]
+        },
+        "display": {
+          "type": "string"
+        },
+        "lower": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "upper": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "lowerInclusive": {
+          "type": "boolean"
+        },
+        "upperInclusive": {
+          "type": "boolean"
+        },
+        "calendarId": {
+          "type": "string"
+        },
+        "originalText": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "kind",
+        "display",
+        "lower",
+        "upper",
+        "lowerInclusive",
+        "upperInclusive",
+        "calendarId"
+      ],
+      "additionalProperties": false
+    },
+    "error": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "retryable": {
+          "type": "boolean",
+          "default": false
+        },
+        "details": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "object",
+            "properties": {
+              "field": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
+              },
+              "reason": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
+              },
+              "rejectedValue": {
+                "default": null
+              }
+            },
+            "additionalProperties": false
+          },
+          "default": null
+        },
+        "candidates": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "object",
+            "properties": {
+              "ref": {
+                "type": "string"
+              },
+              "kind": {
+                "enum": [
+                  "Continuity",
+                  "Project",
+                  "Location",
+                  "Character",
+                  "Organization",
+                  "Object",
+                  "WorldEvent",
+                  "Source",
+                  "SourceSnapshot",
+                  "Claim",
+                  "Tag",
+                  "Note",
+                  "Image",
+                  "VariantGroup",
+                  "Relationship",
+                  "RelationshipType",
+                  "Residence",
+                  "Membership",
+                  "OrganizationLocation",
+                  "Ownership",
+                  "OwnershipPrincipal",
+                  "Custody",
+                  "ObjectLocation",
+                  "EntityEvent",
+                  "TemporalEffect",
+                  "RelationshipEvent",
+                  "RelationshipMembershipPeriod",
+                  "RelationshipParticipant"
+                ]
+              },
+              "label": {
+                "type": "string",
+                "maxLength": 255
+              },
+              "context": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
+              },
+              "continuityName": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
+              },
+              "version": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "default": null
+              },
+              "isDeleted": {
+                "type": "boolean",
+                "default": false
+              },
+              "associationRole": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
+              },
+              "associationNotes": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
+              }
+            },
+            "required": [
+              "ref",
+              "kind",
+              "label"
+            ],
+            "additionalProperties": false
+          },
+          "default": null,
+          "maxItems": 10
+        },
+        "recovery": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ],
+      "additionalProperties": false
+    },
+    "mutationResult": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "code": {
+          "type": "string"
+        },
+        "affected": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ref": {
+                "type": "string"
+              },
+              "kind": {
+                "enum": [
+                  "Continuity",
+                  "Project",
+                  "Location",
+                  "Character",
+                  "Organization",
+                  "Object",
+                  "WorldEvent",
+                  "Source",
+                  "SourceSnapshot",
+                  "Claim",
+                  "Tag",
+                  "Note",
+                  "Image",
+                  "VariantGroup",
+                  "Relationship",
+                  "RelationshipType",
+                  "Residence",
+                  "Membership",
+                  "OrganizationLocation",
+                  "Ownership",
+                  "OwnershipPrincipal",
+                  "Custody",
+                  "ObjectLocation",
+                  "EntityEvent",
+                  "TemporalEffect",
+                  "RelationshipEvent",
+                  "RelationshipMembershipPeriod",
+                  "RelationshipParticipant"
+                ]
+              },
+              "label": {
+                "type": "string",
+                "maxLength": 255
+              },
+              "context": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
+              },
+              "continuityName": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
+              },
+              "version": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "default": null
+              },
+              "isDeleted": {
+                "type": "boolean",
+                "default": false
+              },
+              "associationRole": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
+              },
+              "associationNotes": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
+              }
+            },
+            "required": [
+              "ref",
+              "kind",
+              "label"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "replayed": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null
+        },
+        "error": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "code": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            },
+            "retryable": {
+              "type": "boolean",
+              "default": false
+            },
+            "details": {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "type": "object",
+                "properties": {
+                  "field": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "default": null
+                  },
+                  "reason": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "default": null
+                  },
+                  "rejectedValue": {
+                    "default": null
+                  }
+                },
+                "additionalProperties": false
+              },
+              "default": null
+            },
+            "candidates": {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "$ref": "#/properties/affected/items"
+              },
+              "default": null,
+              "maxItems": 10
+            },
+            "recovery": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "default": null
+            }
+          },
+          "required": [
+            "code",
+            "message"
+          ],
+          "additionalProperties": false,
+          "default": null
+        },
+        "backup": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "createdAtUtc": {
+              "type": "string"
+            },
+            "databaseBytes": {
+              "type": "integer"
+            },
+            "databaseSha256": {
+              "type": "string"
+            },
+            "schemaMigration": {
+              "type": "string"
+            },
+            "schemaValid": {
+              "type": "boolean"
+            },
+            "integrityValid": {
+              "type": "boolean"
+            },
+            "retentionCount": {
+              "type": "integer"
+            },
+            "assetCount": {
+              "type": "integer"
+            },
+            "assetBytes": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "createdAtUtc",
+            "databaseBytes",
+            "databaseSha256",
+            "schemaMigration",
+            "schemaValid",
+            "integrityValid",
+            "retentionCount",
+            "assetCount",
+            "assetBytes"
+          ],
+          "additionalProperties": false,
+          "default": null
+        }
+      },
+      "required": [
+        "success",
+        "code",
+        "affected",
+        "replayed"
+      ],
+      "additionalProperties": false
+    },
+    "clock": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "currentTime": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "referenceTimeZoneId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source": {
+          "type": "string"
+        },
+        "localDisplay": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null
+        },
+        "currentDate": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date",
+          "default": null
+        }
+      },
+      "required": [
+        "status",
+        "currentTime",
+        "referenceTimeZoneId",
+        "source"
+      ],
+      "additionalProperties": false
+    },
+    "timelineItem": {
+      "type": "object",
+      "properties": {
+        "ref": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 255
+        },
+        "summary": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "lane": {
+          "enum": [
+            "WorldEvents",
+            "EntityEvents",
+            "Characters",
+            "Relationships",
+            "Residences",
+            "Memberships",
+            "OrganizationLocations",
+            "Ownership",
+            "Custody",
+            "ObjectLocations",
+            "TemporalEffects",
+            "RelationshipEvents"
+          ]
+        },
+        "occurred": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "enum": [
+                "Unknown",
+                "ExactInstant",
+                "ExactDate",
+                "Month",
+                "Year",
+                "Circa",
+                "Range",
+                "KnownRange",
+                "UncertainRange",
+                "Before",
+                "After"
+              ]
+            },
+            "display": {
+              "type": "string"
+            },
+            "lower": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "upper": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "lowerInclusive": {
+              "type": "boolean"
+            },
+            "upperInclusive": {
+              "type": "boolean"
+            },
+            "calendarId": {
+              "type": "string"
+            },
+            "originalText": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "default": null
+            }
+          },
+          "required": [
+            "kind",
+            "display",
+            "lower",
+            "upper",
+            "lowerInclusive",
+            "upperInclusive",
+            "calendarId"
+          ],
+          "additionalProperties": false
+        },
+        "related": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ref": {
+                "type": "string"
+              },
+              "kind": {
+                "enum": [
+                  "Continuity",
+                  "Project",
+                  "Location",
+                  "Character",
+                  "Organization",
+                  "Object",
+                  "WorldEvent",
+                  "Source",
+                  "SourceSnapshot",
+                  "Claim",
+                  "Tag",
+                  "Note",
+                  "Image",
+                  "VariantGroup",
+                  "Relationship",
+                  "RelationshipType",
+                  "Residence",
+                  "Membership",
+                  "OrganizationLocation",
+                  "Ownership",
+                  "OwnershipPrincipal",
+                  "Custody",
+                  "ObjectLocation",
+                  "EntityEvent",
+                  "TemporalEffect",
+                  "RelationshipEvent",
+                  "RelationshipMembershipPeriod",
+                  "RelationshipParticipant"
+                ]
+              },
+              "label": {
+                "type": "string",
+                "maxLength": 255
+              },
+              "context": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
+              },
+              "continuityName": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
+              },
+              "version": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "default": null
+              },
+              "isDeleted": {
+                "type": "boolean",
+                "default": false
+              },
+              "associationRole": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
+              },
+              "associationNotes": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
+              }
+            },
+            "required": [
+              "ref",
+              "kind",
+              "label"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "narrativeOrder": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "default": null
+        },
+        "isDeleted": {
+          "type": "boolean",
+          "default": false
+        },
+        "warnings": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          },
+          "default": null
+        },
+        "projects": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/properties/related/items"
+          },
+          "default": null,
+          "maxItems": 100
+        },
+        "containsHighlight": {
+          "type": "boolean",
+          "default": false
+        },
+        "boundary": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null
+        },
+        "boundaryDate": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "kind": {
+              "enum": [
+                "Unknown",
+                "ExactInstant",
+                "ExactDate",
+                "Month",
+                "Year",
+                "Circa",
+                "Range",
+                "KnownRange",
+                "UncertainRange",
+                "Before",
+                "After"
+              ]
+            },
+            "display": {
+              "type": "string"
+            },
+            "lower": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "upper": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "lowerInclusive": {
+              "type": "boolean"
+            },
+            "upperInclusive": {
+              "type": "boolean"
+            },
+            "calendarId": {
+              "type": "string"
+            },
+            "originalText": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "default": null
+            }
+          },
+          "required": [
+            "kind",
+            "display",
+            "lower",
+            "upper",
+            "lowerInclusive",
+            "upperInclusive",
+            "calendarId"
+          ],
+          "additionalProperties": false,
+          "default": null
+        },
+        "hasCustomDescription": {
+          "type": "boolean",
+          "default": false
+        },
+        "isMembershipTransition": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "required": [
+        "ref",
+        "kind",
+        "title",
+        "summary",
+        "lane",
+        "occurred",
+        "related"
+      ],
+      "additionalProperties": false
+    },
+    "recordOverview": {
+      "type": "object",
+      "properties": {
+        "summary": {
+          "type": "object",
+          "properties": {
+            "ref": {
+              "type": "string"
+            },
+            "kind": {
+              "enum": [
+                "Continuity",
+                "Project",
+                "Location",
+                "Character",
+                "Organization",
+                "Object",
+                "WorldEvent",
+                "Source",
+                "SourceSnapshot",
+                "Claim",
+                "Tag",
+                "Note",
+                "Image",
+                "VariantGroup",
+                "Relationship",
+                "RelationshipType",
+                "Residence",
+                "Membership",
+                "OrganizationLocation",
+                "Ownership",
+                "OwnershipPrincipal",
+                "Custody",
+                "ObjectLocation",
+                "EntityEvent",
+                "TemporalEffect",
+                "RelationshipEvent",
+                "RelationshipMembershipPeriod",
+                "RelationshipParticipant"
+              ]
+            },
+            "label": {
+              "type": "string",
+              "maxLength": 255
+            },
+            "context": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "default": null
+            },
+            "continuityName": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "default": null
+            },
+            "version": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "default": null
+            },
+            "isDeleted": {
+              "type": "boolean",
+              "default": false
+            },
+            "associationRole": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "default": null
+            },
+            "associationNotes": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "default": null
+            }
+          },
+          "required": [
+            "ref",
+            "kind",
+            "label"
+          ],
+          "additionalProperties": false
+        },
+        "fields": {
+          "type": "object"
+        },
+        "sections": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "ref": {
+                      "type": "string"
+                    },
+                    "kind": {
+                      "enum": [
+                        "Continuity",
+                        "Project",
+                        "Location",
+                        "Character",
+                        "Organization",
+                        "Object",
+                        "WorldEvent",
+                        "Source",
+                        "SourceSnapshot",
+                        "Claim",
+                        "Tag",
+                        "Note",
+                        "Image",
+                        "VariantGroup",
+                        "Relationship",
+                        "RelationshipType",
+                        "Residence",
+                        "Membership",
+                        "OrganizationLocation",
+                        "Ownership",
+                        "OwnershipPrincipal",
+                        "Custody",
+                        "ObjectLocation",
+                        "EntityEvent",
+                        "TemporalEffect",
+                        "RelationshipEvent",
+                        "RelationshipMembershipPeriod",
+                        "RelationshipParticipant"
+                      ]
+                    },
+                    "label": {
+                      "type": "string",
+                      "maxLength": 255
+                    },
+                    "context": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": null
+                    },
+                    "continuityName": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": null
+                    },
+                    "version": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ],
+                      "default": null
+                    },
+                    "isDeleted": {
+                      "type": "boolean",
+                      "default": false
+                    },
+                    "associationRole": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": null
+                    },
+                    "associationNotes": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": null
+                    }
+                  },
+                  "required": [
+                    "ref",
+                    "kind",
+                    "label"
+                  ],
+                  "additionalProperties": false
+                },
+                "maxItems": 100
+              },
+              "nextCursor": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "hasMore": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "items",
+              "nextCursor",
+              "hasMore"
+            ],
+            "additionalProperties": false
+          },
+          "maxProperties": 20
+        },
+        "observedRevision": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "summary",
+        "fields",
+        "sections",
+        "observedRevision"
+      ],
+      "additionalProperties": false
+    },
+    "changesResult": {
+      "type": "object",
+      "properties": {
+        "cursor": {
+          "type": "string",
+          "maxLength": 512
+        },
+        "changes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "scope": {
+                "type": "string"
+              },
+              "kind": {
+                "type": "string"
+              },
+              "ref": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "action": {
+                "type": "string"
+              },
+              "timelineAffected": {
+                "type": "boolean"
+              },
+              "fullVisibleRefreshRequired": {
+                "type": "boolean",
+                "default": false
+              }
+            },
+            "required": [
+              "scope",
+              "kind",
+              "ref",
+              "action",
+              "timelineAffected"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "heartbeat": {
+          "type": "boolean"
+        },
+        "cursorExpired": {
+          "type": "boolean"
+        },
+        "observedRevision": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "cursor",
+        "changes",
+        "heartbeat",
+        "cursorExpired",
+        "observedRevision"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

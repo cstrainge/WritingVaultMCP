@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/tests/">
+    <Project Path="tests/WritingVaultMcp.Tests/WritingVaultMcp.Tests.csproj" />
+  </Folder>
+  <Project Path="WritingVault.Client/WritingVault.Client.csproj" />
+  <Project Path="WritingVault.Web/WritingVault.Web.csproj" />
+  <Project Path="WritingVault.Tray/WritingVault.Tray.csproj" />
+  <Project Path="WritingVaultMcp.csproj" />
+</Solution>

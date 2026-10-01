@@ -1,0 +1,16 @@
+* text=auto eol=lf
+
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+*.md text eol=lf whitespace=-blank-at-eol,-blank-at-eof
+
+*.accdb binary
+*.laccdb binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
+*.dll binary
+*.exe binary

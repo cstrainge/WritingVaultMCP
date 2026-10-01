@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.12" />
+    <PackageReference Include="ModelContextProtocol" Version="2.2.0" />
+    <PackageReference Include="SkiaSharp" Version="4.152.1" />
+    <PackageReference Include="System.Data.OleDb" Version="10.0.12" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json" CopyToOutputDirectory="PreserveNewest" />
+    <InternalsVisibleTo Include="WritingVaultMcp.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="tests\**\*.cs" />
+    <Compile Remove="WritingVault.Client\**\*.cs" />
+    <Compile Remove="WritingVault.Web\**\*.cs" />
+    <Compile Remove="WritingVault.Tray\**\*.cs" />
+    <Compile Remove="tools\TimelineScaleFixture\**\*.cs" />
+    <Compile Remove="artifacts\**\*.cs" />
+    <None Remove="tests\**\*" />
+    <None Remove="WritingVault.Client\**\*" />
+    <None Remove="WritingVault.Web\**\*" />
+    <None Remove="WritingVault.Tray\**\*" />
+    <None Remove="tools\TimelineScaleFixture\**\*" />
+    <None Remove="artifacts\**\*" />
+  </ItemGroup>
+
+</Project>

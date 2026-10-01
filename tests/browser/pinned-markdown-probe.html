@@ -1,0 +1,27 @@
+<!doctype html><meta charset="utf-8"><title>Pinned Markdown probe</title>
+<script src="../../WritingVault.Web/wwwroot/markdown.js"></script>
+<div id="note"></div><pre id="result"></pre>
+<script>
+  const seen = [];
+  WritingVaultMarkdown.configure({
+    image(link, image, reference, revision) {
+      seen.push({ reference, revision });
+      link.href = '/image/' + reference + (revision === null ? '' : '?v=' + revision);
+    },
+    record(link, reference) { seen.push({ record: reference }); }
+  });
+  const note = document.getElementById('note');
+  WritingVaultMarkdown.renderMarkdown(note,
+    '![Old](vault-image:story-image:portrait~ABCDEFGH?v=2){width=50%}\n' +
+    '![Current](vault-image:story-image:portrait~ABCDEFGH){width=300px}\n' +
+    '![Bad](vault-image:story-image:portrait~ABCDEFGH?v=0){width=300px}\n' +
+    '![Remote](https://example.test/image.png)\n' +
+    '[Friend](vault-record:character:friend~ABCDEFGH)');
+  document.getElementById('result').textContent = JSON.stringify({
+    seen,
+    images: note.querySelectorAll('img').length,
+    pinned: note.querySelector('a[href$="?v=2"] img')?.style.width,
+    invalidAsText: note.textContent.includes('vault-image:story-image:portrait~ABCDEFGH?v=0'),
+    remoteAsText: note.textContent.includes('https://example.test/image.png')
+  });
+</script>

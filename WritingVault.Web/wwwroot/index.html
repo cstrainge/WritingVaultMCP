@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en" data-theme="system">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Writer's Vault</title>
+  <link rel="stylesheet" href="/app.css">
+  <script src="/story-dates.js" defer></script>
+  <script src="/timeline.js" defer></script>
+  <script src="/markdown.js" defer></script>
+  <script src="/story-time-cookies.js" defer></script>
+  <script src="/record-pages.js" defer></script>
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="stale-banner" class="stale-banner" role="alert" hidden>
+    <strong>Updates paused — displayed data may be stale.</strong>
+    <span id="stale-detail">Trying to reconnect…</span>
+  </div>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Vault navigation">
+      <a class="brand" href="/" data-nav>
+        <span class="brand-mark" aria-hidden="true">W</span>
+        <span><strong>Writer's Vault</strong><small>Story companion</small></span>
+      </a>
+      <label class="field-label" for="continuity">Continuity</label>
+      <select id="continuity"><option value="">Choose a continuity…</option></select>
+      <nav class="primary-nav">
+        <a href="/" data-view="overview" class="active"><span class="nav-icon" aria-hidden="true">⌂</span><span class="nav-label">Overview</span></a>
+        <a href="/#characters" data-view="Character"><span class="nav-icon" aria-hidden="true">◎</span><span class="nav-label">Characters</span></a>
+        <a href="/#relationships" data-view="Relationship"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="5" cy="12" r="2.5"/><circle cx="19" cy="12" r="2.5"/><path d="M7.5 12h9"/></svg></span><span class="nav-label">Relationships</span></a>
+        <a href="/#locations" data-view="Location"><span class="nav-icon" aria-hidden="true">◇</span><span class="nav-label">Locations</span></a>
+        <a href="/#projects" data-view="Project"><span class="nav-icon" aria-hidden="true">▤</span><span class="nav-label">Projects</span></a>
+        <a href="/#events" data-view="WorldEvent"><span class="nav-icon" aria-hidden="true">↝</span><span class="nav-label">Events</span></a>
+        <a href="/#timeline" data-view="timeline"><span class="nav-icon" aria-hidden="true">▥</span><span class="nav-label">Timeline</span></a>
+        <a href="/#organizations" data-view="Organization"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="6" r="2"/><circle cx="5" cy="9" r="2"/><circle cx="19" cy="9" r="2"/><path d="M8 20v-2a4 4 0 0 1 8 0v2M2 20v-3a4 4 0 0 1 4-4c1 0 2 .4 2.7 1M22 20v-3a4 4 0 0 0-4-4c-1 0-2 .4-2.7 1"/></svg></span><span class="nav-label">Organizations</span></a>
+        <a href="/#objects" data-view="Object"><span class="nav-icon" aria-hidden="true">◇</span><span class="nav-label">Objects</span></a>
+        <a href="/#sources" data-view="Source"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M6 3h9l4 4v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/><path d="M14 3v5h5M8 12h8M8 16h8"/></svg></span><span class="nav-label">Sources</span></a>
+        <a href="/#images" data-view="images"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8" cy="9" r="1.5"/><path d="m4 18 5-5 4 3 3-4 5 5"/></svg></span><span class="nav-label">Images</span></a>
+        <a href="/#tags" data-view="Tag"><span class="nav-icon" aria-hidden="true">#</span><span class="nav-label">Tags</span></a>
+        <a href="/#deleted" data-view="deleted"><span class="nav-icon" aria-hidden="true">↺</span><span class="nav-label">Deleted records</span></a>
+      </nav>
+      <div class="sidebar-foot">
+        <div id="live-state" class="live-state paused"><span></span><strong>Connecting</strong></div>
+        <button id="theme" class="quiet-button" type="button" aria-label="Change color theme">Theme: System</button>
+      </div>
+    </aside>
+    <div class="workspace">
+      <header class="topbar">
+        <button id="menu" class="icon-button" type="button" aria-label="Open navigation" aria-expanded="false">☰</button>
+        <form id="search-form" class="search" role="search">
+          <label class="sr-only" for="search">Search the selected continuity</label>
+          <span aria-hidden="true">⌕</span>
+          <input id="search" type="search" autocomplete="off" placeholder="Search people, places, events, notes…" disabled>
+          <kbd>Ctrl K</kbd>
+        </form>
+        <span id="scope-name" class="scope-name">No continuity selected</span>
+      </header>
+      <main id="main" tabindex="-1">
+        <p id="time-storage-warning" class="time-storage-warning" role="alert" hidden></p>
+        <section id="loading" class="state-card" aria-live="polite">
+          <div class="spinner" aria-hidden="true"></div>
+          <h1>Opening your Vault</h1>
+          <p>Connecting to your Vault.</p>
+        </section>
+        <section id="error" class="state-card error-card" hidden>
+          <span class="state-icon" aria-hidden="true">!</span>
+          <h1>The Vault viewer needs attention</h1>
+          <p id="error-message"></p>
+          <button id="retry" class="primary-button" type="button">Try again</button>
+        </section>
+        <section id="welcome" hidden>
+          <p class="eyebrow">Your story universe, at a glance</p>
+          <h1>Select a continuity</h1>
+          <p class="lede">Choose a world from the sidebar to browse its people, places, events, and connected source material.</p>
+          <div id="continuity-cards" class="card-grid"></div>
+          <button id="more-continuities" class="quiet-button more-button" type="button" hidden>Load more continuities</button>
+        </section>
+        <section id="overview" hidden aria-live="polite">
+          <div class="hero">
+            <div>
+              <p class="eyebrow">Continuity overview</p>
+              <h1 id="overview-title"></h1>
+              <p id="overview-description" class="lede"></p>
+            </div>
+            <div class="hero-meta">
+              <button id="clock" class="clock-button" type="button" disabled></button>
+            </div>
+          </div>
+          <div class="section-heading"><div><p class="eyebrow">Explore</p><h2>Inside this continuity</h2></div><span id="refresh-time"></span></div>
+          <div id="section-grid" class="card-grid"></div>
+          <section id="overview-image-section" class="record-section" hidden><h2>Images</h2><div id="overview-gallery" class="gallery"></div></section>
+          <section class="record-section continuity-notes"><div class="section-heading"><div><p class="eyebrow">World rules and working thoughts</p><h2>Continuity notes</h2></div></div><div id="continuity-note-list" class="result-list"></div><button id="more-continuity-notes" class="quiet-button" type="button" hidden>Load more notes</button></section>
+        </section>
+        <section id="results" hidden aria-live="polite">
+          <div class="section-heading"><div><p class="eyebrow">Universal search</p><h1 id="results-title">Search results</h1></div><button id="clear-search" class="quiet-button" type="button">Clear</button></div>
+          <div class="result-filters"><label for="result-kind">Record type</label><select id="result-kind"><option value="">All record types</option><option value="Character">Characters</option><option value="Relationship">Relationships</option><option value="Project">Projects</option><option value="WorldEvent">World events</option><option value="Location">Locations</option><option value="Organization">Organizations</option><option value="Object">Objects</option><option value="Source">Sources</option><option value="Tag">Tags</option><option value="Note">Notes</option><option value="Claim">Claims</option><option value="SourceSnapshot">Source snapshots</option><option value="VariantGroup">Variant groups</option><option value="EntityEvent">Entity events</option></select><label for="result-deletion">Show</label><select id="result-deletion"><option value="Active">Active</option><option value="Deleted">Deleted</option><option value="All">Active and deleted</option></select></div>
+          <div id="result-list" class="result-list"></div>
+          <button id="more-results" class="quiet-button more-button" type="button" hidden>Load more results</button>
+        </section>
+        <section id="images" hidden aria-live="polite">
+          <div class="record-hero"><div><p class="eyebrow">Vault-wide lookup</p><h1>Images</h1><p class="lede">Find an image in any continuity and copy its stable Markdown reference for a note.</p></div></div>
+          <form id="image-search-form" class="image-search-form" role="search"><label for="image-search">Find images</label><div><input id="image-search" type="search" autocomplete="off" placeholder="Title, caption, or alt text"><button class="primary-button" type="submit">Search images</button></div></form>
+          <p id="image-search-status" class="image-search-status" role="status"></p>
+          <div id="image-results" class="gallery"></div>
+          <button id="image-more" class="quiet-button more-button" type="button" hidden>Load more images</button>
+        </section>
+        <section id="image-detail" hidden aria-live="polite">
+          <div class="record-hero"><div><p class="eyebrow">Vault image</p><h1 id="image-detail-title">Image</h1><p id="image-detail-context" class="lede"></p></div></div>
+          <p id="image-version-banner" class="historical-notice" hidden><span id="image-version-text"></span> <a id="image-latest" href="#">View latest</a></p>
+          <div class="image-detail-toolbar" role="toolbar" aria-label="Image viewing controls">
+            <button id="image-fit" class="quiet-button" type="button">Fit to screen</button>
+            <button id="image-native" class="quiet-button" type="button">Actual size</button>
+            <button id="image-zoom-out" class="quiet-button" type="button" aria-label="Zoom out">−</button>
+            <button id="image-zoom-in" class="quiet-button" type="button" aria-label="Zoom in">+</button>
+            <button id="image-copy-current" class="quiet-button" type="button">Copy current link</button>
+            <button id="image-copy-pinned" class="quiet-button" type="button">Copy pinned link</button>
+            <span id="image-zoom-level" role="status">Fit</span>
+          </div>
+          <div id="image-detail-stage" class="image-detail-stage" role="region" tabindex="0" aria-label="Full-resolution Vault image; scroll to pan when zoomed"><img id="image-detail-picture" alt=""></div>
+          <p id="image-detail-status" role="status"></p>
+          <section class="record-section"><h2>Image details</h2><dl id="image-detail-fields" class="image-detail-fields"></dl></section>
+          <section class="record-section"><h2>Content revisions</h2><div id="image-revisions" class="image-revisions"></div></section>
+        </section>
+        <section id="timeline" hidden aria-live="polite">
+          <div class="record-hero"><div><p class="eyebrow">Continuity chronology</p><h1>Timeline</h1><p class="lede">Events, people, relationships, and changing places in one view.</p></div><button id="timeline-clock" class="clock-button" type="button" aria-label="Set story time for this browser tab"></button></div>
+          <div class="timeline-toolbar">
+            <label for="timeline-layout">Graph layout</label><select id="timeline-layout"><option value="Combined">Combined</option><option value="Grouped">Grouped by type</option></select>
+            <label for="timeline-mode">Table order</label><select id="timeline-mode"><option value="Calendar">Calendar</option><option value="Narrative">Narrative</option></select>
+            <button id="timeline-pan-left" class="quiet-button" type="button" aria-label="Pan earlier">← Earlier</button>
+            <button id="timeline-zoom-in" class="quiet-button" type="button">Zoom in</button>
+            <button id="timeline-zoom-out" class="quiet-button" type="button">Zoom out</button>
+            <button id="timeline-pan-right" class="quiet-button" type="button" aria-label="Pan later">Later →</button>
+            <label for="timeline-range-from">From</label><input id="timeline-range-from" type="date" min="0001-01-01" max="9999-12-30">
+            <label for="timeline-range-to">To</label><input id="timeline-range-to" type="date" min="0001-01-01" max="9999-12-30">
+            <button id="timeline-apply-range" class="quiet-button" type="button">Select dates</button>
+            <button id="timeline-clear-range" class="quiet-button" type="button" hidden>Clear selected dates</button>
+          </div>
+          <p id="timeline-status" class="timeline-status" role="status">Loading the chronology…</p>
+          <button id="timeline-now-outside" class="timeline-now-outside" type="button" hidden></button>
+          <div id="timeline-graph-wrap" class="timeline-graph-wrap" role="region" tabindex="0" aria-label="Graphical chronology. Scroll left and right with arrow keys or touch. Use Tab and Enter to inspect cards. Drag with a mouse or use the date controls to select dates."><svg id="timeline-graph" viewBox="0 0 1000 400" role="group" aria-label="Dated events and periods"></svg></div>
+          <section id="timeline-detail" class="timeline-detail" aria-live="polite" hidden><div><h2 id="timeline-detail-title"></h2><p id="timeline-detail-date"></p><p id="timeline-detail-summary"></p><div id="timeline-detail-related" class="timeline-chips"></div></div><button id="timeline-detail-close" class="quiet-button" type="button" aria-label="Close timeline details">Close</button></section>
+          <p class="timeline-legend">Cards connect dated records to the ruler. Solid bars mark known spans, diagonal stripes mark bounded uncertainty, and checkerboard bars mark open-ended dates. Packed dates appear as dots until you zoom in. Scroll left or right to explore; drag across dates or use the date controls to filter the table. Pan and zoom change the graph only.</p>
+          <div class="timeline-filters">
+            <fieldset id="timeline-kinds"><legend>Record types</legend></fieldset>
+            <div class="timeline-entity-filter"><label for="timeline-entity-search">Individual entities</label><div><input id="timeline-entity-search" type="search" placeholder="Find a person, place, project…"><button id="timeline-find-entity" class="quiet-button" type="button">Find</button></div><div id="timeline-entity-results" class="timeline-chips"></div><div id="timeline-selected-entities" class="timeline-chips"></div></div>
+          </div>
+          <div class="section-heading"><div><p class="eyebrow">Integrated chronology</p><h2>All timeline entries</h2></div><span id="timeline-table-count"></span></div>
+          <p id="timeline-order-note" class="timeline-order-note" hidden>Periods and uncertain dates are placed for browsing. Where they overlap, row order does not establish what happened first.</p>
+          <div class="timeline-table-wrap" role="region" aria-label="Integrated chronology table; scroll horizontally to see all columns" tabindex="0"><table id="timeline-table"><thead><tr><th scope="col" class="timeline-range-heading"><span class="sr-only">Range connection</span></th><th scope="col">Year</th><th scope="col">Month</th><th scope="col">Day or period</th><th scope="col">Type</th><th scope="col">Event or change</th><th scope="col">Connected records</th></tr></thead><tbody id="timeline-rows"></tbody></table></div>
+          <section id="timeline-undated" class="record-section timeline-undated-section" aria-labelledby="timeline-undated-heading" hidden>
+            <div class="section-heading"><div><p class="eyebrow">Without a story date</p><h2 id="timeline-undated-heading">Undated material</h2><p class="timeline-undated-intro">These records have no known story date and are listed separately from the chronology.</p></div></div>
+            <div id="timeline-undated-list" class="result-list"></div>
+          </section>
+        </section>
+        <section id="record" hidden aria-live="polite">
+          <div class="record-hero">
+            <div><p id="record-kind" class="eyebrow"></p><h1 id="record-title"></h1>
+              <p id="record-preferred" class="record-preferred" hidden><span>Preferred:</span> <strong id="record-preferred-name"></strong></p>
+              <div id="record-aka" class="record-aka" aria-label="Also known as" hidden><p class="record-aka-title">AKA</p><ul id="record-aka-list"></ul><p id="record-aka-status" class="record-aka-status" hidden></p></div>
+              <p id="record-context" class="lede"></p></div>
+            <div class="record-actions">
+              <button id="record-timeline" class="record-action" type="button" aria-label="View on timeline" data-tooltip="View on timeline" hidden>
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 4v16M9 5h11M9 12h8M9 19h11"/><circle cx="5" cy="5" r="1.5"/><circle cx="5" cy="12" r="1.5"/><circle cx="5" cy="19" r="1.5"/></svg>
+              </button>
+              <button id="copy-page-link" class="record-action" type="button" aria-label="Copy page link" data-tooltip="Copy page link">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 13.5a5 5 0 0 0 7.1 0l2-2a5 5 0 0 0-7.1-7.1l-1.1 1.1M14 10.5a5 5 0 0 0-7.1 0l-2 2a5 5 0 0 0 7.1 7.1l1.1-1.1"/></svg>
+              </button>
+              <button id="copy-vault-ref" class="record-action" type="button" aria-label="Copy Vault reference" data-tooltip="Copy Vault reference">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="8" y="7" width="12" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h2M11 11h6M11 15h4"/></svg>
+              </button>
+              <span id="record-action-status" class="sr-only" role="status"></span>
+            </div>
+          </div>
+          <p id="record-version-banner" class="historical-notice" hidden>
+            <span id="record-version-text"></span> <a id="record-latest" href="#">View latest</a>
+          </p>
+          <p id="record-deleted" class="deleted-notice" hidden><span aria-hidden="true">⛔</span><span>This record has been deleted. Its preserved details are shown for review.</span></p>
+          <section id="record-image-section" class="record-section" hidden><h2>Images</h2><div id="record-gallery" class="gallery"></div></section>
+          <div class="record-layout">
+            <div><div id="record-main"></div><div id="record-sections"></div></div>
+            <aside class="record-aside" aria-label="Record details and history">
+              <section class="record-details" aria-labelledby="record-details-title">
+                <h2 id="record-details-title">Details</h2>
+                <div class="record-detail-panel"><dl id="record-fields"></dl></div>
+              </section>
+              <section id="record-history" class="record-history" aria-label="History"></section>
+            </aside>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+  <dialog id="time-dialog" aria-labelledby="time-dialog-title">
+    <form id="time-form">
+      <div class="dialog-heading">
+        <p class="eyebrow">Saved in this browser</p>
+        <h2 id="time-dialog-title">Set story time</h2>
+        <p>Choose a story date, with an optional clock time. Your choice is saved in this browser and applied when you open this continuity again. It does not change the Vault.</p>
+      </div>
+      <label for="story-date">Local story date</label>
+      <input id="story-date" name="story-date" type="date" required>
+      <label class="story-time-toggle"><input id="story-has-time" type="checkbox"> Specify a clock time</label>
+      <div id="story-time-fields" hidden>
+        <label for="story-time">Local time (24-hour HH:MM)</label>
+        <input id="story-time" name="story-time" type="text" inputmode="numeric" autocomplete="off" placeholder="14:30" pattern="(?:[01][0-9]|2[0-3]):[0-5][0-9]" maxlength="5">
+      </div>
+      <label for="story-zone">Time zone</label>
+      <input id="story-zone" name="story-zone" type="text" autocomplete="off" placeholder="America/Vancouver" required>
+      <div id="ambiguous-time-fields" hidden>
+        <label for="ambiguous-time">If this time occurs twice at daylight-saving time</label>
+        <select id="ambiguous-time" name="ambiguous-time">
+          <option value="Earlier">Use the earlier occurrence</option>
+          <option value="Later">Use the later occurrence</option>
+        </select>
+      </div>
+      <p id="time-error" class="form-error" role="alert" hidden></p>
+      <div class="dialog-actions">
+        <button id="clear-time" class="quiet-button" type="button">Use continuity clock</button>
+        <button id="cancel-time" class="quiet-button" type="button">Cancel</button>
+        <button class="primary-button" type="submit">Save story time</button>
+      </div>
+    </form>
+  </dialog>
+  <noscript>This local viewer requires JavaScript for session-scoped navigation and live refresh.</noscript>
+</body>
+</html>
