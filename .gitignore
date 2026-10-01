@@ -33,3 +33,5 @@ usability/
 *.pid
 *.tmp
 *.bak
+**/__pycache__/
+*.pyc
