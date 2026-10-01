@@ -147,7 +147,7 @@ public static class V4ContractCatalog
                 ["access"] = tool.Access.ToString(),
                 ["destructive"] = tool.Destructive,
                 ["inputSchema"] = inputSchema,
-                ["outputSchema"] = ExportSchema(tool.ResponseType)
+                ["outputSchema"] = ExportOutputSchema(tool.ResponseType)
             });
         }
 
@@ -200,7 +200,7 @@ public static class V4ContractCatalog
             ["changesResult"] = typeof(V4ChangesResult)
         };
         var schemas = new JsonObject();
-        foreach (var (name, type) in types) schemas[name] = ExportSchema(type);
+        foreach (var (name, type) in types) schemas[name] = ExportOutputSchema(type);
         return new JsonObject { ["surfaceVersion"] = SurfaceVersion, ["schemas"] = schemas };
     }
 
@@ -253,6 +253,45 @@ public static class V4ContractCatalog
         };
         return JsonSchemaExporter.GetJsonSchemaAsNode(SerializerOptions, type, options);
     }
+
+    private static JsonNode ExportOutputSchema(Type type)
+    {
+        var schema = ExportSchema(type);
+        AllowOmittedNullOutputProperties(schema);
+        return schema;
+    }
+
+    private static void AllowOmittedNullOutputProperties(JsonNode? node)
+    {
+        if (node is JsonArray array)
+        {
+            foreach (var item in array) AllowOmittedNullOutputProperties(item);
+            return;
+        }
+        if (node is not JsonObject schema) return;
+
+        // The v4 tools omit null values from serialized results. A nullable
+        // constructor parameter can therefore be absent on the wire even when
+        // JsonSchemaExporter marks it required. Keep the published output
+        // contract aligned with the actual MCP structured content.
+        if (schema["properties"] is JsonObject properties && schema["required"] is JsonArray required)
+        {
+            for (var index = required.Count - 1; index >= 0; index--)
+            {
+                var name = required[index]?.GetValue<string>();
+                if (name is not null && properties[name] is JsonObject property && AllowsNull(property))
+                    required.RemoveAt(index);
+            }
+            if (required.Count == 0) schema.Remove("required");
+        }
+        foreach (var child in schema.ToArray()) AllowOmittedNullOutputProperties(child.Value);
+    }
+
+    private static bool AllowsNull(JsonObject schema) =>
+        schema["type"] is JsonArray types && types.Any(type => type?.ToJsonString() == "\"null\"") ||
+        schema["type"]?.ToJsonString() == "\"null\"" ||
+        schema["anyOf"] is JsonArray anyOf && anyOf.OfType<JsonObject>().Any(AllowsNull) ||
+        schema["oneOf"] is JsonArray oneOf && oneOf.OfType<JsonObject>().Any(AllowsNull);
 
     private static JsonNode TransformSchema(JsonSchemaExporterContext context, JsonNode node)
     {

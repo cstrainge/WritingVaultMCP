@@ -94,6 +94,49 @@ public sealed class V4Phase7ProtocolTests
     }
 
     [Fact]
+    public async Task AdvertisedOutputSchemasAcceptResponsesWithOmittedNullFields()
+    {
+        await using var vault = await TestVault.CreateAsync();
+        await vault.Service.CreateContinuityAsync(new(Guid.NewGuid().ToString(), "Schema Probe", "UTC"));
+        await using var client = await Client(vault, true);
+        var schemas = (await client.ListToolsAsync()).ToDictionary(tool => tool.Name, StringComparer.Ordinal);
+
+        async Task Check(string name, Dictionary<string, object?> arguments)
+        {
+            var result = await client.CallToolAsync(name, arguments);
+            Assert.NotEqual(true, result.IsError);
+            Assert.NotNull(result.StructuredContent);
+            Assert.NotNull(schemas[name].ReturnJsonSchema);
+            using var response = JsonDocument.Parse(result.StructuredContent.ToString()!);
+            ValidateRequiredProperties(schemas[name].ReturnJsonSchema!.Value, response.RootElement, name);
+        }
+
+        await Check("session_get", new());
+        await Check("continuity_list", new());
+        await Check("session_set", new() { ["continuityName"] = "Schema Probe" });
+        await Check("image_search", new() { ["acrossContinuities"] = true });
+    }
+
+    private static void ValidateRequiredProperties(JsonElement schema, JsonElement value, string path)
+    {
+        if (value.ValueKind == JsonValueKind.Object && schema.TryGetProperty("properties", out var properties))
+        {
+            if (schema.TryGetProperty("required", out var required))
+                foreach (var name in required.EnumerateArray().Select(item => item.GetString()!))
+                    Assert.True(value.TryGetProperty(name, out _), $"{path}.{name} is required by the advertised output schema but absent from the result.");
+            foreach (var property in value.EnumerateObject())
+                if (properties.TryGetProperty(property.Name, out var child))
+                    ValidateRequiredProperties(child, property.Value, path + "." + property.Name);
+        }
+        else if (value.ValueKind == JsonValueKind.Array && schema.TryGetProperty("items", out var items))
+        {
+            var index = 0;
+            foreach (var item in value.EnumerateArray())
+                ValidateRequiredProperties(items, item, $"{path}[{index++}]");
+        }
+    }
+
+    [Fact]
     public async Task ImageViewReturnsAnMcpImageBlockAndMetadataWithoutEmbeddedBytes()
     {
         await using var vault=await TestVault.CreateAsync();

@@ -65,7 +65,6 @@
               "required": [
                 "scope",
                 "kind",
-                "ref",
                 "action",
                 "timelineAffected"
               ],
@@ -270,10 +269,7 @@
               }
             },
             "required": [
-              "status",
-              "exactYears",
-              "minimumYears",
-              "maximumYears"
+              "status"
             ],
             "additionalProperties": false
           },
@@ -310,10 +306,7 @@
               }
             },
             "required": [
-              "status",
-              "exactYears",
-              "minimumYears",
-              "maximumYears"
+              "status"
             ],
             "additionalProperties": false
           },
@@ -350,10 +343,7 @@
               }
             },
             "required": [
-              "status",
-              "exactYears",
-              "minimumYears",
-              "maximumYears"
+              "status"
             ],
             "additionalProperties": false
           },
@@ -390,10 +380,7 @@
               }
             },
             "required": [
-              "status",
-              "exactYears",
-              "minimumYears",
-              "maximumYears"
+              "status"
             ],
             "additionalProperties": false
           },
@@ -510,8 +497,6 @@
         "required": [
           "character",
           "status",
-          "asOf",
-          "referenceTimeZoneId",
           "calendar",
           "legal",
           "biological",
@@ -3967,8 +3952,6 @@
                   },
                   "required": [
                     "status",
-                    "currentTime",
-                    "referenceTimeZoneId",
                     "source"
                   ],
                   "additionalProperties": false
@@ -3985,7 +3968,6 @@
               },
               "required": [
                 "name",
-                "description",
                 "defaultTimeZoneId",
                 "clock",
                 "version",
@@ -4011,7 +3993,6 @@
         },
         "required": [
           "items",
-          "nextCursor",
           "hasMore",
           "observedRevision"
         ],
@@ -5839,9 +5820,6 @@
         "required": [
           "target",
           "status",
-          "localDateTime",
-          "timeZoneId",
-          "timeZoneSource",
           "observedRevision"
         ],
         "additionalProperties": false
@@ -8394,7 +8372,6 @@
               },
               "required": [
                 "items",
-                "nextCursor",
                 "hasMore"
               ],
               "additionalProperties": false
@@ -8506,10 +8483,7 @@
                 "changedAtUtc",
                 "clientLabel",
                 "action",
-                "recordKind",
-                "recordRef",
-                "versionBefore",
-                "versionAfter"
+                "recordKind"
               ],
               "additionalProperties": false
             },
@@ -8530,7 +8504,6 @@
         },
         "required": [
           "items",
-          "nextCursor",
           "hasMore",
           "observedRevision"
         ],
@@ -9216,11 +9189,6 @@
               "required": [
                 "ref",
                 "owner",
-                "title",
-                "caption",
-                "altText",
-                "role",
-                "canonStatus",
                 "isPrimary",
                 "mediaType",
                 "width",
@@ -9249,7 +9217,6 @@
         },
         "required": [
           "items",
-          "nextCursor",
           "hasMore",
           "observedRevision"
         ],
@@ -9648,8 +9615,7 @@
                 "mediaType",
                 "width",
                 "height",
-                "byteCount",
-                "archivedAtUtc"
+                "byteCount"
               ],
               "additionalProperties": false
             }
@@ -9672,7 +9638,6 @@
           "currentRevision",
           "revisions",
           "hasMore",
-          "nextBeforeRevision",
           "observedRevision"
         ],
         "additionalProperties": false
@@ -10042,11 +10007,6 @@
               "required": [
                 "ref",
                 "owner",
-                "title",
-                "caption",
-                "altText",
-                "role",
-                "canonStatus",
                 "isPrimary",
                 "mediaType",
                 "width",
@@ -10075,7 +10035,6 @@
         },
         "required": [
           "items",
-          "nextCursor",
           "hasMore",
           "observedRevision"
         ],
@@ -10704,11 +10663,6 @@
             "required": [
               "ref",
               "owner",
-              "title",
-              "caption",
-              "altText",
-              "role",
-              "canonStatus",
               "isPrimary",
               "mediaType",
               "width",
@@ -10920,7 +10874,6 @@
         },
         "required": [
           "items",
-          "nextCursor",
           "hasMore",
           "observedRevision"
         ],
@@ -17061,7 +17014,6 @@
                   },
                   "required": [
                     "items",
-                    "nextCursor",
                     "hasMore"
                   ],
                   "additionalProperties": false
@@ -17203,7 +17155,6 @@
         },
         "required": [
           "items",
-          "nextBeforeVersion",
           "hasMore"
         ],
         "additionalProperties": false
@@ -20075,8 +20026,6 @@
                       "required": [
                         "kind",
                         "display",
-                        "lower",
-                        "upper",
                         "lowerInclusive",
                         "upperInclusive",
                         "calendarId"
@@ -20149,8 +20098,6 @@
                       "required": [
                         "kind",
                         "display",
-                        "lower",
-                        "upper",
                         "lowerInclusive",
                         "upperInclusive",
                         "calendarId"
@@ -20214,8 +20161,6 @@
                       "required": [
                         "kind",
                         "display",
-                        "lower",
-                        "upper",
                         "lowerInclusive",
                         "upperInclusive",
                         "calendarId"
@@ -20228,7 +20173,6 @@
                     "ref",
                     "characterRef",
                     "period",
-                    "notes",
                     "isDeleted"
                   ],
                   "additionalProperties": false
@@ -20306,8 +20250,6 @@
                       "required": [
                         "kind",
                         "display",
-                        "lower",
-                        "upper",
                         "lowerInclusive",
                         "upperInclusive",
                         "calendarId"
@@ -20334,10 +20276,8 @@
                   "required": [
                     "ref",
                     "title",
-                    "description",
                     "occurred",
                     "isDeleted",
-                    "worldEventRef",
                     "projects"
                   ],
                   "additionalProperties": false
@@ -20363,7 +20303,6 @@
               "ref",
               "type",
               "characters",
-              "notes",
               "periods",
               "events",
               "claims",
@@ -20413,7 +20352,6 @@
               "ref",
               "type",
               "characters",
-              "notes",
               "periods",
               "events",
               "claims",
@@ -20428,7 +20366,6 @@
         },
         "required": [
           "canMerge",
-          "reviewToken",
           "conflicts",
           "source",
           "target",
@@ -21495,7 +21432,6 @@
         },
         "required": [
           "items",
-          "nextCursor",
           "hasMore",
           "observedRevision"
         ],
@@ -21560,8 +21496,6 @@
             },
             "required": [
               "status",
-              "currentTime",
-              "referenceTimeZoneId",
               "source"
             ],
             "additionalProperties": false
@@ -21572,7 +21506,6 @@
           }
         },
         "required": [
-          "continuityName",
           "clock"
         ],
         "additionalProperties": false
@@ -21676,8 +21609,6 @@
             },
             "required": [
               "status",
-              "currentTime",
-              "referenceTimeZoneId",
               "source"
             ],
             "additionalProperties": false
@@ -21688,7 +21619,6 @@
           }
         },
         "required": [
-          "continuityName",
           "clock"
         ],
         "additionalProperties": false
@@ -22362,10 +22292,7 @@
         "required": [
           "snapshotRef",
           "text",
-          "nextCursor",
           "hasMore",
-          "mediaType",
-          "retrievedAtUtc",
           "byteSize",
           "observedRevision"
         ],
@@ -23803,7 +23730,6 @@
         },
         "required": [
           "items",
-          "nextCursor",
           "hasMore",
           "observedRevision"
         ],
@@ -24575,10 +24501,7 @@
                   }
                 },
                 "required": [
-                  "status",
-                  "exactYears",
-                  "minimumYears",
-                  "maximumYears"
+                  "status"
                 ],
                 "additionalProperties": false
               },
@@ -24615,10 +24538,7 @@
                   }
                 },
                 "required": [
-                  "status",
-                  "exactYears",
-                  "minimumYears",
-                  "maximumYears"
+                  "status"
                 ],
                 "additionalProperties": false
               },
@@ -24655,10 +24575,7 @@
                   }
                 },
                 "required": [
-                  "status",
-                  "exactYears",
-                  "minimumYears",
-                  "maximumYears"
+                  "status"
                 ],
                 "additionalProperties": false
               },
@@ -24695,10 +24612,7 @@
                   }
                 },
                 "required": [
-                  "status",
-                  "exactYears",
-                  "minimumYears",
-                  "maximumYears"
+                  "status"
                 ],
                 "additionalProperties": false
               },
@@ -24729,8 +24643,6 @@
             "required": [
               "character",
               "status",
-              "asOf",
-              "referenceTimeZoneId",
               "calendar",
               "legal",
               "biological",
@@ -24748,7 +24660,6 @@
         "required": [
           "valid",
           "conflicts",
-          "projectedAge",
           "observedRevision"
         ],
         "additionalProperties": false
@@ -25067,8 +24978,6 @@
                   "required": [
                     "kind",
                     "display",
-                    "lower",
-                    "upper",
                     "lowerInclusive",
                     "upperInclusive",
                     "calendarId"
@@ -25266,8 +25175,6 @@
                   "required": [
                     "kind",
                     "display",
-                    "lower",
-                    "upper",
                     "lowerInclusive",
                     "upperInclusive",
                     "calendarId"
@@ -25288,7 +25195,6 @@
                 "ref",
                 "kind",
                 "title",
-                "summary",
                 "lane",
                 "occurred",
                 "related"
@@ -25352,8 +25258,6 @@
             },
             "required": [
               "status",
-              "currentTime",
-              "referenceTimeZoneId",
               "source"
             ],
             "additionalProperties": false
@@ -25368,7 +25272,6 @@
         },
         "required": [
           "items",
-          "nextCursor",
           "hasMore",
           "undated",
           "clock",
@@ -26431,7 +26334,6 @@
           "pendingWrites",
           "databaseCapacityBand",
           "imageRenditionBytes",
-          "lastSuccessfulBackupUtc",
           "issues",
           "observedRevision"
         ],
