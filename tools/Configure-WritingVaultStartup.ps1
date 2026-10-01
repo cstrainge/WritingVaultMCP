@@ -81,7 +81,8 @@ function Assert-InstallReady {
     }
     if ($profileText.IndexOf($serverDll.Replace('\', '/'), [StringComparison]::OrdinalIgnoreCase) -lt 0 -or
         $profileText.IndexOf($database.Replace('\', '/'), [StringComparison]::OrdinalIgnoreCase) -lt 0 -or
-        $profileText.IndexOf($backupRoot.Replace('\', '/'), [StringComparison]::OrdinalIgnoreCase) -lt 0) {
+        $profileText.IndexOf($backupRoot.Replace('\', '/'), [StringComparison]::OrdinalIgnoreCase) -lt 0 -or
+        $profileText.IndexOf('--tool-surface v4', [StringComparison]::OrdinalIgnoreCase) -lt 0) {
         throw "The $Configuration tunnel profile does not target its own server, database, and backup root. Refresh it with Run-WritingVaultTunnel.ps1."
     }
     try {
@@ -130,11 +131,23 @@ function Get-OwnedTask([string] $Name) {
     if ($null -eq $task) { return $null }
     $expected = Expected-TaskAction $Name
     $action = @($task.Actions)
+    $principalIsCurrentUser = $false
+    try {
+        # Task Scheduler may normalize DOMAIN\user to user when registering a
+        # local account, or return a SID, so compare account identities.
+        $principalSid = if ($task.Principal.UserId -match '^S-\d+(?:-\d+)+$') {
+            [Security.Principal.SecurityIdentifier]::new($task.Principal.UserId)
+        } else {
+            ([Security.Principal.NTAccount]::new($task.Principal.UserId)).Translate([Security.Principal.SecurityIdentifier])
+        }
+        $principalIsCurrentUser = $principalSid.Value -eq [Security.Principal.WindowsIdentity]::GetCurrent().User.Value
+    }
+    catch { }
     if ($action.Count -ne 1 -or
         -not [string]::Equals($action[0].Execute, $expected.Executable, [StringComparison]::OrdinalIgnoreCase) -or
         -not [string]::Equals([string]$action[0].Arguments, $expected.Arguments, [StringComparison]::Ordinal) -or
         -not [string]::Equals([string]$action[0].WorkingDirectory, $projectRoot, [StringComparison]::OrdinalIgnoreCase) -or
-        -not [string]::Equals($task.Principal.UserId, $userId, [StringComparison]::OrdinalIgnoreCase)) {
+        -not $principalIsCurrentUser) {
         throw "The scheduled task named '$Name' is not owned by this Writer's Vault installation."
     }
     return $task

@@ -227,12 +227,15 @@ try {
     $serverCommandPath = $serverDll.Replace('\', '/')
     $databaseCommandPath = $Database.Replace('\', '/')
     $backupCommandPath = $backupRoot.Replace('\', '/')
-    $mcpCommand = 'dotnet "{0}" serve --database "{1}" --backup-root "{2}" --client-label "ChatGPT Tunnel {3}" --tool-surface v4' -f $serverCommandPath, $databaseCommandPath, $backupCommandPath, $configuration
+    # tunnel-client's profile initializer splits a quoted multi-word label and
+    # drops following switches. Keep the label one token so v4 is preserved.
+    $mcpCommand = 'dotnet "{0}" serve --database "{1}" --backup-root "{2}" --client-label ChatGPT-{3} --tool-surface v4' -f $serverCommandPath, $databaseCommandPath, $backupCommandPath, $configuration
     if ($Background) {
         $savedProfile = Get-Content -LiteralPath $profileFile -Raw
         if ($savedProfile.IndexOf($serverCommandPath, [StringComparison]::OrdinalIgnoreCase) -lt 0 -or
             $savedProfile.IndexOf($databaseCommandPath, [StringComparison]::OrdinalIgnoreCase) -lt 0 -or
-            $savedProfile.IndexOf($backupCommandPath, [StringComparison]::OrdinalIgnoreCase) -lt 0) {
+            $savedProfile.IndexOf($backupCommandPath, [StringComparison]::OrdinalIgnoreCase) -lt 0 -or
+            $savedProfile.IndexOf('--tool-surface v4', [StringComparison]::OrdinalIgnoreCase) -lt 0) {
             $failureExitCode = 20
             throw "The $configuration tunnel profile does not target its own server and database. Run the launcher interactively to refresh it."
         }

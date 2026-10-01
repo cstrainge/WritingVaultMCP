@@ -230,6 +230,40 @@ public sealed class V4Phase12RecordSnapshotTests
     }
 
     [Fact]
+    public async Task BaselineCapturesEveryContinuitySectionAcrossRelatedPages()
+    {
+        await using var vault = await TestVault.CreateAsync();
+        var continuity = int.Parse((await vault.Service.CreateContinuityAsync(
+            new(Guid.NewGuid().ToString(), "Paged notes world", "UTC"))).ResourceKey!);
+        var references = new VaultReferenceService(vault.Factory, vault.Coordinator);
+        var app = new AccessV4ApplicationService(vault.Coordinator, references,
+            new V4TargetResolver(new AccessV4SemanticResolver(
+                vault.Factory, vault.Coordinator, references)), vault.Service);
+        for (var index = 0; index < 21; index++)
+        {
+            var added = await app.AddNoteAsync(new(Guid.NewGuid().ToString(), continuity,
+                "Paged notes world", $"Note body {index}", $"Note {index}"));
+            Assert.True(added.Success, added.Code);
+            var character = await vault.Service.CreateEntityAsync(new(
+                Guid.NewGuid().ToString(), continuity, CanonEntityType.Character,
+                $"Character {index}"));
+            Assert.True(character.Success, character.Code);
+        }
+
+        var capture = vault.EnableAutomaticPageSnapshots();
+        await capture.EnsureBaselineAsync();
+
+        var page = await new AccessV4PageSnapshotStore(vault.Factory)
+            .ReadAsync("Continuity", continuity, continuity, 1);
+        Assert.NotNull(page);
+        Assert.Equal(21, page.Content.Overview.Sections["notes"].Items.Count);
+        Assert.Equal(21, page.Content.Notes.Count);
+        Assert.False(page.Content.Overview.Sections["notes"].HasMore);
+        Assert.Equal(21, page.Content.Overview.Sections["entities"].Items.Count);
+        Assert.False(page.Content.Overview.Sections["entities"].HasMore);
+    }
+
+    [Fact]
     public async Task OrdinaryWritesAutomaticallyCaptureTheContinuityAndCharacterPages()
     {
         await using var vault = await TestVault.CreateAsync();

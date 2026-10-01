@@ -188,7 +188,9 @@ public sealed partial class AccessV4ReadService
         foreach (var relation in include.Distinct(StringComparer.OrdinalIgnoreCase))
         {
             var limit = request.Limits?.TryGetValue(relation, out var configured) == true ? configured : V4ContractLimits.DefaultRelationSectionSize;
-            var page = await RelatedContinuityAsync(continuity, new(null, relation, V4DeletionState.Active, null, limit), token).ConfigureAwait(false);
+            var page = await RelatedContinuityAsync(continuity, new(null, relation,
+                request.IncludeDeleted ? V4DeletionState.All : V4DeletionState.Active,
+                null, limit), token).ConfigureAwait(false);
             sections[relation] = new(page.Items, page.NextCursor, page.HasMore);
         }
         return new(new(row.Name, V4RecordKind.Continuity, row.Name, ContinuityName: row.Name,

@@ -20,7 +20,7 @@ The Phase 12 startup controller supports two isolated configurations. `Configure
 
 Release uses the configured production database, viewer URL `http://127.0.0.1:5284`, tunnel profile `writing-vault`, and tasks named `Writing Vault Viewer`, `Writing Vault ChatGPT Tunnel`, and `Writing Vault Tray`. Debug uses `usability\WritingVault.Usability.accdb`, URL `http://127.0.0.1:5285`, profile `writing-vault-debug`, and the corresponding `Writing Vault Debug ...` tasks. Debug backups remain under the configured OneDrive backup root in its `Debug` subfolder. Their PID, health, log, and Windows-encrypted tunnel credential files are separate. The Debug tunnel needs its own tunnel ID; the startup installer rejects a Debug profile that targets the Release server, database, or tunnel ID. The tray never stores a tunnel credential.
 
-These Phase 12 tasks are under construction and are not yet installed by the source tree. `status` and `plan` are read-only. Do not use `install` against a live preview or production listener on the selected fixed port; installation reports that port as occupied.
+`status` and `plan` are read-only. Install tasks with `Configure-WritingVault-Startup.bat install Release`, then start the viewer and tunnel with `start Release` and the tray with `start-tray Release`. The three tasks recover independently and use the current Windows user's interactive logon. Do not use `install` against a live preview or production listener on the selected fixed port; installation reports that port as occupied. Task ownership compares Windows SIDs because Task Scheduler may shorten a local account name when registering it.
 
 ## Backup
 

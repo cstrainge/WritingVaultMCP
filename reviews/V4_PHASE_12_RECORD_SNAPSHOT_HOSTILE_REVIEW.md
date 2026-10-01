@@ -1,7 +1,8 @@
 # Phase 12 historical record-page hostile review
 
-Status: Debug candidate, zero unresolved technical findings. Release cutover and
-real-client usability are separate Phase 12 gates.
+Status: Debug and production migration reviewed, zero unresolved technical
+findings in the snapshot baseline. Real-client usability remains a separate
+Phase 12 check.
 
 ## Findings corrected
 
@@ -25,12 +26,17 @@ real-client usability are separate Phase 12 gates.
   contract tests pass.
 - Migration 012 initially lacked leading indexes for its two continuity
   foreign keys. The indexes were added and the foreign-key index invariant
-  passes. Its checksum is frozen only in the new release commit; it has not
-  been applied to production.
+  passes.
+- The first production baseline exposed two pagination faults absent from the
+  small fixtures: continuation requested a page size above the v4 limit, and
+  the continuity overview's active-only cursor was resumed as an all-records
+  query. Capture now uses the public page maximum, while a continuity overview
+  honors `includeDeleted` for its related sections. A new fixture with 21 notes
+  and 21 entities forces both continuation paths.
 
 ## Evidence
 
-- The final focused snapshot suite passed 13/13, including merged-source
+- The focused snapshot and tray suite passed 17/17, including merged-source
   historical pages, verified backup/restore, and tamper detection. Rename,
   alias, note, deletion, continuity, clock, rollback, and stable-ref cases are
   covered. Missing versions return `snapshot.not_found`.
@@ -44,7 +50,9 @@ real-client usability are separate Phase 12 gates.
 - Every snapshot is JSON-bounded to one MiB, stored with byte count and SHA-256,
   and captured before write commit. The integrity audit checks content hashes
   and per-record version sequences without exposing internal row keys.
+- The Release backend completed the baseline against the migrated production
+  database, logged `backend.ready`, and then exited cleanly after its idle
+  grace. Production schema and integrity checks returned no issues.
 
-The scoped Debug hostile review has zero unresolved findings. Phase 12 still
-requires the immutable Release build, verified production backup, controlled
-migration, task installation, and live acceptance.
+The snapshot baseline hostile review has zero unresolved findings. Phase 12
+still requires the final immutable Release build and live client acceptance.

@@ -70,7 +70,8 @@ internal sealed partial class AccessV4PageSnapshotCapture(
                         throw new VaultCommandException("snapshot.relation_too_large",
                             "The change would make a historical page association exceed its limit.");
                     var next = await reads.RelatedAsync(new V4ListRelatedRequest(
-                        reference, relation, V4DeletionState.All, cursor, 500), token)
+                        reference, relation, V4DeletionState.All, cursor,
+                        V4ContractLimits.MaximumPageSize), token)
                         .ConfigureAwait(false);
                     items.AddRange(next.Items);
                     hasMore = next.HasMore;
