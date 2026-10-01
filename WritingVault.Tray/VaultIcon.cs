@@ -13,6 +13,9 @@ internal static class VaultIcon
     public static Icon Create(string baseIconPath, VaultBadge badge)
     {
         using var source = new Icon(baseIconPath, new Size(32, 32));
+        if (badge == VaultBadge.Healthy)
+            return (Icon)source.Clone();
+
         using var bitmap = new Bitmap(32, 32);
         using (var canvas = Graphics.FromImage(bitmap))
         {
@@ -21,7 +24,6 @@ internal static class VaultIcon
             canvas.DrawIcon(source, new Rectangle(0, 0, 32, 32));
             var color = badge switch
             {
-                VaultBadge.Healthy => Color.FromArgb(47, 166, 111),
                 VaultBadge.Partial => Color.FromArgb(235, 168, 54),
                 VaultBadge.Stopped => Color.FromArgb(105, 108, 105),
                 _ => Color.FromArgb(83, 141, 210)
@@ -38,9 +40,6 @@ internal static class VaultIcon
             canvas.FillEllipse(fill, 20, 20, 10, 10);
             switch (badge)
             {
-                case VaultBadge.Healthy:
-                    canvas.DrawLines(white, [new Point(22, 25), new Point(24, 27), new Point(28, 23)]);
-                    break;
                 case VaultBadge.Partial:
                     canvas.DrawLine(white, 25, 22, 25, 25);
                     canvas.FillEllipse(Brushes.White, 24, 27, 2, 2);
