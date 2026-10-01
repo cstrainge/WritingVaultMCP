@@ -114,9 +114,10 @@ public sealed partial class AccessV4ReadService(
         MeasureAsync<V4DeletePreview>("delete-preview", async () =>
         {
             var continuity = session.RequireContinuityId();
-            var target = string.Equals(request.Ref, session.ContinuityName, StringComparison.Ordinal)
-                ? new ResolvedVaultReference("Continuity", continuity, session.ContinuityName!, session.ContinuityName!, continuity, false)
-                : await ResolveAnyAsync(request.Ref, continuity, true, token).ConfigureAwait(false);
+            var reference = string.Equals(request.Ref, session.ContinuityName, StringComparison.Ordinal)
+                ? await references.ReferenceAsync("Continuity", continuity, token).ConfigureAwait(false)
+                : request.Ref;
+            var target = await ResolveAnyAsync(reference, continuity, true, token).ConfigureAwait(false);
             var summary = new V4ReferenceSummary(target.Reference, Kind(target.ResourceType), target.Label,
                 ContinuityName: target.ContinuityId is null ? null : session.ContinuityName, IsDeleted: target.IsDeleted);
             IReadOnlyList<BlockingReference> found;

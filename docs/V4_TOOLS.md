@@ -12,7 +12,7 @@ The exact input and output schemas, limits, examples, access flags, and destruct
 - `timeline_get` returns calendar or narrative chronology, including fuzzy ranges and undated records. Historical chronology works with an unset clock.
 - `tag_targets`, `history_get`, and `changes_since` provide tag navigation, separate real-UTC history, and committed-change watching.
 - `character_age`, `temporal_effect_preview`, and `entity_local_time` use the effective session clock or a supplied read-only `at` value.
-- `record_delete_preview` reports blockers for supported canon, metadata, and relationship records.
+- `record_delete_preview` reports blockers for supported canon, metadata, and relationship records. Its `target.ref` is a semantic reference accepted by `record_soft_delete`; a selected continuity's plain name may be used as the preview input, but the returned ref is always semantic.
 - `relationship_merge_preview` shows both legacy relationship identities, periods, events and their context, Markdown notes, linked claims, and audit counts. It returns a review token only when the proposed merge has no conflicts.
 - `image_list` remains scoped to the selected continuity and accepts canon-entity and story-record owners. `image_search` includes both image storage kinds and can search across continuities when explicitly requested. `image_view` accepts an explicit semantic image reference from any active continuity and returns a bounded thumbnail, display, or verified original image block; optional `revision` pins retained image content. `image_revision_history` lists the available positive content revisions without bytes. Cross-continuity reads do not change the selected continuity.
 

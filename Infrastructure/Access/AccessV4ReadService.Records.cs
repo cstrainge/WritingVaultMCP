@@ -193,7 +193,8 @@ public sealed partial class AccessV4ReadService
                 null, limit), token).ConfigureAwait(false);
             sections[relation] = new(page.Items, page.NextCursor, page.HasMore);
         }
-        return new(new(row.Name, V4RecordKind.Continuity, row.Name, ContinuityName: row.Name,
+        return new(new(references.ReferenceFromKnownRecord("Continuity", continuity, row.Name),
+            V4RecordKind.Continuity, row.Name, ContinuityName: row.Name,
             Version: row.Version, IsDeleted: row.Deleted), fields, sections, revision);
     }
 

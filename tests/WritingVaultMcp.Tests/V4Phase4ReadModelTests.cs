@@ -304,6 +304,32 @@ public sealed class V4Phase4ReadModelTests
     }
 
     [Fact]
+    public async Task ContinuityPreviewAndOverviewReturnAReferenceThatCanBeSoftDeleted()
+    {
+        await using var vault = await TestVault.CreateAsync();
+        var continuity = await CreateContinuity(vault, "Disposable continuity");
+        var (reads, session, references) = vault.V4();
+        session.SelectContinuity(continuity, "Disposable continuity");
+
+        var preview = await reads.DeletePreviewAsync(new("Disposable continuity"));
+        var overview = await reads.GetAsync(new());
+        Assert.True(preview.CanDelete);
+        Assert.StartsWith("continuity:", preview.Target.Ref, StringComparison.Ordinal);
+        Assert.Equal(preview.Target.Ref, overview.Summary.Ref);
+        Assert.Equal(continuity, (await references.ResolveAsync(preview.Target.Ref, continuity,
+            CancellationToken.None, "Continuity")).Id);
+
+        var records = new AccessV4RecordService(vault.Coordinator, references, session, vault.Service);
+        var deleted = await records.LifecycleAsync(new(Guid.NewGuid().ToString(),
+            preview.Target.Ref, overview.Summary.Version!.Value), false);
+        Assert.True(deleted.Success, $"{deleted.Code}: {deleted.Message}");
+        var deletedPreview = await reads.DeletePreviewAsync(new("Disposable continuity"));
+        Assert.False(deletedPreview.CanDelete);
+        Assert.True(deletedPreview.Target.IsDeleted);
+        Assert.Equal(preview.Target.Ref, deletedPreview.Target.Ref);
+    }
+
+    [Fact]
     public async Task LocationOverviewIncludesReverseResidenceLinks()
     {
         await using var vault=await TestVault.CreateAsync();var continuity=await CreateContinuity(vault,"Places");
