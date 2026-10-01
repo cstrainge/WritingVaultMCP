@@ -51,4 +51,13 @@ public sealed class V4Phase12TrayStatusTests
             Task("Tray", true, "Running", true), false, false, null);
         Assert.Equal(VaultBadge.Stopped, status.Badge);
     }
+
+    [Fact]
+    public void TunnelHealthAcceptsTheClientsActualSuccessfulResult()
+    {
+        Assert.True(VaultServiceController.TunnelHealthSucceeded("{\"result\":\"ok\"}"));
+        Assert.True(VaultServiceController.TunnelHealthSucceeded("{\"result\":\"pass\"}"));
+        Assert.False(VaultServiceController.TunnelHealthSucceeded("{\"result\":\"fail\"}"));
+        Assert.False(VaultServiceController.TunnelHealthSucceeded("{\"readyz\":{\"ok\":true}}"));
+    }
 }

@@ -154,13 +154,20 @@ internal sealed class VaultServiceController(string projectRoot, string configur
                 ["health", "--json", "--url-file", urlFile, "--pid-file", pidFile, "--require-control-plane-poll"],
                 TimeSpan.FromSeconds(5), token);
             if (result.ExitCode != 0) return false;
-            using var json = JsonDocument.Parse(result.Output);
-            return json.RootElement.TryGetProperty("result", out var value) && value.GetString() == "pass";
+            return TunnelHealthSucceeded(result.Output);
         }
         catch (Exception exception) when (exception is IOException or JsonException or InvalidOperationException or TimeoutException or System.ComponentModel.Win32Exception)
         {
             return false;
         }
+    }
+
+    internal static bool TunnelHealthSucceeded(string output)
+    {
+        using var json = JsonDocument.Parse(output);
+        return json.RootElement.TryGetProperty("result", out var value) &&
+            value.ValueKind == JsonValueKind.String &&
+            (value.GetString() is "ok" or "pass");
     }
 
     private static async Task<(int ExitCode, string Output, string Error)> RunProcessAsync(
