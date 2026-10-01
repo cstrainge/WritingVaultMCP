@@ -141,7 +141,9 @@ public sealed class V4Phase8WebTests
         using var json=JsonDocument.Parse(stdout);var tasks=json.RootElement.EnumerateArray().ToArray();Assert.Equal(3,tasks.Length);
         Assert.NotEqual(tasks[0].GetProperty("name").GetString(),tasks[1].GetProperty("name").GetString());
         foreach(var task in tasks){Assert.True(task.GetProperty("hidden").GetBoolean());Assert.True(task.GetProperty("restartCount").GetInt32()>0);Assert.Equal(60,task.GetProperty("restartIntervalSeconds").GetInt32());}
-        foreach(var task in tasks.Take(2)){Assert.Contains("-WindowStyle Hidden",task.GetProperty("arguments").GetString(),StringComparison.Ordinal);Assert.Contains("-Background",task.GetProperty("arguments").GetString(),StringComparison.Ordinal);}
+        Assert.Equal("--service viewer",tasks[0].GetProperty("arguments").GetString());
+        Assert.Equal("--service tunnel",tasks[1].GetProperty("arguments").GetString());
+        foreach(var task in tasks){Assert.Contains("WritingVault.Tray.exe",task.GetProperty("executable").GetString(),StringComparison.Ordinal);}
         Assert.Contains("WritingVault.Tray.exe",tasks[2].GetProperty("executable").GetString(),StringComparison.Ordinal);
         Assert.Contains("http://127.0.0.1:5284",stdout,StringComparison.Ordinal);
         Assert.DoesNotContain("CONTROL_PLANE_API_KEY",stdout,StringComparison.OrdinalIgnoreCase);

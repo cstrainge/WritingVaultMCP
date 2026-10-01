@@ -41,8 +41,8 @@ function Task-Arguments([string] $Script) {
 
 function Get-Plan {
     @(
-        [ordered]@{ name = $viewerTask; executable = $powershell; arguments = Task-Arguments $webLauncher; address = "http://127.0.0.1:$viewerPort"; hidden = $true; restartCount = 100; restartIntervalSeconds = 60 },
-        [ordered]@{ name = $tunnelTask; executable = $powershell; arguments = Task-Arguments $tunnelLauncher; profile = $profileName; hidden = $true; restartCount = 100; restartIntervalSeconds = 60 },
+        [ordered]@{ name = $viewerTask; executable = $trayExe; arguments = '--service viewer'; address = "http://127.0.0.1:$viewerPort"; hidden = $true; restartCount = 100; restartIntervalSeconds = 60 },
+        [ordered]@{ name = $tunnelTask; executable = $trayExe; arguments = '--service tunnel'; profile = $profileName; hidden = $true; restartCount = 100; restartIntervalSeconds = 60 },
         [ordered]@{ name = $trayTask; executable = $trayExe; arguments = ''; hidden = $true; restartCount = 100; restartIntervalSeconds = 60 }
     )
 }
@@ -119,9 +119,15 @@ function New-VaultTask([string] $Name, [string] $Executable, [string] $Arguments
     return New-ScheduledTask -Action $taskAction -Trigger @($logonTrigger, $watchdogTrigger) -Principal $principal -Settings $settings -Description "$Name for the current Windows user. Managed by Writing Vault."
 }
 
-function Expected-TaskAction([string] $Name) {
-    if ($Name -eq $viewerTask) { return @{ Executable = $powershell; Arguments = (Task-Arguments $webLauncher) } }
-    if ($Name -eq $tunnelTask) { return @{ Executable = $powershell; Arguments = (Task-Arguments $tunnelLauncher) } }
+function Expected-TaskActions([string] $Name) {
+    # Accept only our exact previous PowerShell action during the one-time
+    # upgrade. It remains owned so install can back it up and replace it.
+    if ($Name -eq $viewerTask) { return @(
+        @{ Executable = $trayExe; Arguments = '--service viewer' },
+        @{ Executable = $powershell; Arguments = (Task-Arguments $webLauncher) }) }
+    if ($Name -eq $tunnelTask) { return @(
+        @{ Executable = $trayExe; Arguments = '--service tunnel' },
+        @{ Executable = $powershell; Arguments = (Task-Arguments $tunnelLauncher) }) }
     if ($Name -eq $trayTask) { return @{ Executable = $trayExe; Arguments = '' } }
     throw "Unknown Writer's Vault task name."
 }
@@ -129,7 +135,7 @@ function Expected-TaskAction([string] $Name) {
 function Get-OwnedTask([string] $Name) {
     $task = Get-ScheduledTask -TaskName $Name -TaskPath '\' -ErrorAction SilentlyContinue
     if ($null -eq $task) { return $null }
-    $expected = Expected-TaskAction $Name
+    $expected = @(Expected-TaskActions $Name)
     $action = @($task.Actions)
     $principalIsCurrentUser = $false
     try {
@@ -143,9 +149,11 @@ function Get-OwnedTask([string] $Name) {
         $principalIsCurrentUser = $principalSid.Value -eq [Security.Principal.WindowsIdentity]::GetCurrent().User.Value
     }
     catch { }
-    if ($action.Count -ne 1 -or
-        -not [string]::Equals($action[0].Execute, $expected.Executable, [StringComparison]::OrdinalIgnoreCase) -or
-        -not [string]::Equals([string]$action[0].Arguments, $expected.Arguments, [StringComparison]::Ordinal) -or
+    $actionMatches = $action.Count -eq 1 -and @($expected | Where-Object {
+        [string]::Equals($action[0].Execute, $_.Executable, [StringComparison]::OrdinalIgnoreCase) -and
+        [string]::Equals([string]$action[0].Arguments, $_.Arguments, [StringComparison]::Ordinal)
+    }).Count -gt 0
+    if (-not $actionMatches -or
         -not [string]::Equals([string]$action[0].WorkingDirectory, $projectRoot, [StringComparison]::OrdinalIgnoreCase) -or
         -not $principalIsCurrentUser) {
         throw "The scheduled task named '$Name' is not owned by this Writer's Vault installation."
@@ -231,8 +239,8 @@ switch ($Action) {
             if (Get-OwnedTask $name) { $backups[$name] = Export-ScheduledTask -TaskName $name -TaskPath '\' }
         }
         try {
-            Register-ScheduledTask -TaskName $viewerTask -TaskPath '\' -InputObject (New-VaultTask $viewerTask $powershell (Task-Arguments $webLauncher)) -Force | Out-Null
-            Register-ScheduledTask -TaskName $tunnelTask -TaskPath '\' -InputObject (New-VaultTask $tunnelTask $powershell (Task-Arguments $tunnelLauncher)) -Force | Out-Null
+            Register-ScheduledTask -TaskName $viewerTask -TaskPath '\' -InputObject (New-VaultTask $viewerTask $trayExe '--service viewer') -Force | Out-Null
+            Register-ScheduledTask -TaskName $tunnelTask -TaskPath '\' -InputObject (New-VaultTask $tunnelTask $trayExe '--service tunnel') -Force | Out-Null
             Register-ScheduledTask -TaskName $trayTask -TaskPath '\' -InputObject (New-VaultTask $trayTask $trayExe '') -Force | Out-Null
         }
         catch {

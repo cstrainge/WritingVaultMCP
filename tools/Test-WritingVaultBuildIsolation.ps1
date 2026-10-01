@@ -16,10 +16,14 @@ if ($debugPlan[1].profile -ne 'writing-vault-debug' -or $releasePlan[1].profile 
     throw 'Tunnel profiles are not isolated.'
 }
 foreach ($task in $debugPlan[0..1]) {
-    if ($task.arguments -notmatch '(?:^| )-DebugBuild(?:$| )') { throw "Debug task omits -DebugBuild: $($task.name)" }
+    if ($task.executable -notmatch '\\Debug\\' -or $task.arguments -notmatch '^--service (viewer|tunnel)$') {
+        throw "Debug service task does not use the isolated windowless host: $($task.name)"
+    }
 }
 foreach ($task in $releasePlan[0..1]) {
-    if ($task.arguments -match '(?:^| )-DebugBuild(?:$| )') { throw "Release task includes -DebugBuild: $($task.name)" }
+    if ($task.executable -notmatch '\\Release\\' -or $task.arguments -notmatch '^--service (viewer|tunnel)$') {
+        throw "Release service task does not use the isolated windowless host: $($task.name)"
+    }
 }
 if ($debugPlan[2].executable -notmatch '\\Debug\\' -or $releasePlan[2].executable -notmatch '\\Release\\') {
     throw 'Tray executables are not build-specific.'

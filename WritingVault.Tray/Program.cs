@@ -11,8 +11,17 @@ internal static class Program
 #endif
 
     [STAThread]
-    private static void Main()
+    private static void Main(string[] args)
     {
+        if (args.Length > 0)
+        {
+            Environment.ExitCode = args.Length == 2 && args[0] == "--service" &&
+                args[1] is "viewer" or "tunnel"
+                ? ServiceProcessHost.Run(args[1], Configuration)
+                : 2;
+            return;
+        }
+
         using var mutex = new Mutex(initiallyOwned: true, $@"Local\WritingVaultMCP-Tray-{Configuration}", out var ownsMutex);
         if (!ownsMutex)
             return;
