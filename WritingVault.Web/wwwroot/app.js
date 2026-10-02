@@ -212,7 +212,7 @@
     state.continuityNoteCursor = notePage.nextCursor; state.continuityNoteRevision = record.observedRevision;
     $('more-continuity-notes').hidden = !state.continuityNoteCursor;
     $('search').disabled = false; setText('scope-name', session.continuityName); show('overview');
-    loadContinuityImages(session.continuityName, imageLoad).catch(fail);
+    loadContinuityImages(record.summary.ref, imageLoad).catch(fail);
   }
 
   function appendContinuityNotes(items, host, generation, continuityName) {
