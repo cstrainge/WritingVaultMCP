@@ -295,13 +295,20 @@ public sealed partial class AccessVaultService
                   "WHERE c.[EntityType]=? AND c.[Id]>?" +
                   (continuityId is null ? string.Empty : " AND c.[ContinuityId]=?") +
                   (onlyDeleted ? " AND c.[IsDeleted]=True" : includeDeleted ? string.Empty : " AND c.[IsDeleted]=False") +
-                  (string.IsNullOrWhiteSpace(text) ? string.Empty : $" AND s.[{nameColumn}] LIKE ?") +
+                  (string.IsNullOrWhiteSpace(text) ? string.Empty : entityType == CanonEntityType.Character
+                      ? $" AND (s.[{nameColumn}] LIKE ? OR s.[PreferredName] LIKE ?)"
+                      : $" AND s.[{nameColumn}] LIKE ?") +
                   " ORDER BY c.[Id]";
         using var command = new AccessCommand(connection, sql)
             .Add(OleDbType.VarWChar, entityType.ToString(), 30)
             .Add(OleDbType.Integer, afterId);
         if (continuityId is not null) command.Add(OleDbType.Integer, continuityId);
-        if (!string.IsNullOrWhiteSpace(text)) command.Add(OleDbType.VarWChar, $"%{EscapeLike(text.Trim())}%", 255);
+        if (!string.IsNullOrWhiteSpace(text))
+        {
+            var pattern = $"%{EscapeLike(text.Trim())}%";
+            command.Add(OleDbType.VarWChar, pattern, 255);
+            if (entityType == CanonEntityType.Character) command.Add(OleDbType.VarWChar, pattern, 255);
+        }
         var rows = await command.QueryAsync(reader => new EntitySummary(
             reader.GetInt32(0), reader.GetInt32(1), Enum.Parse<CanonEntityType>(reader.GetString(2)),
             reader.GetString(3), reader.GetInt32(4), reader.GetBoolean(5), reader.GetDateTime(6),

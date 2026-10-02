@@ -8,6 +8,44 @@ namespace WritingVaultMcp.Tests;
 
 public sealed class V4Phase4ReadModelTests
 {
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task CharacterSearchMatchesPreferredNamesAndAliasesWithoutDuplicates(bool includeContent)
+    {
+        await using var vault = await TestVault.CreateAsync();
+        var continuity = await CreateContinuity(vault, "Names");
+        var other = await CreateContinuity(vault, "Other Names");
+        var first = await vault.Service.CreateEntityAsync(new(Guid.NewGuid().ToString(), continuity,
+            CanonEntityType.Character, "Morgan", PreferredName: "Starling"));
+        Assert.True(first.Success, first.Message);
+        Assert.True((await vault.Service.CreateEntityAsync(new(Guid.NewGuid().ToString(), continuity,
+            CanonEntityType.Character, "Robin", PreferredName: "Starbright"))).Success);
+        Assert.True((await vault.Service.CreateEntityAsync(new(Guid.NewGuid().ToString(), other,
+            CanonEntityType.Character, "Elsewhere", PreferredName: "Starling"))).Success);
+        Assert.True((await vault.Service.AddAliasAsync(new(Guid.NewGuid().ToString(),
+            int.Parse(first.ResourceKey!), "Starling"))).Success);
+        Assert.True((await vault.Service.AddAliasAsync(new(Guid.NewGuid().ToString(),
+            int.Parse(first.ResourceKey!), "Captain"))).Success);
+        var (reads, session, _) = vault.V4();
+        session.SelectContinuity(continuity, "Names");
+
+        var page = await reads.SearchAsync(new(Text: "  sTaR  ", Kinds: [V4RecordKind.Character],
+            Limit: 1, IncludeContent: includeContent));
+        Assert.Equal("Morgan", Assert.Single(page.Items).Label);
+        Assert.True(page.HasMore);
+        var next = await reads.SearchAsync(new(Text: "  sTaR  ", Kinds: [V4RecordKind.Character],
+            Cursor: page.NextCursor, Limit: 1, IncludeContent: includeContent));
+        Assert.Equal("Robin", Assert.Single(next.Items).Label);
+        Assert.False(next.HasMore);
+        var alias = await reads.SearchAsync(new(Text: "captain", Kinds: [V4RecordKind.Character], IncludeContent: includeContent));
+        var name = await reads.SearchAsync(new(Text: "Morgan", Kinds: [V4RecordKind.Character], IncludeContent: includeContent));
+        var aliasRecord = await reads.GetAsync(new(Assert.Single(alias.Items).Ref));
+        var preferredRecord = await reads.GetAsync(new(page.Items[0].Ref));
+        Assert.Equal(preferredRecord.Summary.Ref, aliasRecord.Summary.Ref);
+        Assert.Equal(page.Items[0].Ref, Assert.Single(name.Items).Ref);
+    }
+
     [Fact]
     public async Task ContinuityListPagesPastOneHundredWithoutLosingNames()
     {

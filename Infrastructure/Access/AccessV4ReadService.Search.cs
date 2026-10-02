@@ -363,13 +363,17 @@ public sealed partial class AccessV4ReadService
         var (table,_)=Subtype(type); await using var connection=connectionFactory.Create(); await connection.OpenAsync(token).ConfigureAwait(false);
         var character = type == CanonEntityType.Character;
         var predicate = character
-            ? "(s.[PhysicalDescription] LIKE ? OR s.[PersonalitySummary] LIKE ?)"
+            ? "(s.[PhysicalDescription] LIKE ? OR s.[PersonalitySummary] LIKE ? OR s.[PreferredName] LIKE ?)"
             : "s.[Description] LIKE ?";
         using var command=new AccessCommand(connection,$"SELECT s.[EntityId] FROM [{table}] AS s INNER JOIN [CanonEntities] AS c ON s.[EntityId]=c.[Id] WHERE c.[ContinuityId]=? AND {predicate}")
             .Add(OleDbType.Integer,continuity);
         var pattern=$"%{EscapeLike(text.Trim())}%";
         command.Add(OleDbType.LongVarWChar,pattern);
-        if(character)command.Add(OleDbType.LongVarWChar,pattern);
+        if(character)
+        {
+            command.Add(OleDbType.LongVarWChar,pattern);
+            command.Add(OleDbType.VarWChar,pattern,255);
+        }
         return (await command.QueryAsync(r=>r.GetInt32(0),token).ConfigureAwait(false)).ToHashSet();
     }
 
