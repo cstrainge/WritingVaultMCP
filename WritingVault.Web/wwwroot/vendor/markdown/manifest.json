@@ -460,8 +460,8 @@
     },
     {
       "path": "THIRD-PARTY-NOTICES.txt",
-      "bytes": 178010,
-      "sha256": "8a91766eea907d947a88807a9886a554a499ca71aab7c2567e74ce688116adad"
+      "bytes": 177989,
+      "sha256": "c8d63375452ed26fa0a0c83242c2e67bf3c8338bf44333afff7f56eda7191bb0"
     },
     {
       "path": "vendor.js",

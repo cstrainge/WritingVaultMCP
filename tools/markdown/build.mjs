@@ -34,7 +34,7 @@ for (const [path, metadata] of Object.entries(lock.packages).sort(([a], [b]) => 
     if (text) notices.push(`\n${text}\n`);
   }
 }
-await writeFile(join(output, 'THIRD-PARTY-NOTICES.txt'), notices.join(''));
+await writeFile(join(output, 'THIRD-PARTY-NOTICES.txt'), notices.join('').replace(/\r\n?/g, '\n'));
 const files = [];
 async function inventory(directory) {
   for (const item of (await readdir(directory, { withFileTypes: true })).sort((a, b) => a.name.localeCompare(b.name))) {
