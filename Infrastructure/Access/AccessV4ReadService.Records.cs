@@ -59,6 +59,12 @@ public sealed partial class AccessV4ReadService
                 ?? throw new V4ResolutionException("record.not_found", "The record was not found.");
             var safe = await v3Mapper.DictionaryAsync(details.Fields, details.Summary.EntityType.ToString(), token).ConfigureAwait(false);
             var fields = ToJsonFields(safe, "EntityId", "ContinuityId", "DeletedOperationId").ToDictionary(pair => pair.Key, pair => pair.Value);
+            if (fields.Remove("speciesReference", out var speciesReference))
+            {
+                var species = await references.ResolveAsync(speciesReference.GetString()!, continuity, token, "Species").ConfigureAwait(false);
+                fields["species"] = JsonSerializer.SerializeToElement(new V4ReferenceSummary(species.Reference,
+                    V4RecordKind.Species, species.Label, ContinuityName: session.ContinuityName, IsDeleted: species.IsDeleted), TransitionDateJson);
+            }
             if (target.ResourceType == "Project")
             {
                 await using var connection = connectionFactory.Create();
@@ -621,13 +627,14 @@ public sealed partial class AccessV4ReadService
     {
         if(ids.Count==0)return [];
         var placeholders=string.Join(',',ids.Select(_=>"?"));
-        var sql=$"SELECT c.[Id],c.[EntityType],"+EntityLabelExpression("c")+",c.[Version],c.[IsDeleted] FROM (((((([CanonEntities] AS c LEFT JOIN [Projects] AS p ON c.[Id]=p.[EntityId]) LEFT JOIN [Locations] AS l ON c.[Id]=l.[EntityId]) LEFT JOIN [Characters] AS ch ON c.[Id]=ch.[EntityId]) LEFT JOIN [Organizations] AS o ON c.[Id]=o.[EntityId]) LEFT JOIN [Objects] AS ob ON c.[Id]=ob.[EntityId]) LEFT JOIN [WorldEvents] AS w ON c.[Id]=w.[EntityId]) WHERE c.[Id] IN ("+placeholders+") AND c.[ContinuityId]=?"+DeletionSql("c",deletion);
+        var sql=$"SELECT c.[Id],c.[EntityType],"+EntityLabelExpression("c")+",c.[Version],c.[IsDeleted] FROM ((((((([CanonEntities] AS c LEFT JOIN [Projects] AS p ON c.[Id]=p.[EntityId]) LEFT JOIN [Locations] AS l ON c.[Id]=l.[EntityId]) LEFT JOIN [Characters] AS ch ON c.[Id]=ch.[EntityId]) LEFT JOIN [Organizations] AS o ON c.[Id]=o.[EntityId]) LEFT JOIN [Objects] AS ob ON c.[Id]=ob.[EntityId]) LEFT JOIN [WorldEvents] AS w ON c.[Id]=w.[EntityId]) LEFT JOIN [Species] AS sp ON c.[Id]=sp.[EntityId]) WHERE c.[Id] IN ("+placeholders+") AND c.[ContinuityId]=?"+DeletionSql("c",deletion);
         using var command=new AccessCommand(connection,sql);foreach(var id in ids)command.Add(OleDbType.Integer,id);command.Add(OleDbType.Integer,session.RequireContinuityId());
         return await command.QueryAsync(r=>new RelationRow(r.GetInt32(0),r.GetString(1),r.GetString(2),null,r.GetInt32(3),r.GetBoolean(4)),token).ConfigureAwait(false);
     }
 
     private static IReadOnlyList<string> DefaultEntitySections(string type)=>type.ToUpperInvariant() switch
     {
+        "SPECIES"=>["characters","notes","events","tags","projects","images","sources","claims"],
         "CHARACTER"=>["notes","events","relationshipEvents","tags","projects","images","sources","claims","aliases","relationships","relationshipMembershipPeriods","residences","memberships","temporalEffects","ownership","custody","eventParticipation"],
         "PROJECT"=>["notes","events","tags","images","sources","claims","members","eventParticipation"],
         "WORLDEVENT"=>["notes","events","contextEvents","relationshipEvents","tags","projects","images","sources","claims","participants","locations"],
@@ -692,7 +699,7 @@ public sealed partial class AccessV4ReadService
         else if (relation is "entities" or "records")
         {
             var search = await SearchAsync(new(Kinds: [V4RecordKind.Project, V4RecordKind.Location, V4RecordKind.Character,
-                V4RecordKind.Organization, V4RecordKind.Object, V4RecordKind.WorldEvent], DeletionState: request.DeletionState,
+                V4RecordKind.Organization, V4RecordKind.Object, V4RecordKind.WorldEvent, V4RecordKind.Species], DeletionState: request.DeletionState,
                 Cursor: request.Cursor, Limit: request.Limit), token).ConfigureAwait(false);
             return search;
         }
@@ -731,6 +738,8 @@ public sealed partial class AccessV4ReadService
         var owner = target.StorageKey;
         switch (relation)
         {
+            case "characters" when target.ResourceType == "Species":
+                type = "Character"; sql = $"SELECT TOP {take} r.[EntityId],r.[GivenName],c.[Version],c.[IsDeleted] FROM [Characters] AS r INNER JOIN [CanonEntities] AS c ON r.[EntityId]=c.[Id] WHERE r.[SpeciesId]=? AND r.[EntityId]>?" + DeletionSql("c", deletion) + " ORDER BY r.[EntityId]"; break;
             case "notes": type = "EntityNote"; sql = $"SELECT TOP {take} r.[Id],IIf(r.[Title] Is Null,'note',r.[Title]),r.[Version],r.[IsDeleted] FROM [EntityNotes] AS r WHERE r.[EntityId]=? AND r.[Id]>?" + DeletionSql("r", deletion) + " ORDER BY r.[Id]"; break;
             case "events":
                 if (target.ResourceType.Equals("Project", StringComparison.OrdinalIgnoreCase))
@@ -872,7 +881,7 @@ public sealed partial class AccessV4ReadService
             await using var connection = connectionFactory.Create(); await connection.OpenAsync(token).ConfigureAwait(false);
             using (var entities = new AccessCommand(connection,
                        "SELECT c.[Id],c.[EntityType],c.[Version],c.[IsDeleted]," + EntityLabelExpression("c") +
-                       " FROM (((((( [CanonEntities] AS c LEFT JOIN [Projects] AS p ON c.[Id]=p.[EntityId]) LEFT JOIN [Locations] AS l ON c.[Id]=l.[EntityId]) LEFT JOIN [Characters] AS ch ON c.[Id]=ch.[EntityId]) LEFT JOIN [Organizations] AS o ON c.[Id]=o.[EntityId]) LEFT JOIN [Objects] AS ob ON c.[Id]=ob.[EntityId]) LEFT JOIN [WorldEvents] AS w ON c.[Id]=w.[EntityId]) INNER JOIN [EntityTags] AS x ON c.[Id]=x.[EntityId] " +
+                       " FROM ((((((( [CanonEntities] AS c LEFT JOIN [Projects] AS p ON c.[Id]=p.[EntityId]) LEFT JOIN [Locations] AS l ON c.[Id]=l.[EntityId]) LEFT JOIN [Characters] AS ch ON c.[Id]=ch.[EntityId]) LEFT JOIN [Organizations] AS o ON c.[Id]=o.[EntityId]) LEFT JOIN [Objects] AS ob ON c.[Id]=ob.[EntityId]) LEFT JOIN [WorldEvents] AS w ON c.[Id]=w.[EntityId]) LEFT JOIN [Species] AS sp ON c.[Id]=sp.[EntityId]) INNER JOIN [EntityTags] AS x ON c.[Id]=x.[EntityId] " +
                        "WHERE x.[TagId]=? AND c.[ContinuityId]=?" + DeletionSql("c", request.DeletionState) + " ORDER BY c.[Id]")
                    .Add(OleDbType.Integer, tag.StorageKey).Add(OleDbType.Integer, continuity))
             {

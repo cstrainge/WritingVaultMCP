@@ -203,7 +203,7 @@ public sealed class ProjectStoryEventTests
                     await Execute($"ALTER TABLE [{table}] DROP COLUMN [{column}]");
             await Execute("ALTER TABLE [Characters] DROP COLUMN [BirthdayRecurring]");
             // Leave ProjectBoundary present to exercise a migration resumed after partial DDL.
-            await Execute($"DELETE FROM [SchemaMigrations] WHERE [MigrationId]='{AccessSchemaDefinition.MigrationId}'");
+            await Execute($"DELETE FROM [SchemaMigrations] WHERE [MigrationId]='{AccessSchemaDefinition.ProjectStoryEventMigrationId}'");
         }
         var migration = await new AccessSchemaMigrator(vault.Factory, TimeProvider.System).MigrateAsync(false);
         Assert.True(migration.Changed);

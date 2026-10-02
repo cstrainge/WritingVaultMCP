@@ -36,7 +36,8 @@
             "TemporalEffect",
             "RelationshipEvent",
             "RelationshipMembershipPeriod",
-            "RelationshipParticipant"
+            "RelationshipParticipant",
+            "Species"
           ]
         },
         "label": {
@@ -130,7 +131,8 @@
                   "TemporalEffect",
                   "RelationshipEvent",
                   "RelationshipMembershipPeriod",
-                  "RelationshipParticipant"
+                  "RelationshipParticipant",
+                  "Species"
                 ]
               },
               "label": {
@@ -246,7 +248,8 @@
                   "TemporalEffect",
                   "RelationshipEvent",
                   "RelationshipMembershipPeriod",
-                  "RelationshipParticipant"
+                  "RelationshipParticipant",
+                  "Species"
                 ]
               },
               "label": {
@@ -558,7 +561,8 @@
                   "TemporalEffect",
                   "RelationshipEvent",
                   "RelationshipMembershipPeriod",
-                  "RelationshipParticipant"
+                  "RelationshipParticipant",
+                  "Species"
                 ]
               },
               "label": {
@@ -675,7 +679,8 @@
                   "TemporalEffect",
                   "RelationshipEvent",
                   "RelationshipMembershipPeriod",
-                  "RelationshipParticipant"
+                  "RelationshipParticipant",
+                  "Species"
                 ]
               },
               "label": {
@@ -1045,7 +1050,8 @@
                   "TemporalEffect",
                   "RelationshipEvent",
                   "RelationshipMembershipPeriod",
-                  "RelationshipParticipant"
+                  "RelationshipParticipant",
+                  "Species"
                 ]
               },
               "label": {
@@ -1428,7 +1434,8 @@
                 "TemporalEffect",
                 "RelationshipEvent",
                 "RelationshipMembershipPeriod",
-                "RelationshipParticipant"
+                "RelationshipParticipant",
+                "Species"
               ]
             },
             "label": {
@@ -1527,7 +1534,8 @@
                         "TemporalEffect",
                         "RelationshipEvent",
                         "RelationshipMembershipPeriod",
-                        "RelationshipParticipant"
+                        "RelationshipParticipant",
+                        "Species"
                       ]
                     },
                     "label": {

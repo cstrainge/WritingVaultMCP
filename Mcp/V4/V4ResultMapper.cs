@@ -78,7 +78,7 @@ public sealed class V4ResultMapper(VaultReferenceService references)
         "CHARACTER" => V4RecordKind.Character,
         "ORGANIZATION" => V4RecordKind.Organization,
         "OBJECT" => V4RecordKind.Object,
-        "WORLDEVENT" => V4RecordKind.WorldEvent,
+        "WORLDEVENT" => V4RecordKind.WorldEvent, "SPECIES" => V4RecordKind.Species,
         "SOURCE" => V4RecordKind.Source,
         "SOURCESNAPSHOT" => V4RecordKind.SourceSnapshot,
         "CLAIM" => V4RecordKind.Claim,

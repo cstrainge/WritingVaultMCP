@@ -88,7 +88,9 @@ internal static class AccessSchemaDefinition
     public const string ImageContentRevisionChecksum = "86E54828D2907B3F29CC83E01935AB3E106C8BCE8E512166C56D4CD802A5A16D";
     public const string RecordPageSnapshotMigrationId = "20261001_012_record_page_snapshots";
     public const string RecordPageSnapshotChecksum = "2235B7EE2541A40E982ACF556875E7CBE7E9E7F9C8B7686C05437CD0DB6420B6";
-    public const string MigrationId = "20261002_013_project_story_events";
+    public const string ProjectStoryEventMigrationId = "20261002_013_project_story_events";
+    public const string ProjectStoryEventChecksum = "9D114896D9F0EC60259AF607A4D6433CCC76E7BF0488A571676A4B15DC01B290";
+    public const string MigrationId = "20261002_014_species";
     public const string ApplicationVersion = "4.0.0";
 
     private static AccessColumnDefinition C(
@@ -190,12 +192,14 @@ internal static class AccessSchemaDefinition
             C("BirthLocationDetail", "TEXT(255)"),
             C("Gender", "TEXT(100)"),
             C("Pronouns", "TEXT(100)"),
-            C("Species", "TEXT(100)"),
+            C("SpeciesId", "LONG"), C("Race", "TEXT(100)"),
             C("Occupation", "TEXT(255)"),
             C("Nationality", "TEXT(100)"),
             C("PhysicalDescription", "LONGTEXT"),
             C("PersonalitySummary", "LONGTEXT")
         ], ["EntityId"]),
+
+        new("Species", [C("EntityId", "LONG", true), C("Name", "TEXT(255)", true), C("Description", "LONGTEXT")], ["EntityId"]),
 
         new("Organizations",
         [
@@ -658,6 +662,7 @@ internal static class AccessSchemaDefinition
         new("IX_CanonEntities_ContinuityType", "CanonEntities", ["ContinuityId", "EntityType"]),
         new("IX_CanonEntities_VariantGroup", "CanonEntities", ["VariantGroupId"]),
         new("IX_Locations_Parent", "Locations", ["ParentLocationId"]),
+        new("IX_Characters_Species", "Characters", ["SpeciesId"]),
         new("IX_Characters_BirthLocation", "Characters", ["BirthLocationId"]),
         new("IX_SourceSnapshots_Source", "SourceSnapshots", ["SourceId"]),
         new("UX_SourceSnapshots_SourceHash", "SourceSnapshots", ["SourceId", "ContentSha256"], true),
@@ -762,6 +767,8 @@ internal static class AccessSchemaDefinition
         new("FK_Characters_BirthLocation", "Characters", "BirthLocationId", "Locations", "EntityId"),
         new("FK_Organizations_Canon", "Organizations", "EntityId", "CanonEntities"),
         new("FK_Objects_Canon", "Objects", "EntityId", "CanonEntities"),
+        new("FK_Species_Canon", "Species", "EntityId", "CanonEntities"),
+        new("FK_Characters_Species", "Characters", "SpeciesId", "Species", "EntityId"),
         new("FK_WorldEvents_Canon", "WorldEvents", "EntityId", "CanonEntities"),
         new("FK_SourceSnapshots_Source", "SourceSnapshots", "SourceId", "Sources"),
         new("FK_EntityNotes_Entity", "EntityNotes", "EntityId", "CanonEntities"),
@@ -906,8 +913,8 @@ internal static class AccessSchemaDefinition
             .Concat(
             [
                 new("CK_Locations_NoSelfParent", "Locations", "[ParentLocationId] IS NULL OR [ParentLocationId] <> [EntityId]"),
-                new("CK_VariantGroups_EntityType", "VariantGroups", "[EntityType] IN ('Project','Location','Character','Organization','Object','WorldEvent')"),
-                new("CK_CanonEntities_EntityType", "CanonEntities", "[EntityType] IN ('Project','Location','Character','Organization','Object','WorldEvent')"),
+                new("CK_VariantGroups_EntityType", "VariantGroups", "[EntityType] IN ('Project','Location','Character','Organization','Object','WorldEvent','Species')"),
+                new("CK_CanonEntities_EntityType", "CanonEntities", "[EntityType] IN ('Project','Location','Character','Organization','Object','WorldEvent','Species')"),
                 new("CK_CharacterRelationships_NoSelf", "CharacterRelationships", "[SourceCharacterId] <> [TargetCharacterId]"),
                 new("CK_RelMerge_NoSelf", "RelationshipMergeRedirects", "[SourceRelationshipId] <> [TargetRelationshipId]"),
                 new("CK_RelTransitions_Kind", "RelationshipMembershipTransitions", "[TransitionKind] IN ('Join','Leave')"),

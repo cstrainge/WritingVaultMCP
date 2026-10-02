@@ -214,7 +214,7 @@ public sealed class ApplicationAcceptanceTests
         var patch = await vault.Service.PatchEntityAsync(new(
             Guid.NewGuid().ToString(), characterId, 1,
             Description: new PatchField<string>(true, null),
-            SecondaryType: new PatchField<string>(true, "Human")));
+            Race: new PatchField<string>(true, "Northern")));
         Assert.True(patch.Success, patch.Message);
 
         var deleteOne = vault.Service.SoftDeleteEntityAsync(new(Guid.NewGuid().ToString(), characterId, 2));

@@ -7,7 +7,7 @@
     ['Project', 'Project spans'], ['ProjectEvent', 'Project events'],
     ['CharacterEvent', 'Character events'],
     ['LocationEvent', 'Location events'], ['OrganizationEvent', 'Organization events'],
-    ['ObjectEvent', 'Object events'], ['Character', 'Characters'],
+    ['ObjectEvent', 'Object events'], ['SpeciesEvent', 'Species events'], ['Character', 'Characters'],
     ['Relationship', 'Relationships'], ['RelationshipMembershipPeriod', 'Relationship memberships'],
     ['Residence', 'Residences'], ['Membership', 'Memberships'],
     ['OrganizationLocation', 'Organization locations'], ['Ownership', 'Ownership'],
@@ -15,11 +15,11 @@
   ];
   const eventOwners = new Map([
     ['ProjectEvent', 'Project'], ['CharacterEvent', 'Character'], ['LocationEvent', 'Location'],
-    ['OrganizationEvent', 'Organization'], ['ObjectEvent', 'Object']
+    ['OrganizationEvent', 'Organization'], ['ObjectEvent', 'Object'], ['SpeciesEvent', 'Species']
   ]);
   const kindGroups = [
     ['Projects', ['Project', 'ProjectEvent']],
-    ['Events', ['WorldEvent', 'RelationshipEvent', 'CharacterEvent', 'LocationEvent', 'OrganizationEvent', 'ObjectEvent']],
+    ['Events', ['WorldEvent', 'RelationshipEvent', 'CharacterEvent', 'LocationEvent', 'OrganizationEvent', 'ObjectEvent', 'SpeciesEvent']],
     ['People & relationships', ['Character', 'Relationship', 'RelationshipMembershipPeriod',
       'Residence', 'Membership', 'TemporalEffect']],
     ['Places & objects', ['OrganizationLocation', 'Ownership', 'Custody', 'ObjectLocation']]
@@ -43,7 +43,7 @@
       return 'Membership';
     if (item.kind === 'EntityEvent') {
       const owner = (item.related || []).find(link =>
-        ['Character', 'Location', 'Organization', 'Object', 'Project'].includes(link.kind));
+        ['Character', 'Location', 'Organization', 'Object', 'Project', 'Species'].includes(link.kind));
       return owner ? `${owner.kind} event` : 'Entity event';
     }
     return typeNames.get(item.kind) || item.kind.replace(/([a-z])([A-Z])/g, '$1 $2');

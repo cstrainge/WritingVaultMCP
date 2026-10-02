@@ -229,7 +229,7 @@ public sealed partial class AccessV4ReadService(
     }
 
     private static string EntityLabelExpression(string alias) =>
-        $"IIf({alias}.[EntityType]='Project',p.[Name],IIf({alias}.[EntityType]='Location',l.[Name],IIf({alias}.[EntityType]='Character',IIf(ch.[PreferredName] Is Null,ch.[GivenName],ch.[PreferredName]),IIf({alias}.[EntityType]='Organization',o.[Name],IIf({alias}.[EntityType]='Object',ob.[Name],w.[Title])))))";
+        $"IIf({alias}.[EntityType]='Project',p.[Name],IIf({alias}.[EntityType]='Location',l.[Name],IIf({alias}.[EntityType]='Character',IIf(ch.[PreferredName] Is Null,ch.[GivenName],ch.[PreferredName]),IIf({alias}.[EntityType]='Organization',o.[Name],IIf({alias}.[EntityType]='Object',ob.[Name],IIf({alias}.[EntityType]='Species',sp.[Name],w.[Title]))))))";
 
     internal async Task<string> RevisionAsync(CancellationToken token)
     {
@@ -268,19 +268,20 @@ public sealed partial class AccessV4ReadService(
         CanonEntityType.Project => ("Projects", "Name"), CanonEntityType.Location => ("Locations", "Name"),
         CanonEntityType.Character => ("Characters", "GivenName"), CanonEntityType.Organization => ("Organizations", "Name"),
         CanonEntityType.Object => ("Objects", "Name"), CanonEntityType.WorldEvent => ("WorldEvents", "Title"),
+        CanonEntityType.Species => ("Species", "Name"),
         _ => throw new ArgumentOutOfRangeException(nameof(type))
     };
     private static CanonEntityType? EntityType(V4RecordKind kind) => kind switch
     {
         V4RecordKind.Project => CanonEntityType.Project, V4RecordKind.Location => CanonEntityType.Location,
         V4RecordKind.Character => CanonEntityType.Character, V4RecordKind.Organization => CanonEntityType.Organization,
-        V4RecordKind.Object => CanonEntityType.Object, V4RecordKind.WorldEvent => CanonEntityType.WorldEvent, _ => null
+        V4RecordKind.Object => CanonEntityType.Object, V4RecordKind.WorldEvent => CanonEntityType.WorldEvent, V4RecordKind.Species => CanonEntityType.Species, _ => null
     };
     internal static V4RecordKind Kind(string type) => type.ToUpperInvariant() switch
     {
         "CONTINUITY" => V4RecordKind.Continuity, "PROJECT" => V4RecordKind.Project, "LOCATION" => V4RecordKind.Location,
         "CHARACTER" => V4RecordKind.Character, "ORGANIZATION" => V4RecordKind.Organization, "OBJECT" => V4RecordKind.Object,
-        "WORLDEVENT" => V4RecordKind.WorldEvent, "SOURCE" => V4RecordKind.Source,"SOURCESNAPSHOT"=>V4RecordKind.SourceSnapshot,
+        "WORLDEVENT" => V4RecordKind.WorldEvent, "SPECIES" => V4RecordKind.Species, "SOURCE" => V4RecordKind.Source,"SOURCESNAPSHOT"=>V4RecordKind.SourceSnapshot,
         "CLAIM"=>V4RecordKind.Claim,"TAG" => V4RecordKind.Tag,"VARIANTGROUP"=>V4RecordKind.VariantGroup,
         "ENTITYNOTE" or "CONTINUITYNOTE" => V4RecordKind.Note, "ENTITYEVENT" => V4RecordKind.EntityEvent,
         "RELATIONSHIPEVENT" => V4RecordKind.RelationshipEvent,

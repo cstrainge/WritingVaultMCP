@@ -38,7 +38,7 @@ internal sealed partial class AccessV4PageSnapshotCapture(
                 .ConfigureAwait(false);
             if (reference is not null && !overview.Summary.IsDeleted && overview.Summary.Kind is
                     V4RecordKind.Project or V4RecordKind.Location or V4RecordKind.Character or
-                    V4RecordKind.Organization or V4RecordKind.Object or V4RecordKind.WorldEvent)
+                    V4RecordKind.Organization or V4RecordKind.Object or V4RecordKind.WorldEvent or V4RecordKind.Species)
             {
                 var fields = new Dictionary<string, JsonElement>(overview.Fields,
                     StringComparer.OrdinalIgnoreCase);

@@ -42,11 +42,11 @@ public sealed record CreateCanonEntityRequest(
     string? PreferredName = null,
     string? Gender = null,
     string? Pronouns = null,
-    string? Species = null,
+    int? SpeciesId = null,
     string? Occupation = null,
     string? Nationality = null,
     string? PhysicalDescription = null,
-    string? PersonalitySummary = null, bool BirthdayRecurring = false);
+    string? PersonalitySummary = null, bool BirthdayRecurring = false, string? Race = null);
 
 public sealed record DuplicateEntityRequest(
     string OperationId, int SourceEntityId, int TargetContinuityId,
@@ -217,11 +217,11 @@ public sealed record PatchEntityRequest(
     PatchField<string>? PreferredName = null,
     PatchField<string>? Gender = null,
     PatchField<string>? Pronouns = null,
-    PatchField<string>? Species = null,
+    PatchField<int?>? SpeciesId = null,
     PatchField<string>? Occupation = null,
     PatchField<string>? Nationality = null,
     PatchField<string>? PhysicalDescription = null,
-    PatchField<string>? PersonalitySummary = null, PatchField<bool>? BirthdayRecurring = null);
+    PatchField<string>? PersonalitySummary = null, PatchField<bool>? BirthdayRecurring = null, PatchField<string>? Race = null);
 
 public sealed record EntitySummary(
     int Id, int ContinuityId, CanonEntityType EntityType, string Name, int Version, bool IsDeleted, DateTime UpdatedAtUtc,

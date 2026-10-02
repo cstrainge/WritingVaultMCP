@@ -165,6 +165,7 @@ public sealed class AccessPurgeService(string provider = "Microsoft.ACE.OLEDB.12
         probes.AddRange(entityType switch
         {
             "Project" => [("ProjectAssignments","ProjectEntities","ProjectId")],
+            "Species" => [("SpeciesCharacters","Characters","SpeciesId")],
             "Location" => [("ChildLocations","Locations","ParentLocationId"), ("Birthplaces","Characters","BirthLocationId"), ("Residences","CharacterResidences","LocationId"), ("OrganizationLocations","OrganizationLocations","LocationId"), ("ObjectLocations","ObjectLocationPeriods","LocationId"), ("EventLocations","WorldEventLocations","LocationId")],
             "Character" => [("Aliases","CharacterAliases","CharacterId"), ("Residences","CharacterResidences","CharacterId"), ("Memberships","OrganizationMemberships","CharacterId"), ("RelationshipSources","CharacterRelationships","SourceCharacterId"), ("RelationshipTargets","CharacterRelationships","TargetCharacterId"), ("OwnershipPrincipals","OwnershipPrincipals","CharacterId")],
             "Organization" => [("Aliases","OrganizationAliases","OrganizationId"), ("Memberships","OrganizationMemberships","OrganizationId"), ("OrganizationLocations","OrganizationLocations","OrganizationId"), ("OwnershipPrincipals","OwnershipPrincipals","OrganizationId")],
@@ -185,7 +186,7 @@ public sealed class AccessPurgeService(string provider = "Microsoft.ACE.OLEDB.12
     private static string SubtypeTable(string type) => type switch
     {
         "Project" => "Projects", "Location" => "Locations", "Character" => "Characters",
-        "Organization" => "Organizations", "Object" => "Objects", "WorldEvent" => "WorldEvents",
+        "Organization" => "Organizations", "Object" => "Objects", "WorldEvent" => "WorldEvents", "Species" => "Species",
         _ => throw new InvalidOperationException("Unsupported entity type.")
     };
 

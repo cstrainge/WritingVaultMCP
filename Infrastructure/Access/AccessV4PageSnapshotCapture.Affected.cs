@@ -9,7 +9,7 @@ internal sealed partial class AccessV4PageSnapshotCapture
 {
     private static readonly HashSet<string> OverviewTypes = new(StringComparer.OrdinalIgnoreCase)
     {
-        "Continuity", "Project", "Location", "Character", "Organization", "Object", "WorldEvent",
+        "Continuity", "Project", "Location", "Character", "Organization", "Object", "WorldEvent", "Species",
         "VariantGroup", "Source", "SourceSnapshot", "Tag", "EntityNote", "ContinuityNote",
         "EntityEvent", "Claim", "EntityImage", "StoryImage", "RelationshipEvent",
         "RelationshipParticipant", "RelationshipMembershipPeriod", "RelationshipEventProject",
@@ -122,6 +122,12 @@ internal sealed partial class AccessV4PageSnapshotCapture
                 foreach (var row in owners)
                     foreach (var (ownerType, ownerKey) in row)
                         await AddAsync(ownerType, ownerKey).ConfigureAwait(false);
+            }
+            if (type.Equals("Character", StringComparison.OrdinalIgnoreCase))
+            {
+                using var species = context.Command("SELECT [SpeciesId] FROM [Characters] WHERE [EntityId]=?").Add(OleDbType.Integer, key);
+                var linked = await species.ExecuteScalarAsync(token).ConfigureAwait(false);
+                if (linked is not null and not DBNull) await AddAsync("Species", Convert.ToInt32(linked, CultureInfo.InvariantCulture)).ConfigureAwait(false);
             }
             if (type.Equals("CharacterRelationship", StringComparison.OrdinalIgnoreCase))
             {

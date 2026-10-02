@@ -1,6 +1,6 @@
 namespace WritingVaultMcp.Domain;
 
-public enum CanonEntityType { Project, Location, Character, Organization, Object, WorldEvent }
+public enum CanonEntityType { Project, Location, Character, Organization, Object, WorldEvent, Species }
 public enum OwnershipState { Owned, Unknown, Unowned }
 public enum CustodyState { Known, Unknown, Unowned }
 public enum PrincipalKind { Character, Organization, External }

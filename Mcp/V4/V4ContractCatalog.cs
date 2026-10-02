@@ -54,7 +54,7 @@ public static class V4ContractCatalog
         W<V4VariantGroupCreateRequest>("variant_group_create", "Creates a selected-continuity variant group for one canon entity kind."),
         W<V4VariantGroupUpdateRequest>("variant_group_update", "Applies sparse versioned changes to a variant group.", true),
         W<V4EntityVariantGroupSetRequest>("entity_variant_group_set", "Assigns or clears an entity's same-kind selected-continuity variant group.", true),
-        W<V4EntityCreateRequest>("entity_create", "Creates one of the six canon entity kinds inside the selected continuity."),
+        W<V4EntityCreateRequest>("entity_create", "Creates a canon entity, including Species, inside the selected continuity. For characters, fields.species is an optional Species semantic reference; fields.race is optional text."),
         W<V4EntityUpdateRequest>("entity_update", "Applies an allowlisted sparse versioned patch to one canon entity. For a character with an exact Gregorian birth date, birthdayRecurring enables annual birthdays through death; changing birth or death automatically updates the schedule.", true),
         W<V4EntityDuplicateRequest>("entity_duplicate_to_continuity", "Creates an independent shallow duplicate in a target continuity."),
         W<V4TagCreateRequest>("tag_create", "Creates a normalized vault-global tag."),
@@ -424,9 +424,11 @@ public static class V4ContractCatalog
             foreach (var field in new[]
                      {
                          "secondaryType", "timeZoneId", "birthLocation", "birthLocationDetail", "middleNames",
-                         "familyName", "preferredName", "gender", "pronouns", "species", "occupation", "nationality"
+                         "familyName", "preferredName", "gender", "pronouns", "species", "race", "occupation", "nationality"
                      }) properties[field] = Text(V4ContractLimits.MaximumNameLength);
             properties["birthdayRecurring"] = new JsonObject { ["type"] = "boolean", ["description"] = "Repeat exact Gregorian birthdays annually through the character death date without extending the timeline bounds." };
+            properties["species"]!["description"] = "Optional same-continuity Species semantic reference for a character. Set null to clear. This is not free text.";
+            properties["race"]!["description"] = "Optional character race text, independent of species. Set null to clear.";
             properties["birth"] = NullableDate();
             properties["death"] = NullableDate();
             properties["occurred"] = NullableDate();

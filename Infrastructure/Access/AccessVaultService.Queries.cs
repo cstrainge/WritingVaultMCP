@@ -395,7 +395,7 @@ public sealed partial class AccessVaultService
             ("OrganizationMembershipAsCharacter","OrganizationMemberships","CharacterId"), ("OrganizationAliases","OrganizationAliases","OrganizationId"),
             ("OrganizationLocations","OrganizationLocations","OrganizationId"), ("OrganizationLocationTarget","OrganizationLocations","LocationId"),
             ("RelationshipSource","CharacterRelationships","SourceCharacterId"), ("RelationshipTarget","CharacterRelationships","TargetCharacterId"),
-            ("LocationChildren","Locations","ParentLocationId"), ("BirthLocation","Characters","BirthLocationId"),
+            ("LocationChildren","Locations","ParentLocationId"), ("BirthLocation","Characters","BirthLocationId"), ("SpeciesCharacters","Characters","SpeciesId"),
             ("OwnershipPrincipalCharacter","OwnershipPrincipals","CharacterId"), ("OwnershipPrincipalOrganization","OwnershipPrincipals","OrganizationId"),
             ("OwnershipPeriods","ObjectOwnershipPeriods","ObjectId"), ("CustodyPeriods","ObjectCustodyPeriods","ObjectId"),
             ("ObjectLocations","ObjectLocationPeriods","ObjectId"),
@@ -615,6 +615,7 @@ public sealed partial class AccessVaultService
         CanonEntityType.Project => ("Projects", "Name"), CanonEntityType.Location => ("Locations", "Name"),
         CanonEntityType.Character => ("Characters", "GivenName"), CanonEntityType.Organization => ("Organizations", "Name"),
         CanonEntityType.Object => ("Objects", "Name"), CanonEntityType.WorldEvent => ("WorldEvents", "Title"),
+        CanonEntityType.Species => ("Species", "Name"),
         _ => throw new ArgumentOutOfRangeException(nameof(type))
     };
 

@@ -97,11 +97,12 @@
   const routeView = () => ({
     '#characters': ['Character', 'Characters'], '#relationships': ['Relationship', 'Relationships'], '#locations': ['Location', 'Locations'],
     '#projects': ['Project', 'Projects'], '#events': ['WorldEvent', 'Events'],
+    '#species': ['Species', 'Beastariry'],
     '#organizations': ['Organization', 'Organizations'], '#objects': ['Object', 'Objects'],
     '#sources': ['Source', 'Sources'], '#tags': ['Tag', 'Tags'],
     '#deleted': [null, 'Deleted records', 'Deleted']
   }[location.hash.toLowerCase()]);
-  const allKinds = ['Project', 'Location', 'Character', 'Organization', 'Object', 'WorldEvent',
+  const allKinds = ['Project', 'Location', 'Character', 'Organization', 'Object', 'WorldEvent', 'Species',
     'Source', 'SourceSnapshot', 'Claim', 'Tag', 'Note', 'Image', 'VariantGroup', 'Relationship',
     'RelationshipType', 'Residence', 'Membership', 'OrganizationLocation', 'Ownership',
     'OwnershipPrincipal', 'Custody', 'ObjectLocation', 'EntityEvent', 'TemporalEffect'];
@@ -650,7 +651,7 @@
       $('main').classList.remove('updating');
       if (!snapshot) await Promise.all([
         loadRecordHistory(reference, load),
-        ['Character', 'Project', 'WorldEvent', 'Location', 'Organization', 'Object',
+        ['Character', 'Project', 'WorldEvent', 'Location', 'Organization', 'Object', 'Species',
           'Relationship', 'EntityEvent', 'RelationshipEvent'].includes(record.summary.kind) ?
           loadRecordImages(reference, load, record.summary.isDeleted) : Promise.resolve(),
         record.summary.kind === 'SourceSnapshot' ? loadSourceText(reference, load, record.summary.isDeleted) : Promise.resolve()
@@ -909,7 +910,7 @@
     } else if (view === 'images') {
       openImages(true).catch(fail);
     } else {
-      const hash = view === 'WorldEvent' ? 'events' : view === 'deleted' ? 'deleted' : `${view.toLowerCase()}s`;
+      const hash = view === 'Species' ? 'species' : view === 'WorldEvent' ? 'events' : view === 'deleted' ? 'deleted' : `${view.toLowerCase()}s`;
       history.pushState({}, '', `${pathFor(state.continuity)}#${hash}`);
       runSearch('', view === 'deleted' ? null : view, link.querySelector('.nav-label').textContent.trim(), false,
         view === 'deleted' ? 'Deleted' : 'Active').catch(fail);

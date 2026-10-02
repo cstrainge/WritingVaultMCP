@@ -17,7 +17,7 @@ internal static class RequestSafetyValidator
         ["TargetField"] = 100, ["Locator"] = 255, ["ReferenceTimeZoneId"] = 100,
         ["DefaultTimeZoneId"] = 100, ["TimeZoneId"] = 100,
         ["BirthLocationDetail"] = 255, ["MiddleNames"] = 255, ["FamilyName"] = 100,
-        ["PreferredName"] = 100, ["Gender"] = 100, ["Pronouns"] = 100, ["Species"] = 100,
+        ["PreferredName"] = 100, ["Gender"] = 100, ["Pronouns"] = 100, ["Species"] = 512, ["Race"] = 100,
         ["Occupation"] = 255, ["Nationality"] = 100,
         ["CalendarId"] = 50, ["Citation"] = LongTextLimit, ["Description"] = LongTextLimit,
         ["Notes"] = LongTextLimit, ["Body"] = LongTextLimit, ["Content"] = LongTextLimit,

@@ -136,6 +136,7 @@ public sealed class AccessSchemaMigrator(IAccessConnectionFactory connectionFact
         if (pending.Length == 0) return false;
 
         var addressedColumns = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var removedColumns = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var addressedIndexes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var addressedChecks = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var addressedTables = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -143,6 +144,7 @@ public sealed class AccessSchemaMigrator(IAccessConnectionFactory connectionFact
         foreach (var command in pending.SelectMany(migration => migration.Commands))
         {
             if (TryParseAddColumn(command) is { } column) addressedColumns.Add($"{column.Table}.{column.Name}");
+            if (TryParseDropColumn(command) is { } removed) removedColumns.Add($"{removed.Table}.{removed.Name}");
             if (TryParseIndex(command) is { } index) addressedIndexes.Add($"{index.Table}.{index.Name}");
             if (TryParseConstraint(command) is { } constraint) addressedChecks.Add(constraint);
             if (TryParseCreateTable(command) is { } table)
@@ -155,6 +157,7 @@ public sealed class AccessSchemaMigrator(IAccessConnectionFactory connectionFact
         var canUpgrade = verification.Issues.All(issue =>
             (issue.Code == "schema.migration_missing" && missingMigrationIds.Contains(issue.ObjectName)) ||
             (issue.Code == "schema.column_missing" && addressedColumns.Contains(issue.ObjectName)) ||
+            (issue.Code == "schema.column_unexpected" && removedColumns.Contains(issue.ObjectName)) ||
             (issue.Code == "schema.table_missing" && addressedTables.Contains(issue.ObjectName)) ||
             (issue.Code == "schema.index_missing" && addressedIndexes.Contains(issue.ObjectName)) ||
             (issue.Code == "schema.foreign_key_missing" && addressedForeignKeys.Contains(issue.ObjectName)) ||
@@ -176,6 +179,9 @@ public sealed class AccessSchemaMigrator(IAccessConnectionFactory connectionFact
         string command,
         CancellationToken cancellationToken)
     {
+        if (TryParseDropColumn(command) is { } removed && !connection.GetSchema("Columns").Rows.Cast<System.Data.DataRow>()
+            .Any(row => string.Equals(row["TABLE_NAME"]?.ToString(), removed.Table, StringComparison.OrdinalIgnoreCase) &&
+                        string.Equals(row["COLUMN_NAME"]?.ToString(), removed.Name, StringComparison.OrdinalIgnoreCase))) return;
         if (TryParseAddColumn(command) is { } column && connection.GetSchema("Columns").Rows.Cast<System.Data.DataRow>()
             .Any(row => string.Equals(row["TABLE_NAME"]?.ToString(), column.Table, StringComparison.OrdinalIgnoreCase) &&
                         string.Equals(row["COLUMN_NAME"]?.ToString(), column.Name, StringComparison.OrdinalIgnoreCase))) return;
@@ -214,6 +220,12 @@ public sealed class AccessSchemaMigrator(IAccessConnectionFactory connectionFact
     {
         var match = Regex.Match(command, @"CREATE(?:\s+UNIQUE)?\s+INDEX\s+\[(?<name>[^\]]+)\]\s+ON\s+\[(?<table>[^\]]+)\]", RegexOptions.IgnoreCase);
         return match.Success ? (match.Groups["name"].Value, match.Groups["table"].Value) : null;
+    }
+
+    private static (string Table, string Name)? TryParseDropColumn(string command)
+    {
+        var match = Regex.Match(command, @"^\s*ALTER\s+TABLE\s+\[(?<table>[^\]]+)\]\s+DROP\s+COLUMN\s+\[(?<name>[^\]]+)\]\s*$", RegexOptions.IgnoreCase);
+        return match.Success ? (match.Groups["table"].Value, match.Groups["name"].Value) : null;
     }
 
     private static string? TryParseConstraint(string command)

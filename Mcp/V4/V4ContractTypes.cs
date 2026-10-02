@@ -37,14 +37,14 @@ public enum V4TimelineMode { Calendar, Narrative }
 public enum V4TimelineResolution { Auto, Aggregate, Detail }
 public enum V4ImageSize { Thumbnail, Display, Original }
 public enum V4TagAction { Add, Remove }
-public enum V4CanonEntityKind { Project, Location, Character, Organization, Object, WorldEvent }
+public enum V4CanonEntityKind { Project, Location, Character, Organization, Object, WorldEvent, Species }
 public enum V4RecordKind
 {
     Continuity, Project, Location, Character, Organization, Object, WorldEvent,
     Source, SourceSnapshot, Claim, Tag, Note, Image, VariantGroup,
     Relationship, RelationshipType, Residence, Membership, OrganizationLocation,
     Ownership, OwnershipPrincipal, Custody, ObjectLocation, EntityEvent, TemporalEffect,
-    RelationshipEvent, RelationshipMembershipPeriod, RelationshipParticipant
+    RelationshipEvent, RelationshipMembershipPeriod, RelationshipParticipant, Species
 }
 
 public enum V4TimelineLane
@@ -318,7 +318,7 @@ public sealed record V4EntityFields(
     string? MiddleNames = null, string? FamilyName = null, string? PreferredName = null,
     string? Gender = null, string? Pronouns = null, string? Species = null,
     string? Occupation = null, string? Nationality = null,
-    string? PhysicalDescription = null, string? PersonalitySummary = null, bool BirthdayRecurring = false);
+    string? PhysicalDescription = null, string? PersonalitySummary = null, bool BirthdayRecurring = false, string? Race = null);
 
 public sealed record V4ContinuityCreateRequest(
     string MutationToken, string Name, string DefaultTimeZoneId, string? Description = null);

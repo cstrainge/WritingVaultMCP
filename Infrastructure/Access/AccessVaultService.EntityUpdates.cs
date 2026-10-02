@@ -18,14 +18,12 @@ public sealed partial class AccessVaultService
             request.BirthLocationDetail?.Specified == true, request.NarrativeOrder?.Specified == true,
             request.MiddleNames?.Specified == true, request.FamilyName?.Specified == true,
             request.PreferredName?.Specified == true, request.Gender?.Specified == true,
-            request.Pronouns?.Specified == true, request.Species?.Specified == true,
+            request.Pronouns?.Specified == true, request.SpeciesId?.Specified == true,
             request.Occupation?.Specified == true, request.Nationality?.Specified == true,
-            request.PhysicalDescription?.Specified == true, request.PersonalitySummary?.Specified == true, request.BirthdayRecurring?.Specified == true
+            request.PhysicalDescription?.Specified == true, request.PersonalitySummary?.Specified == true, request.BirthdayRecurring?.Specified == true, request.Race?.Specified == true
         };
         if (!fields.Any(value => value)) return Task.FromResult(new VaultMutationResult(false, "patch.empty", Message: "At least one field must be specified."));
         if (request.Name?.Specified == true && string.IsNullOrWhiteSpace(request.Name.Value)) return Task.FromResult(new VaultMutationResult(false, "validation.name", Message: "Name cannot be null or blank."));
-        if (request.Species?.Specified == true && request.SecondaryType?.Specified == true)
-            return Task.FromResult(new VaultMutationResult(false, "validation.failed", Message: "Specify either Species or SecondaryType for a character patch, not both."));
         if (request.PersonalitySummary?.Specified == true && request.Description?.Specified == true)
             return Task.FromResult(new VaultMutationResult(false, "validation.failed", Message: "Specify either PersonalitySummary or Description for a character patch, not both."));
         if (request.TimeZoneId?.Specified == true && request.TimeZoneId.Value is not null)
@@ -52,10 +50,11 @@ public sealed partial class AccessVaultService
                 {
                     CanonEntityType.Project => ("Projects", "Name", "Description", (string?)null),
                     CanonEntityType.Location => ("Locations", "Name", "Description", "LocationType"),
-                    CanonEntityType.Character => ("Characters", "GivenName", "PersonalitySummary", "Species"),
+                    CanonEntityType.Character => ("Characters", "GivenName", "PersonalitySummary", (string?)null),
                     CanonEntityType.Organization => ("Organizations", "Name", "Description", "OrganizationType"),
                     CanonEntityType.Object => ("Objects", "Name", "Description", "ObjectType"),
                     CanonEntityType.WorldEvent => ("WorldEvents", "Title", "Description", (string?)null),
+                    CanonEntityType.Species => ("Species", "Name", "Description", (string?)null),
                     _ => throw new ArgumentOutOfRangeException()
                 };
                 var assignments = new List<string>();
@@ -133,7 +132,14 @@ public sealed partial class AccessVaultService
                 AddCharacterField(request.PreferredName, "PreferredName", OleDbType.VarWChar, 100);
                 AddCharacterField(request.Gender, "Gender", OleDbType.VarWChar, 100);
                 AddCharacterField(request.Pronouns, "Pronouns", OleDbType.VarWChar, 100);
-                AddCharacterField(request.Species, "Species", OleDbType.VarWChar, 100);
+                AddCharacterField(request.Race, "Race", OleDbType.VarWChar, 100);
+                if (request.SpeciesId?.Specified == true)
+                {
+                    if (entity.Type != CanonEntityType.Character) throw new VaultCommandException("patch.unsupported_field", "Species is supported only for characters.");
+                    if (request.SpeciesId.Value is { } speciesId)
+                        await RequireEntityAsync(context, speciesId, CanonEntityType.Species, entity.ContinuityId, token).ConfigureAwait(false);
+                    assignments.Add("[SpeciesId]=?"); parameters.Add((OleDbType.Integer, request.SpeciesId.Value, null));
+                }
                 AddCharacterField(request.Occupation, "Occupation", OleDbType.VarWChar, 255);
                 AddCharacterField(request.Nationality, "Nationality", OleDbType.VarWChar, 100);
                 AddCharacterField(request.PhysicalDescription, "PhysicalDescription", OleDbType.LongVarWChar, null);

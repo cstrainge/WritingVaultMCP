@@ -116,6 +116,7 @@ public sealed class AccessV4SemanticResolver(
                 CanonEntityType.Character => ("Characters", "IIf(s.[PreferredName] Is Null,s.[GivenName],s.[PreferredName])"),
                 CanonEntityType.Organization => ("Organizations", "s.[Name]"),
                 CanonEntityType.Object => ("Objects", "s.[Name]"), CanonEntityType.WorldEvent => ("WorldEvents", "s.[Title]"),
+                CanonEntityType.Species => ("Species", "s.[Name]"),
                 _ => throw new ArgumentOutOfRangeException(nameof(type))
             };
             using (var command = new AccessCommand(connection,

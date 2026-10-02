@@ -273,7 +273,7 @@ public sealed class AccessIntegrityVerifier(IAccessConnectionFactory connectionF
         foreach (var (table, type) in new[]
         {
             ("Projects","Project"), ("Locations","Location"), ("Characters","Character"),
-            ("Organizations","Organization"), ("Objects","Object"), ("WorldEvents","WorldEvent")
+            ("Organizations","Organization"), ("Objects","Object"), ("WorldEvents","WorldEvent"), ("Species","Species")
         })
         {
             using var command = new AccessCommand(connection, $"SELECT COUNT(*) FROM [{table}] AS s INNER JOIN [CanonEntities] AS c ON s.[EntityId]=c.[Id] WHERE c.[EntityType]<>'{type}'");

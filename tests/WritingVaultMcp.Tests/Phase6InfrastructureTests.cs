@@ -13,11 +13,14 @@ public sealed class Phase6InfrastructureTests
         await using var vault = await TestVault.CreateAsync();
         var continuity = int.Parse((await vault.Service.CreateContinuityAsync(new(
             Guid.NewGuid().ToString(), "Canon", "UTC"))).ResourceKey!);
+        var species = await vault.Service.CreateEntityAsync(new(Guid.NewGuid().ToString(), continuity, CanonEntityType.Species, "Human"));
+        Assert.True(species.Success, species.Message);
+        var speciesId = int.Parse(species.ResourceKey!);
         var created = await vault.Service.CreateEntityAsync(new(
             Guid.NewGuid().ToString(), continuity, CanonEntityType.Character, "Ada",
             Birth: StoryDate.Year(1988),
             MiddleNames: "Robin", FamilyName: "North", PreferredName: "Ari",
-            Gender: "nonbinary", Pronouns: "they/them", Species: "Human",
+            Gender: "nonbinary", Pronouns: "they/them", SpeciesId: speciesId, Race: "Northern",
             Occupation: "Cartographer", Nationality: "Lostvillian",
             PhysicalDescription: "Tall", PersonalitySummary: "Careful"));
         Assert.True(created.Success, created.Message);
@@ -29,7 +32,8 @@ public sealed class Phase6InfrastructureTests
         Assert.Equal("Ari", details.Fields["PreferredName"]);
         Assert.Equal("nonbinary", details.Fields["Gender"]);
         Assert.Equal("they/them", details.Fields["Pronouns"]);
-        Assert.Equal("Human", details.Fields["Species"]);
+        Assert.Equal(speciesId, details.Fields["SpeciesId"]);
+        Assert.Equal("Northern", details.Fields["Race"]);
         Assert.Equal("Cartographer", details.Fields["Occupation"]);
         Assert.Equal("Lostvillian", details.Fields["Nationality"]);
         Assert.Equal("Tall", details.Fields["PhysicalDescription"]);

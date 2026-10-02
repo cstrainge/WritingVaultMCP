@@ -72,7 +72,7 @@ public sealed class VaultMcpResultMapper(VaultReferenceService references)
         ["EntityId"] = "Entity", ["CharacterId"] = "Entity", ["RelatedCharacterId"] = "Entity",
         ["SourceCharacterId"] = "Entity", ["TargetCharacterId"] = "Entity", ["ParticipantEntityId"] = "Entity",
         ["MemberEntityId"] = "Entity", ["WorldEventId"] = "Entity", ["LocationId"] = "Entity",
-        ["ParentLocationId"] = "Entity", ["BirthLocationId"] = "Entity", ["OrganizationId"] = "Entity",
+        ["ParentLocationId"] = "Entity", ["BirthLocationId"] = "Entity", ["SpeciesId"] = "Species", ["OrganizationId"] = "Entity",
         ["ObjectId"] = "Entity", ["ProjectId"] = "Entity", ["SourceEntityId"] = "Entity",
         ["SourceId"] = "Source", ["TagId"] = "Tag", ["ClaimId"] = "Claim", ["NoteId"] = "EntityNote",
         ["SourceSnapshotId"] = "SourceSnapshot", ["PrincipalId"] = "OwnershipPrincipal",

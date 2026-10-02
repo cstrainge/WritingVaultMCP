@@ -26,7 +26,7 @@ public sealed partial class AccessV4ReadService
             var kinds = request.Kinds is { Count: > 0 }
                 ? request.Kinds.Distinct().ToArray()
                 : Enum.GetValues<V4RecordKind>().Where(kind => kind is V4RecordKind.Project or V4RecordKind.Location or
-                    V4RecordKind.Character or V4RecordKind.Organization or V4RecordKind.Object or V4RecordKind.WorldEvent or
+                    V4RecordKind.Character or V4RecordKind.Organization or V4RecordKind.Object or V4RecordKind.WorldEvent or V4RecordKind.Species or
                     V4RecordKind.Source or V4RecordKind.Tag).ToArray();
             if (kinds.Length == 1 && kinds[0] == V4RecordKind.Character)
                 return await SearchCharactersByNameAsync(request, continuity, revision, token).ConfigureAwait(false);

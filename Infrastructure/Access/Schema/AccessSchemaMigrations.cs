@@ -97,17 +97,28 @@ internal static class AccessSchemaMigrations
             AccessSchemaDefinition.RecordPageSnapshotChecksum,
             AccessSchemaDefinition.ApplicationVersion,
             RecordPageSnapshotCommands()),
-        new(AccessSchemaDefinition.MigrationId, AccessSchemaDefinition.Checksum,
+        new(AccessSchemaDefinition.ProjectStoryEventMigrationId, AccessSchemaDefinition.ProjectStoryEventChecksum,
             AccessSchemaDefinition.ApplicationVersion,
             new[] { "ALTER TABLE [EntityEvents] ADD COLUMN [ProjectBoundary] TEXT(20)",
                 "ALTER TABLE [Characters] ADD COLUMN [BirthdayRecurring] YESNO NOT NULL DEFAULT 0" }.Concat(
                 new[] { "WorldEvents", "EntityEvents", "RelationshipEvents" }.SelectMany(table => new[] {
                     $"ALTER TABLE [{table}] ADD COLUMN [RecurrenceFrequency] TEXT(10)",
                     $"ALTER TABLE [{table}] ADD COLUMN [RecurrenceInterval] LONG",
-                    $"ALTER TABLE [{table}] ADD COLUMN [RecurrenceUntil] DATETIME" })).ToArray())
+                    $"ALTER TABLE [{table}] ADD COLUMN [RecurrenceUntil] DATETIME" })).ToArray()),
+        new(AccessSchemaDefinition.MigrationId, AccessSchemaDefinition.Checksum,
+            AccessSchemaDefinition.ApplicationVersion, SpeciesCommands())
     ];
 
     public static AccessSchemaMigration Current => All[^1];
+
+    private static IReadOnlyList<string> SpeciesCommands() =>
+        AccessSchemaDefinition.Tables.Where(t => t.Name == "Species").Select(t => t.CreateSql())
+            .Concat(new[] { "ALTER TABLE [Characters] ADD COLUMN [SpeciesId] LONG", "ALTER TABLE [Characters] ADD COLUMN [Race] TEXT(100)", "ALTER TABLE [Characters] DROP COLUMN [Species]" })
+            .Concat(AccessSchemaDefinition.Indexes.Where(i => i.Table == "Species" || i.Columns.Contains("SpeciesId")).Select(i => i.CreateSql()))
+            .Concat(AccessSchemaDefinition.ForeignKeys.Where(k => k.Name is "FK_Species_Canon" or "FK_Characters_Species").Select(k => k.CreateSql()))
+            .Concat(AccessSchemaDefinition.CheckConstraints.Where(c => c.Table == "Species").Select(c => c.CreateSql()))
+            .Concat(AccessSchemaDefinition.CheckConstraints.Where(c => c.Name is "CK_CanonEntities_EntityType" or "CK_VariantGroups_EntityType")
+                .SelectMany(c => new[] { $"ALTER TABLE [{c.Table}] DROP CONSTRAINT [{c.Name}]", c.CreateSql() })).ToArray();
 
     private static IReadOnlyList<string> V4Commands()
     {

@@ -522,7 +522,8 @@
               "Character",
               "Organization",
               "Object",
-              "WorldEvent"
+              "WorldEvent",
+              "Species"
             ]
           },
           "text": {
@@ -1238,6 +1239,7 @@
               "Organization",
               "Object",
               "WorldEvent",
+              "Species",
               null
             ],
             "default": null
@@ -2631,7 +2633,8 @@
                   "Character",
                   "Organization",
                   "Object",
-                  "WorldEvent"
+                  "WorldEvent",
+                  "Species"
                 ]
               },
               "name": {
@@ -2948,6 +2951,13 @@
               "birthdayRecurring": {
                 "type": "boolean",
                 "default": false
+              },
+              "race": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
               }
             },
             "required": [
@@ -4139,6 +4149,28 @@
                   "value"
                 ],
                 "default": null
+              },
+              "race": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "specified": {
+                    "type": "boolean"
+                  },
+                  "value": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                },
+                "required": [
+                  "specified",
+                  "value"
+                ],
+                "default": null
               }
             },
             "required": [
@@ -4300,7 +4332,8 @@
               "Character",
               "Organization",
               "Object",
-              "WorldEvent"
+              "WorldEvent",
+              "Species"
             ]
           },
           "text": {
@@ -8192,7 +8225,8 @@
                   "Character",
                   "Organization",
                   "Object",
-                  "WorldEvent"
+                  "WorldEvent",
+                  "Species"
                 ]
               },
               "name": {
@@ -8290,6 +8324,7 @@
               "Organization",
               "Object",
               "WorldEvent",
+              "Species",
               null
             ],
             "default": null

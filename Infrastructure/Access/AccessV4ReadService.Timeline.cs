@@ -59,9 +59,9 @@ public sealed partial class AccessV4ReadService
                 throw new VaultValidationException([new("timeline.filter_too_large", "filters", "A timeline filter list cannot exceed 100 values.")]);
             if (request.EntityEventKinds is { } ownerKinds && ownerKinds.Any(kind =>
                     kind is not (V4RecordKind.Character or V4RecordKind.Location or
-                        V4RecordKind.Organization or V4RecordKind.Object or V4RecordKind.Project)))
+                        V4RecordKind.Organization or V4RecordKind.Object or V4RecordKind.Project or V4RecordKind.Species)))
                 throw new VaultValidationException([new("timeline.entity_event_kind", "entityEventKinds",
-                    "Entity event kinds must be Character, Location, Organization, Object, or Project.")]);
+                    "Entity event kinds must be Character, Location, Organization, Object, Project, or Species.")]);
             var from = request.From is null ? null : ParseInput(request.From);
             var to = request.To is null ? null : ParseInput(request.To);
             var viewportLower = from?.LowerBound ?? from?.UpperBound;
@@ -637,7 +637,7 @@ public sealed partial class AccessV4ReadService
                 "WorldEvent", V4TimelineLane.WorldEvents, "Event", true).ConfigureAwait(false);
             using (var events = new AccessCommand(connection,
                        "SELECT e.[Id],e.[Title],e.[Description],e.[EventKind],e.[EventLowerBound],e.[EventUpperBound],e.[EventLowerInclusive],e.[EventUpperInclusive],e.[EventOriginalText],e.[EventCalendarId],e.[NarrativeOrder],e.[Version],(e.[IsDeleted] OR c.[IsDeleted]),e.[EntityId],c.[EntityType]," + EntityLabelExpression("c") + ",e.[ProjectBoundary]" +
-                       " FROM (((((( [EntityEvents] AS e INNER JOIN [CanonEntities] AS c ON e.[EntityId]=c.[Id]) LEFT JOIN [Projects] AS p ON c.[Id]=p.[EntityId]) LEFT JOIN [Locations] AS l ON c.[Id]=l.[EntityId]) LEFT JOIN [Characters] AS ch ON c.[Id]=ch.[EntityId]) LEFT JOIN [Organizations] AS o ON c.[Id]=o.[EntityId]) LEFT JOIN [Objects] AS ob ON c.[Id]=ob.[EntityId]) LEFT JOIN [WorldEvents] AS w ON c.[Id]=w.[EntityId] WHERE c.[ContinuityId]=?")
+                       " FROM ((((((( [EntityEvents] AS e INNER JOIN [CanonEntities] AS c ON e.[EntityId]=c.[Id]) LEFT JOIN [Projects] AS p ON c.[Id]=p.[EntityId]) LEFT JOIN [Locations] AS l ON c.[Id]=l.[EntityId]) LEFT JOIN [Characters] AS ch ON c.[Id]=ch.[EntityId]) LEFT JOIN [Organizations] AS o ON c.[Id]=o.[EntityId]) LEFT JOIN [Objects] AS ob ON c.[Id]=ob.[EntityId]) LEFT JOIN [WorldEvents] AS w ON c.[Id]=w.[EntityId]) LEFT JOIN [Species] AS sp ON c.[Id]=sp.[EntityId] WHERE c.[ContinuityId]=?")
                    .Add(OleDbType.Integer, continuity))
             {
                 rows.AddRange(await events.QueryAsync(r => new TimelineRow(r.GetInt32(0), "EntityEvent", r.GetString(1),

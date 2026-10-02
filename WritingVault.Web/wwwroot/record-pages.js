@@ -240,7 +240,7 @@
       state.lastRefresh = new Date(); revokeImages();
       const summary = record.summary;
       setText('record-kind', label(summary.kind)); renderCharacterHeader(record);
-      $('record-timeline').hidden = !!snapshot || !['Character', 'Project', 'WorldEvent', 'Location', 'Organization', 'Object'].includes(summary.kind);
+      $('record-timeline').hidden = !!snapshot || !['Character', 'Project', 'WorldEvent', 'Location', 'Organization', 'Object', 'Species'].includes(summary.kind);
       setText('record-context', summary.context || ''); $('record-deleted').hidden = !summary.isDeleted;
       const main = $('record-main'); clear(main);
       const fields = $('record-fields'); clear(fields);
@@ -304,7 +304,8 @@
         const term = document.createElement('dt'); term.textContent = label(key);
         const detail = document.createElement('dd');
         const href = /url$/i.test(key) && typeof value === 'string' ? safeUrl(value) : null;
-        if (href) { const link = document.createElement('a'); link.href = href; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.textContent = value; detail.append(link); }
+        if (key === 'species' && value?.ref) detail.append(referenceRow(value));
+        else if (href) { const link = document.createElement('a'); link.href = href; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.textContent = value; detail.append(link); }
         else if (/AtUtc$/.test(key) && typeof value === 'string')
           detail.textContent = window.WritingVaultStoryDates.utcTimestamp(value);
         else detail.textContent = displayValue(value);

@@ -43,19 +43,23 @@ public sealed class SemanticVaultWriteTools(
     [McpServerTool(Name = "entity_create", Destructive = false, Idempotent = true, OpenWorld = false, UseStructuredContent = true), Description("Creates an entity in the selected continuity. Related records use semantic references.")]
     public Task<McpMutationResult> CreateEntity(McpCreateEntityRequest request, CancellationToken token) => Mutate(async () =>
     {
+        var species = request.Species is null ? null : await Resolve(request.Species, token, "Species");
         var birthLocation = request.BirthLocationReference is null ? null : await Resolve(request.BirthLocationReference, token, "Location");
         var group = request.VariantGroupReference is null ? null : await Resolve(request.VariantGroupReference, token, "VariantGroup");
         return await vault.CreateEntityAsync(new(Op(request.RequestToken), Cid, request.EntityType, request.Name,
             request.Description, request.SecondaryType, request.TimeZoneId, request.Birth, request.Death, request.Occurred,
             birthLocation?.Id, request.BirthLocationDetail, group?.Id, Label, request.NarrativeOrder,
             request.MiddleNames, request.FamilyName, request.PreferredName, request.Gender, request.Pronouns,
-            request.Species, request.Occupation, request.Nationality, request.PhysicalDescription, request.PersonalitySummary, request.BirthdayRecurring), token);
+            species?.Id, request.Occupation, request.Nationality, request.PhysicalDescription, request.PersonalitySummary, request.BirthdayRecurring, request.Race), token);
     }, token);
 
     [McpServerTool(Name = "entity_patch", Destructive = true, Idempotent = true, OpenWorld = false, UseStructuredContent = true), Description("Patches an entity by semantic reference with explicit field state and expectedVersion.")]
     public Task<McpMutationResult> PatchEntity(McpPatchEntityRequest request, CancellationToken token) => Mutate(async () =>
     {
         var entity = await Entity(request.EntityReference, token);
+        PatchField<int?>? species = null;
+        if (request.Species is { Specified: true } speciesField)
+            species = new(true, speciesField.Value is null ? null : (await Resolve(speciesField.Value, token, "Species")).Id);
         PatchField<int?>? birthLocation = null;
         if (request.BirthLocationReference is { Specified: true } field)
             birthLocation = new(true, field.Value is null ? null : (await Resolve(field.Value, token, "Location")).Id);
@@ -63,8 +67,8 @@ public sealed class SemanticVaultWriteTools(
             request.Name, request.Description, request.SecondaryType, request.TimeZoneId, Label,
             request.Birth, request.Death, request.Occurred, birthLocation, request.BirthLocationDetail,
             request.NarrativeOrder, request.MiddleNames, request.FamilyName, request.PreferredName, request.Gender,
-            request.Pronouns, request.Species, request.Occupation, request.Nationality,
-            request.PhysicalDescription, request.PersonalitySummary, request.BirthdayRecurring), token);
+            request.Pronouns, species, request.Occupation, request.Nationality,
+            request.PhysicalDescription, request.PersonalitySummary, request.BirthdayRecurring, request.Race), token);
     }, token);
 
     [McpServerTool(Name = "entity_duplicate_to_continuity", Destructive = false, Idempotent = true, OpenWorld = false, UseStructuredContent = true), Description("Copies core fields to a named target continuity as an independent entity.")]

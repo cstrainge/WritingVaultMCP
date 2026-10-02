@@ -24,6 +24,8 @@ Every page-shaped read includes an opaque observed revision. Use `changes_since`
 - Backups: `vault_backup_create`
 - Variant groups: `variant_group_create`, `variant_group_update`, `entity_variant_group_set`
 - Canon entities: `entity_create`, `entity_update`, `entity_duplicate_to_continuity`
+  - `Species` is a continuity-scoped canon entity, listed under **Beastariry** in the viewer. It supports Markdown descriptions, notes, images and revisions, tags, sources, claims, events, project links, variant groups, and record history. Its `characters` relation lists characters linked to it.
+  - A character's optional `fields.species` (or `changes.species`) takes a `species:…~…` reference from the same continuity; `null` clears it. `fields.race` / `changes.race` is independent optional text (100 characters). The previous free-text species column is removed by migration 014 without creating inferred species records. Copies to another continuity clear the species link and retain race text.
 - Tags: `tag_create`, `tag_update`, `tag_apply`
 - Sources and claims: `source_create`, `source_update`, `source_snapshot_add`, `claim_create`, `claim_update`
 - Notes: `note_add`, `note_update`, `note_source_link`

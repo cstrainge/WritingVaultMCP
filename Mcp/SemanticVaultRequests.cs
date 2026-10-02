@@ -14,7 +14,7 @@ public sealed record McpCreateEntityRequest(
     string? BirthLocationReference = null, string? BirthLocationDetail = null, string? VariantGroupReference = null,
     double? NarrativeOrder = null, string? MiddleNames = null, string? FamilyName = null, string? PreferredName = null,
     string? Gender = null, string? Pronouns = null, string? Species = null, string? Occupation = null,
-    string? Nationality = null, string? PhysicalDescription = null, string? PersonalitySummary = null, bool BirthdayRecurring = false);
+    string? Nationality = null, string? PhysicalDescription = null, string? PersonalitySummary = null, bool BirthdayRecurring = false, string? Race = null);
 public sealed record McpPatchEntityRequest(
     string RequestToken, string EntityReference, int ExpectedVersion,
     PatchField<string>? Name = null, PatchField<string>? Description = null, PatchField<string>? SecondaryType = null,
@@ -24,7 +24,7 @@ public sealed record McpPatchEntityRequest(
     PatchField<string>? MiddleNames = null, PatchField<string>? FamilyName = null, PatchField<string>? PreferredName = null,
     PatchField<string>? Gender = null, PatchField<string>? Pronouns = null, PatchField<string>? Species = null,
     PatchField<string>? Occupation = null, PatchField<string>? Nationality = null,
-    PatchField<string>? PhysicalDescription = null, PatchField<string>? PersonalitySummary = null, PatchField<bool>? BirthdayRecurring = null);
+    PatchField<string>? PhysicalDescription = null, PatchField<string>? PersonalitySummary = null, PatchField<bool>? BirthdayRecurring = null, PatchField<string>? Race = null);
 public sealed record McpDuplicateEntityRequest(string RequestToken, string SourceEntityReference, string TargetContinuityName, string? Name = null);
 public sealed record McpSetClockRequest(string RequestToken, DateTimeOffset? CurrentInstant, string? ReferenceTimeZoneId, int ExpectedVersion);
 public sealed record McpCreateTagRequest(string RequestToken, string Name, string? Description = null);

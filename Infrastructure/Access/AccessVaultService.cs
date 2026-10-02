@@ -67,12 +67,13 @@ public sealed partial class AccessVaultService(
             if (request.EntityType != CanonEntityType.Character && new[]
                 {
                     request.MiddleNames, request.FamilyName, request.PreferredName, request.Gender, request.Pronouns,
-                    request.Species, request.Occupation, request.Nationality, request.PhysicalDescription, request.PersonalitySummary
+                    request.Race, request.Occupation, request.Nationality, request.PhysicalDescription, request.PersonalitySummary
                 }.Any(value => value is not null))
                 throw new ArgumentException("Character-specific fields require EntityType Character.");
-            if (request.Species is not null && request.SecondaryType is not null &&
-                !string.Equals(request.Species, request.SecondaryType, StringComparison.Ordinal))
-                throw new ArgumentException("Species and SecondaryType cannot specify different values.");
+            if (request.SpeciesId is not null && request.EntityType != CanonEntityType.Character)
+                throw new ArgumentException("Species is supported only for characters.");
+            if (request.SecondaryType is not null && request.EntityType is CanonEntityType.Character or CanonEntityType.Species)
+                throw new ArgumentException("SecondaryType is not supported for characters or species.");
             if (request.PersonalitySummary is not null && request.Description is not null &&
                 !string.Equals(request.PersonalitySummary, request.Description, StringComparison.Ordinal))
                 throw new ArgumentException("PersonalitySummary and Description cannot specify different values.");
@@ -97,6 +98,8 @@ public sealed partial class AccessVaultService(
                     await RequireVariantGroupAsync(context, variantGroupId, request.ContinuityId, request.EntityType, token).ConfigureAwait(false);
                 if (request.BirthLocationId is { } birthLocation)
                     await RequireEntityAsync(context, birthLocation, CanonEntityType.Location, request.ContinuityId, token).ConfigureAwait(false);
+                if (request.SpeciesId is { } speciesId)
+                    await RequireEntityAsync(context, speciesId, CanonEntityType.Species, request.ContinuityId, token).ConfigureAwait(false);
                 var now = DateTime.UtcNow;
                 using var canon = context.Command(
                         "INSERT INTO [CanonEntities] ([ContinuityId],[EntityType],[VariantGroupId],[CreatedAtUtc],[UpdatedAtUtc]) VALUES (?,?,?,?,?)")
@@ -159,6 +162,7 @@ public sealed partial class AccessVaultService(
                     CanonEntityType.Organization => ("Organizations", "Name", 255),
                     CanonEntityType.Object => ("Objects", "Name", 255),
                     CanonEntityType.WorldEvent => ("WorldEvents", "Title", 255),
+                    CanonEntityType.Species => ("Species", "Name", 255),
                     _ => throw new ArgumentOutOfRangeException()
                 };
                 using var sourceNameCommand = context.Command($"SELECT [{sourceNameColumn}] FROM [{sourceTable}] WHERE [EntityId]=?")
@@ -481,6 +485,11 @@ public sealed partial class AccessVaultService(
     {
         switch (request.EntityType)
         {
+            case CanonEntityType.Species:
+                using (var command = context.Command("INSERT INTO [Species] ([EntityId],[Name],[Description]) VALUES (?,?,?)")
+                    .Add(OleDbType.Integer, id).Add(OleDbType.VarWChar, name, 255).Add(OleDbType.LongVarWChar, request.Description))
+                    await command.ExecuteNonQueryAsync(token).ConfigureAwait(false);
+                break;
             case CanonEntityType.Project:
                 using (var command = context.Command("INSERT INTO [Projects] ([EntityId],[Name],[Description]) VALUES (?,?,?)")
                            .Add(OleDbType.Integer, id).Add(OleDbType.VarWChar, name, 255).Add(OleDbType.LongVarWChar, request.Description))
@@ -495,7 +504,7 @@ public sealed partial class AccessVaultService(
             case CanonEntityType.Character:
                 var birth = request.Birth ?? StoryDate.Unknown();
                 var death = request.Death ?? StoryDate.Unknown();
-                using (var command = context.Command("INSERT INTO [Characters] ([EntityId],[GivenName],[MiddleNames],[FamilyName],[PreferredName],[BirthKind],[BirthLowerBound],[BirthUpperBound],[BirthLowerInclusive],[BirthUpperInclusive],[BirthOriginalText],[BirthCalendarId],[DeathKind],[DeathLowerBound],[DeathUpperBound],[DeathLowerInclusive],[DeathUpperInclusive],[DeathOriginalText],[DeathCalendarId],[BirthLocationId],[BirthLocationDetail],[Gender],[Pronouns],[Species],[Occupation],[Nationality],[PhysicalDescription],[PersonalitySummary]) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
+                using (var command = context.Command("INSERT INTO [Characters] ([EntityId],[GivenName],[MiddleNames],[FamilyName],[PreferredName],[BirthKind],[BirthLowerBound],[BirthUpperBound],[BirthLowerInclusive],[BirthUpperInclusive],[BirthOriginalText],[BirthCalendarId],[DeathKind],[DeathLowerBound],[DeathUpperBound],[DeathLowerInclusive],[DeathUpperInclusive],[DeathOriginalText],[DeathCalendarId],[BirthLocationId],[BirthLocationDetail],[Gender],[Pronouns],[SpeciesId],[Occupation],[Nationality],[PhysicalDescription],[PersonalitySummary],[Race]) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
                            .Add(OleDbType.Integer, id).Add(OleDbType.VarWChar, name, 100)
                            .Add(OleDbType.VarWChar, request.MiddleNames, 255).Add(OleDbType.VarWChar, request.FamilyName, 100)
                            .Add(OleDbType.VarWChar, request.PreferredName, 100))
@@ -503,10 +512,11 @@ public sealed partial class AccessVaultService(
                     AddStoryDate(command, birth); AddStoryDate(command, death);
                     command.Add(OleDbType.Integer, request.BirthLocationId).Add(OleDbType.VarWChar, request.BirthLocationDetail, 255)
                         .Add(OleDbType.VarWChar, request.Gender, 100).Add(OleDbType.VarWChar, request.Pronouns, 100)
-                        .Add(OleDbType.VarWChar, request.Species ?? request.SecondaryType, 100)
+                        .Add(OleDbType.Integer, request.SpeciesId)
                         .Add(OleDbType.VarWChar, request.Occupation, 255).Add(OleDbType.VarWChar, request.Nationality, 100)
                         .Add(OleDbType.LongVarWChar, request.PhysicalDescription)
-                        .Add(OleDbType.LongVarWChar, request.PersonalitySummary ?? request.Description);
+                        .Add(OleDbType.LongVarWChar, request.PersonalitySummary ?? request.Description)
+                        .Add(OleDbType.VarWChar, request.Race, 100);
                     await command.ExecuteNonQueryAsync(token).ConfigureAwait(false);
                 }
                 break;
@@ -544,6 +554,8 @@ public sealed partial class AccessVaultService(
     {
         var sql = type switch
         {
+            CanonEntityType.Species =>
+                "INSERT INTO [Species] ([EntityId],[Name],[Description]) SELECT ?,?,[Description] FROM [Species] WHERE [EntityId]=?",
             CanonEntityType.Project =>
                 "INSERT INTO [Projects] ([EntityId],[Name],[Description]) SELECT ?,?,[Description] FROM [Projects] WHERE [EntityId]=?",
             CanonEntityType.Location =>
@@ -552,11 +564,11 @@ public sealed partial class AccessVaultService(
                 "INSERT INTO [Characters] ([EntityId],[GivenName],[MiddleNames],[FamilyName],[PreferredName]," +
                 "[BirthKind],[BirthLowerBound],[BirthUpperBound],[BirthLowerInclusive],[BirthUpperInclusive],[BirthOriginalText],[BirthCalendarId]," +
                 "[DeathKind],[DeathLowerBound],[DeathUpperBound],[DeathLowerInclusive],[DeathUpperInclusive],[DeathOriginalText],[DeathCalendarId]," +
-                "[BirthLocationId],[BirthLocationDetail],[Gender],[Pronouns],[Species],[Occupation],[Nationality],[PhysicalDescription],[PersonalitySummary],[BirthdayRecurring]) " +
+                "[BirthLocationId],[BirthLocationDetail],[Gender],[Pronouns],[SpeciesId],[Occupation],[Nationality],[PhysicalDescription],[PersonalitySummary],[BirthdayRecurring],[Race]) " +
                 "SELECT ?,?,[MiddleNames],[FamilyName],[PreferredName]," +
                 "[BirthKind],[BirthLowerBound],[BirthUpperBound],[BirthLowerInclusive],[BirthUpperInclusive],[BirthOriginalText],[BirthCalendarId]," +
                 "[DeathKind],[DeathLowerBound],[DeathUpperBound],[DeathLowerInclusive],[DeathUpperInclusive],[DeathOriginalText],[DeathCalendarId]," +
-                "Null,[BirthLocationDetail],[Gender],[Pronouns],[Species],[Occupation],[Nationality],[PhysicalDescription],[PersonalitySummary],[BirthdayRecurring] FROM [Characters] WHERE [EntityId]=?",
+                "Null,[BirthLocationDetail],[Gender],[Pronouns],Null,[Occupation],[Nationality],[PhysicalDescription],[PersonalitySummary],[BirthdayRecurring],[Race] FROM [Characters] WHERE [EntityId]=?",
             CanonEntityType.Organization =>
                 "INSERT INTO [Organizations] ([EntityId],[Name],[OrganizationType],[Description]) SELECT ?,?,[OrganizationType],[Description] FROM [Organizations] WHERE [EntityId]=?",
             CanonEntityType.Object =>
