@@ -260,6 +260,8 @@ public sealed class AccessV4TemporalService(
         var local = DateTime.SpecifyKind(TimeZoneInfo.ConvertTime(instant.Value, tz).DateTime, DateTimeKind.Unspecified);
         var calendarAge = StoryAge.Calculate(data.Birth, DateOnly.FromDateTime(local), data.Death);
         var calendar = Measure(calendarAge);
+        if (calendarAge.ExactYears == 0)
+            calendar = calendar with { Display = InfantCalendarDisplay(data.Birth, data.Death, DateOnly.FromDateTime(local)) };
         var effects = data.Effects.Where(e => !e.Deleted).Concat(hypothetical is null ? [] : [hypothetical]).ToArray();
         var warnings = new List<string>();
         V4AgeMeasure biological = calendar, experienced = calendar;
@@ -307,7 +309,7 @@ public sealed class AccessV4TemporalService(
                     : EffectSummary(effect, session.ContinuityName));
         }
         return new(character, calendarAge.Status.ToString(), instant.Value.ToString("O", CultureInfo.InvariantCulture), zone,
-            calendar, calendar with { Display = "CalendarAge legal policy" }, biological, experienced,
+            calendar, calendar, biological, experienced,
             applied, warnings.Distinct().ToArray(), revision);
     }
 
@@ -338,12 +340,12 @@ public sealed class AccessV4TemporalService(
                 var lastMissing = b.MinimumYears is null && b.MaximumYears is null && b.ExactYears is null;
                 if (firstMissing || lastMissing) minimum = 0;
                 return new("DayRange", null, minimum, maximum,
-                    $"{minimum:0.##}–{maximum:0.##} years during this day");
+                    $"{DurationDisplay(minimum, maximum)} during this day");
             }
             return Math.Abs(maximum - minimum) < 1e-9
                 ? a with { ExactYears = minimum, MinimumYears = minimum, MaximumYears = maximum }
                 : new("Bounded", null, minimum, maximum,
-                    $"{minimum:0.##}–{maximum:0.##} years");
+                    DurationDisplay(minimum, maximum));
         }
         return beginning with
         {
@@ -464,11 +466,48 @@ public sealed class AccessV4TemporalService(
             V4RecordKind.TemporalEffect, effect.Name, ContinuityName: continuityName,
             Version: effect.Version, IsDeleted: effect.Deleted);
     private static V4AgeMeasure Measure(StoryAge value) => new(value.Status.ToString(), value.ExactYears, value.MinimumYears, value.MaximumYears,
-        value.ExactYears is { } exact ? $"{exact} years" : value.MinimumYears is { } min && value.MaximumYears is { } max ? $"{min}–{max} years" : null);
+        value.ExactYears is { } exact ? $"{exact} {(exact == 1 ? "year" : "years")}" : value.MinimumYears is { } min && value.MaximumYears is { } max ? $"{min}–{max} years" : null);
     private static V4AgeMeasure DurationMeasure(double minimumDays, double maximumDays)
     {
         var min = minimumDays / 365.2425d; var max = maximumDays / 365.2425d;
-        return Math.Abs(max - min) < 1e-9 ? new("Exact", min, min, max, $"{min:0.##} years") : new("Bounded", null, min, max, $"{min:0.##}–{max:0.##} years");
+        return Math.Abs(max - min) < 1e-9 ? new("Exact", min, min, max, DurationDisplay(min, min)) : new("Bounded", null, min, max, DurationDisplay(min, max));
+    }
+    private static string DurationDisplay(double min, double max)
+    {
+        // Adjusted biological/experienced durations have no calendar month anchor.
+        var unit = max < 1 ? "day" : "year";
+        if (max < 1) { min *= 365.2425d; max *= 365.2425d; }
+        return Math.Abs(max - min) < 1e-9
+            ? FormattableString.Invariant($"{min:0.##} {unit}{(Math.Round(min, 2) == 1 ? "" : "s")}")
+            : FormattableString.Invariant($"{min:0.##}–{max:0.##} {unit}s");
+    }
+
+    private static string InfantCalendarDisplay(StoryDate birth, StoryDate death, DateOnly asOf)
+    {
+        var earliest = DateOnly.FromDateTime(birth.LowerBound!.Value);
+        var latest = DateOnly.FromDateTime(birth.UpperInclusive ? birth.UpperBound!.Value : birth.UpperBound!.Value.AddTicks(-1));
+        var endMin = asOf;
+        var endMax = asOf;
+        if (death.Kind != StoryDateKind.Unknown)
+        {
+            var first = DateOnly.FromDateTime(death.LowerBound!.Value);
+            var last = DateOnly.FromDateTime(death.UpperInclusive ? death.UpperBound!.Value : death.UpperBound!.Value.AddTicks(-1));
+            if (first < endMin) endMin = first;
+            if (last < endMax) endMax = last;
+        }
+        static string Elapsed(DateOnly start, DateOnly end)
+        {
+            if (end <= start) return "0 days";
+            var months = (end.Year - start.Year) * 12 + end.Month - start.Month;
+            if (start.AddMonths(months) > end) months--;
+            var days = end.DayNumber - start.AddMonths(months).DayNumber;
+            var monthText = $"{months} {(months == 1 ? "month" : "months")}";
+            var dayText = $"{days} {(days == 1 ? "day" : "days")}";
+            return months == 0 ? dayText : days == 0 ? monthText : $"{monthText}, {dayText}";
+        }
+        var minimum = Elapsed(latest, endMin);
+        var maximum = Elapsed(earliest, endMax);
+        return minimum == maximum ? minimum : $"{minimum}–{maximum}";
     }
     private static DateTime Min(DateTime a, DateTime b) => a <= b ? a : b;
     private static DateTime Max(DateTime a, DateTime b) => a >= b ? a : b;

@@ -9,6 +9,58 @@ namespace WritingVaultMcp.Tests;
 
 public sealed class V4Phase5TemporalTests
 {
+    [Theory]
+    [InlineData("2026-10-01", "2026-10-01", null, "0 days")]
+    [InlineData("2026-09-30", "2026-10-01", null, "1 day")]
+    [InlineData("2026-09-01", "2026-10-01", null, "1 month")]
+    [InlineData("2026-08-31", "2026-10-01", null, "1 month, 1 day")]
+    [InlineData("2026-01-31", "2026-02-28", null, "1 month")]
+    [InlineData("2024-02-29", "2025-02-27", null, "11 months, 29 days")]
+    [InlineData("2024-02-29", "2025-02-28", null, "1 year")]
+    [InlineData("2025-10-01", "2026-10-01", null, "1 year")]
+    [InlineData("2024-10-01", "2026-10-01", null, "2 years")]
+    [InlineData("2026-08-31", "2028-10-01", "2026-10-01", "1 month, 1 day")]
+    public async Task AgeDisplayUsesCalendarMonthsDaysAndSingularUnits(string birth, string at, string? death, string expected)
+    {
+        await using var vault = await TestVault.CreateAsync();
+        var continuity = int.Parse((await vault.Service.CreateContinuityAsync(new(
+            Guid.NewGuid().ToString(), "Young ages", "UTC"))).ResourceKey!);
+        await vault.Service.CreateEntityAsync(new(Guid.NewGuid().ToString(), continuity,
+            CanonEntityType.Character, "Baby", Birth: StoryDate.ExactDate(DateOnly.Parse(birth)),
+            Death: death is null ? null : StoryDate.ExactDate(DateOnly.Parse(death))));
+        var (reads, session, references) = vault.V4();
+        session.SelectContinuity(continuity, "Young ages");
+        session.SetDate(DateOnly.Parse(at), "UTC");
+        var temporal = new AccessV4TemporalService(vault.Factory, vault.Coordinator, references,
+            new V4TargetResolver(new AccessV4SemanticResolver(vault.Factory, vault.Coordinator, references)), session, reads);
+        var age = await temporal.AgeAsync(new("Baby"));
+        Assert.All(new[] { age.Calendar, age.Legal, age.Biological, age.Experienced },
+            measure => Assert.Equal(expected, measure.Display));
+    }
+
+    [Fact]
+    public async Task YoungAgeDisplayPreservesUncertainBirthAndAdjustedDayBounds()
+    {
+        await using var vault = await TestVault.CreateAsync();
+        var continuity = int.Parse((await vault.Service.CreateContinuityAsync(new(
+            Guid.NewGuid().ToString(), "Young bounds", "UTC"))).ResourceKey!);
+        await vault.Service.CreateEntityAsync(new(Guid.NewGuid().ToString(), continuity,
+            CanonEntityType.Character, "Uncertain", Birth: new StoryDate(StoryDateKind.Month,
+                new DateTime(2026, 9, 1), new DateTime(2026, 10, 1), true, false)));
+        await vault.Service.CreateEntityAsync(new(Guid.NewGuid().ToString(), continuity,
+            CanonEntityType.Character, "Tracked", Birth: StoryDate.ExactDate(new(2026, 9, 30))));
+        var (reads, session, references) = vault.V4();
+        session.SelectContinuity(continuity, "Young bounds"); session.SetDate(new(2026, 10, 1), "UTC");
+        var temporal = new AccessV4TemporalService(vault.Factory, vault.Coordinator, references,
+            new V4TargetResolver(new AccessV4SemanticResolver(vault.Factory, vault.Coordinator, references)), session, reads);
+        Assert.Equal("1 day–1 month", (await temporal.AgeAsync(new("Uncertain"))).Calendar.Display);
+        Assert.True((await temporal.SetProfileAsync(new(Guid.NewGuid().ToString(), "Tracked", null, true))).Success);
+        var age = await temporal.AgeAsync(new("Tracked"));
+        Assert.Equal("1 day", age.Calendar.Display);
+        Assert.Equal("1–2 days", age.Biological.Display);
+        Assert.Equal("1–2 days", age.Experienced.Display);
+    }
+
     [Fact]
     public async Task DateOnlySessionReportsDayWideTemporalAgeBounds()
     {

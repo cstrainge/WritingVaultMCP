@@ -6,8 +6,12 @@
       revokeImages, openRecord, openImageDetail, fail, formatTime } = context;
     function ageMeasure(measure) {
       if (!measure) return 'Unavailable';
+      if (measure.display) return measure.display;
       const number = value => new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(value);
-      if (Number.isFinite(measure.exactYears)) return `${number(measure.exactYears)} years`;
+      if (Number.isFinite(measure.exactYears)) {
+        const unit = new Intl.PluralRules('en', { maximumFractionDigits: 2 }).select(measure.exactYears) === 'one' ? 'year' : 'years';
+        return `${number(measure.exactYears)} ${unit}`;
+      }
       if (Number.isFinite(measure.minimumYears) && Number.isFinite(measure.maximumYears))
         return `${number(measure.minimumYears)}–${number(measure.maximumYears)} years`;
       if (measure.status === 'BirthDateUnknown') return 'Birth date unknown';
