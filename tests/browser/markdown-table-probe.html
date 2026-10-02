@@ -1,0 +1,31 @@
+<!doctype html><meta charset="utf-8"><title>Markdown table regression probe</title>
+<script src="../../WritingVault.Web/wwwroot/markdown.js"></script>
+<div id="note"></div><pre id="result"></pre>
+<script>
+const seen = [];
+WritingVaultMarkdown.configure({
+  image(link, image, reference, revision) { seen.push({reference, revision}); },
+  record(link, reference) { seen.push({reference}); }
+});
+const note = document.getElementById('note');
+const alt = 'An accessible cover description. '.repeat(20);
+WritingVaultMarkdown.renderMarkdown(note,
+  '| [Book](vault-record:project:book~ABCDEFGH) | Other | Empty |  \n' +
+  '| :--- | :---: | ---: |\n' +
+  `| ![${alt}](vault-image:image:cover~ABCDEFGH?v=2){width=200px} | **Bold** | |\n\n` +
+  'Left | Right\n--- | ---\na \\| b | `c\\|d`\nshort |\nextra | cell | ignored\n\n' +
+  '| Not | table |\n| nope | --- |\n\n' +
+  '```\n| Code | Only |\n| --- | --- |\n```\n\n' +
+  '<img src=x onerror=alert(1)>\n[Unsafe](javascript:alert)\n![Remote](https://example.test/x.png)');
+const assert = (condition, message) => { if (!condition) throw new Error(message); };
+assert(note.querySelectorAll('table').length === 2, 'Table detection or fenced code');
+assert(note.querySelectorAll('table')[0].querySelectorAll('td').length === 3, 'Empty cell');
+assert(note.querySelector('img').alt === alt && note.querySelector('img').style.width === '200px', 'Long alt or image width');
+assert(seen.length === 2 && seen[1].revision === 2, 'Vault handlers and pinned revision');
+assert(note.querySelectorAll('th')[1].style.textAlign === 'center', 'Center alignment');
+assert(note.querySelectorAll('th')[2].style.textAlign === 'right', 'Right alignment');
+assert(note.querySelectorAll('table')[1].querySelector('td').textContent === 'a | b', 'Escaped pipe');
+assert(note.querySelector('code').textContent === 'c|d', 'Inline code pipe');
+assert(note.querySelectorAll('img').length === 1 && !note.querySelector('a[href^="javascript"]'), 'Unsafe HTML or URL');
+document.getElementById('result').textContent = JSON.stringify({passed:true,tables:2,altLength:alt.length});
+</script>

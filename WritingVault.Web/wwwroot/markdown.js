@@ -10,7 +10,7 @@
   let handlers = Object.freeze({});
   const configure = value => { handlers = Object.freeze({ ...value }); };
   const renderInline = (node, source, context) => {
-    const pattern = /!\[([^\]\n]{0,300})\]\(([^)\s]{1,2048})\)(\{[^}\n]*\})?|\[([^\]\n]{1,300})\]\(([^)\s]{1,2048})\)|`([^`\n]+)`|\*\*([^*\n]+)\*\*|\*([^*\n]+)\*/g;
+    const pattern = /!\[([^\]\n]*)\]\(([^)\s]{1,2048})\)(\{[^}\n]*\})?|\[([^\]\n]{1,300})\]\(([^)\s]{1,2048})\)|`([^`\n]+)`|\*\*([^*\n]+)\*\*|\*([^*\n]+)\*/g;
     let offset = 0; let match;
     while ((match = pattern.exec(source)) !== null) {
       node.append(document.createTextNode(source.slice(offset, match.index)));
@@ -61,10 +61,27 @@
     }
     node.append(document.createTextNode(source.slice(offset)));
   };
+  const tableCells = line => {
+    // Escaped pipes belong to the cell, including pipes inside inline code.
+    const cells = []; let cell = ''; let separated = false;
+    for (let i = 0; i < line.length; i++) {
+      if (line[i] === '\\' && i + 1 < line.length) {
+        const next = line[++i];
+        cell += next === '|' ? '|' : `\\${next}`;
+      } else if (line[i] === '|') {
+        cells.push(cell.trim()); cell = ''; separated = true;
+      } else cell += line[i];
+    }
+    cells.push(cell.trim());
+    if (line.trimStart().startsWith('|')) cells.shift();
+    if (cells[cells.length - 1] === '' && /\|\s*$/.test(line)) cells.pop();
+    return separated ? cells : null;
+  };
   const renderMarkdown = (container, source) => {
     const lines = String(source).split(/\r?\n/);
     let list = null; let code = null; const context = { imageCount: 0, recordCount: 0 };
-    for (const line of lines) {
+    for (let index = 0; index < lines.length; index++) {
+      const line = lines[index];
       if (/^\s*```/.test(line)) {
         if (code) { container.append(code); code = null; }
         else { code = document.createElement('pre'); code.append(document.createElement('code')); }
@@ -72,6 +89,37 @@
       }
       if (code) { code.firstChild.textContent += `${line}\n`; continue; }
       if (!line.trim()) { list = null; continue; }
+      const headers = tableCells(line);
+      const separators = tableCells(lines[index + 1] || '');
+      if (headers?.length && separators?.length === headers.length &&
+          separators.every(cell => /^:?-{3,}:?$/.test(cell))) {
+        list = null;
+        const wrapper = document.createElement('div'); wrapper.className = 'note-table-wrap';
+        wrapper.tabIndex = 0; wrapper.setAttribute('role', 'region');
+        wrapper.setAttribute('aria-label', 'Note table; scroll horizontally for more columns');
+        const table = document.createElement('table'); table.className = 'note-table';
+        const head = document.createElement('thead'), body = document.createElement('tbody');
+        const addRow = (parent, cells, tag) => {
+          const row = document.createElement('tr');
+          headers.forEach((_, column) => {
+            const cell = document.createElement(tag);
+            if (tag === 'th') cell.scope = 'col';
+            const marker = separators[column];
+            if (marker.endsWith(':')) cell.style.textAlign = marker.startsWith(':') ? 'center' : 'right';
+            else if (marker.startsWith(':')) cell.style.textAlign = 'left';
+            renderInline(cell, cells[column] || '', context); row.append(cell);
+          });
+          parent.append(row);
+        };
+        addRow(head, headers, 'th'); index++;
+        while (index + 1 < lines.length) {
+          const cells = tableCells(lines[index + 1]);
+          if (!cells || !lines[index + 1].trim()) break;
+          addRow(body, cells, 'td'); index++;
+        }
+        table.append(head, body); wrapper.append(table); container.append(wrapper);
+        continue;
+      }
       const heading = line.match(/^(#{1,3})\s+(.+)$/);
       const bullet = line.match(/^\s*[-*+]\s+(.+)$/);
       let element;

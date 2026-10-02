@@ -218,6 +218,12 @@ button.vault-card { width: 100%; text-align: left; color: var(--ink); cursor: po
 .image-detail-fields dd { margin: .25rem 0 0; }
 .record-prose .note-image-link { display: inline-block; max-width: 100%; margin: .45rem 0; vertical-align: middle; }
 .record-prose .note-image-link img { display: block; max-width: 100%; height: auto; border-radius: .5rem; }
+.note-table-wrap { max-width: 100%; overflow-x: auto; margin: 1rem 0; }
+.note-table-wrap:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.note-table { border-collapse: collapse; width: 100%; }
+.note-table th, .note-table td { padding: .8rem; border: 1px solid var(--line); text-align: left; vertical-align: top; }
+.note-table th { background: var(--surface-2); }
+.record-prose .note-table .note-image-link { margin: 0; }
 .record-prose .unavailable-link { color: var(--muted); text-decoration: underline dotted; cursor: not-allowed; }
 .association-note { grid-column: 1 / -1; white-space: pre-wrap; }
 .history-entry { border-top: 1px solid var(--line); padding: .8rem 0; font-size: .82rem; line-height: 1.45; }
