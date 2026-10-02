@@ -1411,6 +1411,31 @@
         "isOccurrence": {
           "type": "boolean",
           "default": false
+        },
+        "factStatus": {
+          "enum": [
+            "Unspecified",
+            "Tentative",
+            "Confirmed"
+          ],
+          "default": "Unspecified",
+          "description": "Editorial certainty independent of date precision. Use Tentative for guesses or provisional plans, including exact dates. Confirmed requires an established decision; Unspecified makes no certainty claim."
+        },
+        "storyBeginsStatus": {
+          "enum": [
+            "Unspecified",
+            "Tentative",
+            "Confirmed"
+          ],
+          "default": "Unspecified"
+        },
+        "storyEndsStatus": {
+          "enum": [
+            "Unspecified",
+            "Tentative",
+            "Confirmed"
+          ],
+          "default": "Unspecified"
         }
       },
       "required": [

@@ -12,7 +12,7 @@ public sealed partial class AccessV4ApplicationService
     public async Task<VaultMutationResult> UpdateEventAsync(V4EventUpdateRequest request,
         int continuity, string? clientLabel, CancellationToken cancellationToken = default)
     {
-        if (request.Title is null && request.Description is null && request.Occurred is null &&
+        if (request.FactStatus is null && request.Title is null && request.Description is null && request.Occurred is null &&
             request.WorldEvent is null && request.NarrativeOrder is null && request.ProjectBoundary is null && request.Recurrence is null &&
             !request.ClearDescription && !request.ClearWorldEvent && !request.ClearNarrativeOrder && !request.ClearProjectBoundary && !request.ClearRecurrence)
             return new(false, "patch.empty", Message: "Specify at least one event field or clear flag.");
@@ -102,12 +102,22 @@ public sealed partial class AccessV4ApplicationService
                 update.Add(OleDbType.Integer, target.StorageKey);
                 await update.ExecuteNonQueryAsync(token);
                 await WriteRecurrenceAsync(context, table, key, target.StorageKey, recurrence, token);
+                if (request.FactStatus is { } factStatus) await WriteFactStatusAsync(context, table, key, target.StorageKey, factStatus, token);
                 var versionTable = target.ResourceType == "WorldEvent" ? "CanonEntities" : table;
                 using var bump = context.Command($"UPDATE [{versionTable}] SET [Version]=[Version]+1,[UpdatedAtUtc]=? WHERE [Id]=?")
                     .Add(OleDbType.Date, DateTime.UtcNow).Add(OleDbType.Integer, target.StorageKey);
                 await bump.ExecuteNonQueryAsync(token);
                 return new VaultMutationOutcome(target.ResourceType, target.StorageKey.ToString(), current.Version + 1, "update", request, current.Version);
             }, cancellationToken);
+    }
+
+    private static async Task WriteFactStatusAsync(VaultWriteContext context, string table, string key,
+        int id, V4FactStatus status, CancellationToken token)
+    {
+        if (!Enum.IsDefined(status)) throw new ArgumentException("Unknown factStatus.");
+        using var command = context.Command($"UPDATE [{table}] SET [FactStatus]=? WHERE [{key}]=?")
+            .Add(OleDbType.VarWChar, status.ToString(), 20).Add(OleDbType.Integer, id);
+        await command.ExecuteNonQueryAsync(token);
     }
 
     private static void ValidateRecurrence(StoryDate date, V4EventRecurrence? recurrence,

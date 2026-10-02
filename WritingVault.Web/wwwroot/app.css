@@ -428,3 +428,5 @@ dialog label { margin-top: .45rem; font-size: .78rem; font-weight: 750; }
 }
 .image-revisions{display:flex;flex-wrap:wrap;gap:.7rem}
 .image-revisions a{display:inline-block;padding:.65rem .9rem;border:1px solid var(--line,#4d5045);border-radius:.65rem;color:var(--accent,#e39a6a)}
+/* Editorial certainty is independent of the precision of a story date. */
+.fact-status-badge { display: inline-block; padding: .2rem .5rem; margin: .15rem .4rem .35rem 0; border: 1px dashed #a7782e; border-radius: .35rem; color: #795015; background: #fff4dc; font-size: .85rem; font-weight: 600; }

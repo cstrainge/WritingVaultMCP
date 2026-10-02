@@ -127,7 +127,8 @@ public sealed record VaultTimelineItem(
     string? Boundary = null, VaultStoryDate? BoundaryDate = null,
     bool HasCustomDescription = false, bool IsMembershipTransition = false,
     VaultStoryDate? StoryBegins = null, VaultStoryDate? StoryEnds = null,
-    VaultEventRecurrence? Recurrence = null, bool IsOccurrence = false);
+    VaultEventRecurrence? Recurrence = null, bool IsOccurrence = false,
+    string FactStatus = "Unspecified", string StoryBeginsStatus = "Unspecified", string StoryEndsStatus = "Unspecified");
 
 public sealed record VaultTimelinePage(
     IReadOnlyList<VaultTimelineItem> Items, string? NextCursor, bool HasMore,

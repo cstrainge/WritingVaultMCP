@@ -243,6 +243,13 @@
       $('record-timeline').hidden = !!snapshot || !['Character', 'Project', 'WorldEvent', 'Location', 'Organization', 'Object', 'Species'].includes(summary.kind);
       setText('record-context', summary.context || ''); $('record-deleted').hidden = !summary.isDeleted;
       const main = $('record-main'); clear(main);
+      if (record.fields?.factStatus === 'Tentative' || record.fields?.storyBeginsStatus === 'Tentative' || record.fields?.storyEndsStatus === 'Tentative') {
+        const status = document.createElement('p'); status.className = 'fact-status-badge';
+        status.textContent = record.fields?.factStatus === 'Tentative' ? 'Tentative story fact' :
+          ['storyBegins', 'storyEnds'].filter(key => record.fields?.[key + 'Status'] === 'Tentative')
+            .map(key => key === 'storyBegins' ? 'Tentative story beginning' : 'Tentative story ending').join(' · ');
+        main.append(status);
+      }
       const fields = $('record-fields'); clear(fields);
       const proseKeys = new Set(['description', 'body', 'content', 'claimText', 'notes', 'impact', 'outcome', 'caption']);
       if (summary.kind === 'Character' && record.fields?.age) renderAge(main, record.fields.age);

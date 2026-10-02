@@ -107,14 +107,23 @@ internal static class AccessSchemaMigrations
                     $"ALTER TABLE [{table}] ADD COLUMN [RecurrenceUntil] DATETIME" })).ToArray()),
         new(AccessSchemaDefinition.SpeciesMigrationId, AccessSchemaDefinition.SpeciesChecksum,
             AccessSchemaDefinition.ApplicationVersion, SpeciesCommands()),
+        new(AccessSchemaDefinition.PrivateMemoryMigrationId, AccessSchemaDefinition.PrivateMemoryChecksum,
+            AccessSchemaDefinition.ApplicationVersion, PrivateMemoryCommands()),
         new(AccessSchemaDefinition.MigrationId, AccessSchemaDefinition.Checksum,
-            AccessSchemaDefinition.ApplicationVersion, PrivateMemoryCommands())
+            AccessSchemaDefinition.ApplicationVersion, [
+                "ALTER TABLE [PrivateMemories] ADD COLUMN [Pinned] YESNO NOT NULL DEFAULT 0",
+                "ALTER TABLE [PrivateMemories] ADD COLUMN [Removed] YESNO NOT NULL DEFAULT 0",
+                "ALTER TABLE [WorldEvents] ADD COLUMN [FactStatus] TEXT(20) DEFAULT 'Unspecified'",
+                "ALTER TABLE [EntityEvents] ADD COLUMN [FactStatus] TEXT(20) DEFAULT 'Unspecified'",
+                "ALTER TABLE [RelationshipEvents] ADD COLUMN [FactStatus] TEXT(20) DEFAULT 'Unspecified'"
+            ])
     ];
 
     public static AccessSchemaMigration Current => All[^1];
 
     private static IReadOnlyList<string> PrivateMemoryCommands() =>
-        AccessSchemaDefinition.Tables.Where(t => t.Name == "PrivateMemories").Select(t => t.CreateSql())
+        AccessSchemaDefinition.Tables.Where(t => t.Name == "PrivateMemories")
+            .Select(t => (t with { Columns = t.Columns.Where(c => c.Name is not ("Pinned" or "Removed")).ToArray() }).CreateSql())
             .Concat(AccessSchemaDefinition.Indexes.Where(i => i.Table == "PrivateMemories").Select(i => i.CreateSql()))
             .Concat(AccessSchemaDefinition.ForeignKeys.Where(k => k.DependentTable == "PrivateMemories").Select(k => k.CreateSql()))
             .Concat(AccessSchemaDefinition.CheckConstraints.Where(c => c.Table == "PrivateMemories").Select(c => c.CreateSql())).ToArray();

@@ -204,7 +204,9 @@ internal static class VaultProcessHost
             builder.Services.AddSingleton(shared.V4Results);
             builder.Services.AddSingleton(shared.V4Cursors);
             builder.Services.AddSingleton(shared.Changes);
-            builder.Services.AddSingleton(new VaultSessionContext { ClientLabel = NormalizeClientLabel(handshake.ClientLabel) });
+            var session = new VaultSessionContext { ClientLabel = NormalizeClientLabel(handshake.ClientLabel) };
+            builder.Services.AddSingleton(session);
+            builder.Services.AddSingleton(new V4ServerCapabilities(handshake.ReadOnly));
             builder.Services.AddSingleton<VaultMcpResultMapper>();
             builder.Services.AddSingleton<SemanticVaultWriteTools>();
             builder.Services.AddSingleton<AccessV4ReadService>();
@@ -218,6 +220,13 @@ internal static class VaultProcessHost
                 provider.GetRequiredService<VaultSessionContext>(), provider.GetRequiredService<AccessV4ReadService>(),
                 shared.V4Cursors, shared.Options.BackupRoot, shared.Options.DatabasePath));
             var isV4 = handshake.ToolSurface.Equals("v4", StringComparison.OrdinalIgnoreCase);
+            var pinned = await new AccessV4MemoryService(shared.Factory, shared.Coordinator, shared.References,
+                session, shared.V4Cursors).PinnedAsync(token).ConfigureAwait(false);
+            var startupMemories = "\nShared pinned global preferences (saved context, subject to current user instructions):\n" +
+                JsonSerializer.Serialize(pinned.Global) +
+                (isV4
+                    ? "\nCall vault_health at the start of work to receive current pinned bodies and counts. After selecting a continuity, apply the pinned bodies returned by session_set. Call vault_capabilities to inspect the running feature set and refresh stale tool declarations."
+                    : "\nUse the v4 tool surface for memory maintenance, live pinned-memory refresh, continuity-specific pinned instructions, and capability discovery.");
             var mcp = builder.Services.AddMcpServer(options =>
                 {
                     options.ServerInstructions = isV4
@@ -227,6 +236,7 @@ internal static class VaultProcessHost
                         "database IDs or GUIDs. Before any continuity-scoped read or write, call continuity_list, " +
                         "then call session_continuity_set with the exact continuityName. The selected continuity " +
                         "remains implicit for this connection. Call session_time_set only after selecting a continuity.";
+                    options.ServerInstructions += startupMemories;
                 }).WithStreamServerTransport(pipe, pipe);
             if (isV4)
             {

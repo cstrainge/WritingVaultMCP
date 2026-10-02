@@ -98,7 +98,7 @@ public sealed class PrivateMemoryTests
         await using (var connection = vault.Factory.Create())
         {
             await connection.OpenAsync();
-            foreach (var sql in new[] { "DROP TABLE [PrivateMemories]", $"DELETE FROM [SchemaMigrations] WHERE [MigrationId]='{AccessSchemaDefinition.MigrationId}'" })
+            foreach (var sql in new[] { "DROP TABLE [PrivateMemories]", $"DELETE FROM [SchemaMigrations] WHERE [MigrationId] IN ('{AccessSchemaDefinition.PrivateMemoryMigrationId}','{AccessSchemaDefinition.MigrationId}')" })
             { using var cmd = connection.CreateCommand(); cmd.CommandText = sql; await cmd.ExecuteNonQueryAsync(); }
         }
         var migrator = new AccessSchemaMigrator(vault.Factory, TimeProvider.System);

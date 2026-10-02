@@ -617,7 +617,7 @@
       const layouts = this.graphItems.map(item => {
         const [lower, upper] = bounds(item);
         const category = item.kind === 'Aggregate' ? 'CLUSTER' : humanType(item).toUpperCase();
-        const title = item.title.replace(/\s+/g, ' ').trim();
+        const title = (item.factStatus === 'Tentative' ? 'Tentative · ' : '') + item.title.replace(/\s+/g, ' ').trim();
         const cardWidth = Math.min(maxCardWidth, Math.max(minCardWidth,
           Math.ceil(titleWidth(title) + 30), Math.ceil(measure(categoryProbe, category) + 44)));
         const titleLines = wrapTitle(title, cardWidth - 30);
@@ -784,7 +784,7 @@
           tabindex: '0', role: 'button', 'data-ref': item.ref, 'data-key': entryKey(item),
           'aria-label': `${humanType(item)}; ${item.title}; ${this.dateText(item)}${openStart || openEnd ? '; open-ended' : ''}`
         });
-        const title = svgNode('title', {}); title.textContent = `${item.title}: ${this.dateText(item)}`;
+        const title = svgNode('title', {}); title.textContent = `${item.factStatus === 'Tentative' ? 'Tentative · ' : ''}${item.title}: ${this.dateText(item)}`;
         group.append(title);
         const barStart = x(openStart ? domain[0] : lower);
         const barEnd = x(openEnd ? domain[1] : upper);
@@ -938,6 +938,7 @@
         }
         row.append(node('td', chronologyType(item), 'timeline-type-cell'));
         const title = node('td');
+        if (item.factStatus === 'Tentative') title.append(node('span', 'Tentative', 'fact-status-badge'));
         const membershipTransition = item.isMembershipTransition;
         if (item.boundary && !membershipTransition) title.append(node('span', item.boundary === 'Start' ? 'Start' :
           item.boundary === 'End' ? 'End' : 'In progress', 'timeline-boundary-label'));
@@ -1085,7 +1086,7 @@
 
     showDetail(item) {
       const detail = byId('timeline-detail'); detail.hidden = false;
-      byId('timeline-detail-title').textContent = item.title;
+      byId('timeline-detail-title').textContent = (item.factStatus === 'Tentative' ? 'Tentative · ' : '') + item.title;
       this.appendDate(byId('timeline-detail-date'), item);
       byId('timeline-detail-summary').textContent = [item.summary || (item.kind === 'Aggregate'
         ? 'A density cluster. The date selection narrows the table so you can inspect its entries.' : ''),

@@ -25,8 +25,11 @@ public sealed class V4VaultReadTools(
     AccessIntegrityVerifier integrity,
     VaultWriteCoordinator coordinator,
     CoordinatedVaultBackupService backup,
-    AccessV4MemoryService memories)
+    AccessV4MemoryService memories,
+    V4ServerCapabilities? capabilities = null)
 {
+    [McpServerTool(Name="vault_capabilities",UseStructuredContent=true),Description("Reports features, access mode, tool names, build identity and catalog fingerprint from the running server so clients can detect stale tool declarations.")]
+    public V4CapabilitiesResult Capabilities(V4EmptyRequest request)=>(capabilities ?? new()).Get();
     [McpServerTool(Name="vault_health",UseStructuredContent=true),Description("Reports v4 readiness and storage capacity without exposing paths.")]
     public Task<V4HealthResult> Health(V4EmptyRequest request,CancellationToken token=default)=>Safe(async()=>
     {
@@ -120,8 +123,9 @@ public sealed class V4VaultReadTools(
 
     private async Task<V4SessionView> SessionView(CancellationToken token)
     {
-        if(session.ContinuityId is not { } id)return new(null,new("Unset",null,null,"none"));
-        return new(session.ContinuityName,await reads.EffectiveClockAsync(id,token));
+        var pinned = await memories.PinnedAsync(token);
+        if(session.ContinuityId is not { } id)return new(null,new("Unset",null,null,"none"),PinnedMemories:pinned);
+        return new(session.ContinuityName,await reads.EffectiveClockAsync(id,token),PinnedMemories:pinned);
     }
     private static async Task<T> Safe<T>(Func<Task<T>> action)
     {

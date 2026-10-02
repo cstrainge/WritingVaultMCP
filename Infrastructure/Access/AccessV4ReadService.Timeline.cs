@@ -144,6 +144,9 @@ public sealed partial class AccessV4ReadService
                         var projected = ProjectTimelineItem(item.Row, associations);
                         if (item.Boundary is null) return projected;
                         return projected with { Boundary = item.Boundary,
+                            FactStatus = item.Row.Type == "Project" ? item.Boundary switch {
+                                "Start" => item.Row.StoryBeginsStatus, "End" => item.Row.StoryEndsStatus, _ => item.Row.FactStatus
+                            } : item.Row.FactStatus,
                             BoundaryDate = item.BoundaryAt is { } at
                                 ? item.Row.Type == "Project" && item.Boundary == "Start" && item.Row.StoryBegins is { } begins
                                     ? StoryDateView(begins)
@@ -194,7 +197,8 @@ public sealed partial class AccessV4ReadService
                         entries.Add(new(members[0].Key, new V4TimelineItem(first.Ref, "Aggregate",
                             $"{members.Length} {group.Key.Lane} entries", null, group.Key.Lane, interval,
                             sample, IsDeleted: members.All(item => item.Row.Deleted), Warnings: warnings,
-                            ContainsHighlight: members.Any(item => ContainsHighlight(item.Row))), null));
+                            ContainsHighlight: members.Any(item => ContainsHighlight(item.Row)),
+                            FactStatus: CombinedFactStatus(members.Select(item => item.Row.FactStatus))), null));
                     }
                 }
                 else
@@ -219,7 +223,8 @@ public sealed partial class AccessV4ReadService
                                 ContinuityName: session.ContinuityName, IsDeleted: item.IsDeleted)).ToArray(),
                             projected.Where(item => item.NarrativeOrder is not null).Select(item => item.NarrativeOrder).Min(),
                             projected.All(item => item.IsDeleted),
-                            projected.SelectMany(item => item.Warnings ?? []).Distinct(StringComparer.Ordinal).ToArray());
+                            projected.SelectMany(item => item.Warnings ?? []).Distinct(StringComparer.Ordinal).ToArray(),
+                            FactStatus: CombinedFactStatus(projected.Select(item => item.FactStatus)));
                         entries.Add(new(members[0].Key, aggregate with
                         {
                             ContainsHighlight = members.Any(item => ContainsHighlight(item.Row))
@@ -272,7 +277,8 @@ public sealed partial class AccessV4ReadService
             IsMembershipTransition: boundary is not null,
             StoryBegins: row.StoryBegins is null ? null : StoryDateView(row.StoryBegins),
             StoryEnds: row.StoryEnds is null ? null : StoryDateView(row.StoryEnds),
-            Recurrence: row.Recurrence, IsOccurrence: row.IsOccurrence);
+            Recurrence: row.Recurrence, IsOccurrence: row.IsOccurrence,
+            FactStatus: row.FactStatus, StoryBeginsStatus: row.StoryBeginsStatus, StoryEndsStatus: row.StoryEndsStatus);
     }
 
     private static IEnumerable<TimelineDetailEntry> ExpandDetailEntries(
@@ -697,15 +703,36 @@ public sealed partial class AccessV4ReadService
             }
             foreach (var (table, type, key) in new[] { ("WorldEvents", "WorldEvent", "EntityId"), ("EntityEvents", "EntityEvent", "Id"), ("RelationshipEvents", "RelationshipEvent", "Id") })
             {
+                using var facts = new AccessCommand(connection, $"SELECT [{key}],[FactStatus] FROM [{table}]");
+                var statusById = (await facts.QueryAsync(r => (Id: r.GetInt32(0), Status: r.IsDBNull(1) ? V4FactStatus.Unspecified : Enum.Parse<V4FactStatus>(r.GetString(1))), token)).ToDictionary(r => r.Id, r => r.Status);
+                for (var i = 0; i < rows.Count; i++)
+                    if (rows[i].Type == type && statusById.TryGetValue(rows[i].Id, out var status)) rows[i] = rows[i] with { FactStatus = status };
                 using var schedules = new AccessCommand(connection, $"SELECT [{key}],[RecurrenceFrequency],[RecurrenceInterval],[RecurrenceUntil] FROM [{table}] WHERE [RecurrenceFrequency] IS NOT NULL");
                 var byId = (await schedules.QueryAsync(r => (Id: r.GetInt32(0), Recurrence: new V4EventRecurrence(
                     Enum.Parse<V4RecurrenceFrequency>(r.GetString(1)), r.GetInt32(2), r.IsDBNull(3) ? null : r.GetDateTime(3).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture))), token)).ToDictionary(row => row.Id, row => row.Recurrence);
                 for (var i = 0; i < rows.Count; i++)
                     if (rows[i].Type == type && byId.TryGetValue(rows[i].Id, out var recurrence)) rows[i] = rows[i] with { Recurrence = recurrence };
             }
+            for (var i = 0; i < rows.Count; i++)
+            {
+                if (rows[i].Type != "Project") continue;
+                var boundaries = rows.Where(r => r.Type == "EntityEvent" && r.OwnerId == rows[i].Id && !r.Deleted && r.ProjectBoundary is not null).ToArray();
+                rows[i] = rows[i] with {
+                    FactStatus = CombinedFactStatus(boundaries.Select(r => r.FactStatus)),
+                    StoryBeginsStatus = boundaries.SingleOrDefault(r => r.ProjectBoundary == "StoryBegins")?.FactStatus ?? V4FactStatus.Unspecified,
+                    StoryEndsStatus = boundaries.SingleOrDefault(r => r.ProjectBoundary == "StoryEnds")?.FactStatus ?? V4FactStatus.Unspecified
+                };
+            }
             await AddPeriodRowsAsync(connection, continuity, rows, token).ConfigureAwait(false);
             return rows;
         }, token).ConfigureAwait(false);
+    }
+
+    private static V4FactStatus CombinedFactStatus(IEnumerable<V4FactStatus> statuses)
+    {
+        var values = statuses.ToArray();
+        return values.Contains(V4FactStatus.Tentative) ? V4FactStatus.Tentative :
+            values.Length > 0 && values.All(s => s == V4FactStatus.Confirmed) ? V4FactStatus.Confirmed : V4FactStatus.Unspecified;
     }
 
     private static async Task AddPeriodRowsAsync(

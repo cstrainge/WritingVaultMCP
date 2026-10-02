@@ -866,6 +866,27 @@
       }
     },
     {
+      "name": "memory_delete",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "scope": "Global",
+        "key": "example",
+        "expectedVersion": 1
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
       "name": "memory_read",
       "request": {
         "scope": "Global"
@@ -1990,6 +2011,23 @@
           }
         ],
         "replayed": false
+      }
+    },
+    {
+      "name": "vault_capabilities",
+      "request": {},
+      "response": {
+        "surfaceVersion": "example",
+        "serverBuild": "example",
+        "schemaMigration": "example",
+        "catalogFingerprint": "example",
+        "readOnly": false,
+        "tools": [
+          "example"
+        ],
+        "features": {},
+        "startupMemoryDelivery": "example",
+        "refreshInstructions": "example"
       }
     },
     {

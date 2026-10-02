@@ -1,6 +1,6 @@
 {
   "surfaceVersion": "4.0",
-  "toolCount": 89,
+  "toolCount": 91,
   "tools": [
     {
       "name": "changes_since",
@@ -5860,6 +5860,15 @@
             ],
             "additionalProperties": false,
             "default": null
+          },
+          "factStatus": {
+            "enum": [
+              "Unspecified",
+              "Tentative",
+              "Confirmed"
+            ],
+            "default": "Unspecified",
+            "description": "Editorial certainty independent of date precision. Use Tentative for guesses or provisional plans, including exact dates. Confirmed requires an established decision; Unspecified makes no certainty claim."
           }
         },
         "required": [
@@ -8539,6 +8548,15 @@
             ],
             "additionalProperties": false,
             "default": null
+          },
+          "factStatus": {
+            "enum": [
+              "Unspecified",
+              "Tentative",
+              "Confirmed"
+            ],
+            "default": "Unspecified",
+            "description": "Editorial certainty independent of date precision. Use Tentative for guesses or provisional plans, including exact dates. Confirmed requires an established decision; Unspecified makes no certainty claim."
           }
         },
         "required": [
@@ -8933,6 +8951,16 @@
           "clearRecurrence": {
             "type": "boolean",
             "default": false
+          },
+          "factStatus": {
+            "enum": [
+              "Unspecified",
+              "Tentative",
+              "Confirmed",
+              null
+            ],
+            "default": null,
+            "description": "Editorial certainty independent of date precision. Use Tentative for guesses or provisional plans, including exact dates. Confirmed requires an established decision; Unspecified makes no certainty claim."
           }
         },
         "required": [
@@ -12422,8 +12450,313 @@
       }
     },
     {
+      "name": "memory_delete",
+      "description": "Deletes a private memory by scope, key, and expectedVersion; removes its body and pin. Retries use the same mutationToken. Deleted keys retain a version tombstone (memory_read includeDeleted=true); memory_save with that version can reuse the key with new content. Backups retain their prior snapshots.",
+      "access": "Write",
+      "destructive": true,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "mutationToken": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+          },
+          "scope": {
+            "enum": [
+              "Global",
+              "Continuity"
+            ]
+          },
+          "key": {
+            "type": "string"
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "mutationToken",
+          "scope",
+          "key",
+          "expectedVersion"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "affected": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "ref": {
+                  "type": "string"
+                },
+                "kind": {
+                  "enum": [
+                    "Continuity",
+                    "Project",
+                    "Location",
+                    "Character",
+                    "Organization",
+                    "Object",
+                    "WorldEvent",
+                    "Source",
+                    "SourceSnapshot",
+                    "Claim",
+                    "Tag",
+                    "Note",
+                    "Image",
+                    "VariantGroup",
+                    "Relationship",
+                    "RelationshipType",
+                    "Residence",
+                    "Membership",
+                    "OrganizationLocation",
+                    "Ownership",
+                    "OwnershipPrincipal",
+                    "Custody",
+                    "ObjectLocation",
+                    "EntityEvent",
+                    "TemporalEffect",
+                    "RelationshipEvent",
+                    "RelationshipMembershipPeriod",
+                    "RelationshipParticipant",
+                    "Species"
+                  ]
+                },
+                "label": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "context": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null
+                },
+                "continuityName": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null
+                },
+                "version": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ],
+                  "default": null
+                },
+                "isDeleted": {
+                  "type": "boolean",
+                  "default": false
+                },
+                "associationRole": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null
+                },
+                "associationNotes": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null
+                }
+              },
+              "required": [
+                "ref",
+                "kind",
+                "label"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "replayed": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": null
+          },
+          "error": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              },
+              "retryable": {
+                "type": "boolean",
+                "default": false
+              },
+              "details": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": null
+                    },
+                    "reason": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": null
+                    },
+                    "rejectedValue": {
+                      "default": null
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "default": null
+              },
+              "candidates": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "$ref": "#/properties/affected/items"
+                },
+                "default": null,
+                "maxItems": 10
+              },
+              "recovery": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ],
+            "additionalProperties": false,
+            "default": null
+          },
+          "backup": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "createdAtUtc": {
+                "type": "string"
+              },
+              "databaseBytes": {
+                "type": "integer"
+              },
+              "databaseSha256": {
+                "type": "string"
+              },
+              "schemaMigration": {
+                "type": "string"
+              },
+              "schemaValid": {
+                "type": "boolean"
+              },
+              "integrityValid": {
+                "type": "boolean"
+              },
+              "retentionCount": {
+                "type": "integer"
+              },
+              "assetCount": {
+                "type": "integer"
+              },
+              "assetBytes": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "createdAtUtc",
+              "databaseBytes",
+              "databaseSha256",
+              "schemaMigration",
+              "schemaValid",
+              "integrityValid",
+              "retentionCount",
+              "assetCount",
+              "assetBytes"
+            ],
+            "additionalProperties": false,
+            "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
+            ],
+            "additionalProperties": false,
+            "default": null
+          }
+        },
+        "required": [
+          "success",
+          "code",
+          "affected",
+          "replayed"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
       "name": "memory_read",
-      "description": "Reads full private AI note bodies in Global or selected Continuity scope. Omit key to load all; follow nextCursor until hasMore=false. These notes are shared by Vault AI clients and hidden from the viewer and ordinary search.",
+      "description": "Reads full shared private AI notes in Global or selected Continuity scope. Search key/body using text (literal, case-insensitive), filter pinnedOnly, or select one key. Follow nextCursor until hasMore=false. includeDeleted includes empty version tombstones. Hidden from the viewer and ordinary search.",
       "access": "Read",
       "destructive": false,
       "inputSchema": {
@@ -12455,6 +12788,22 @@
             "default": 10,
             "minimum": 1,
             "maximum": 10
+          },
+          "text": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": null,
+            "maxLength": 500
+          },
+          "pinnedOnly": {
+            "type": "boolean",
+            "default": false
+          },
+          "includeDeleted": {
+            "type": "boolean",
+            "default": false
           }
         },
         "required": [
@@ -12495,6 +12844,14 @@
                 "updatedAtUtc": {
                   "type": "string",
                   "format": "date-time"
+                },
+                "pinned": {
+                  "type": "boolean",
+                  "default": false
+                },
+                "isDeleted": {
+                  "type": "boolean",
+                  "default": false
                 }
               },
               "required": [
@@ -12526,7 +12883,7 @@
     },
     {
       "name": "memory_save",
-      "description": "Saves private AI context in Global or selected Continuity scope, separate from visible record notes. Use a stable lowercase key and expectedVersion=0 to create; read first and use its version to replace the full body. Keep mutationToken stable on retries. Body maximum 65536 characters.",
+      "description": "Creates or edits shared private AI context. expectedVersion=0 creates; use the read version to replace the body. pinned=true delivers standing instructions in startup/session/health responses; false unpins; omission preserves pin state. Each scope allows 32 pins and 32768 total pinned body characters, with no truncation. Body maximum 65536 characters. Keep mutationToken stable on retries.",
       "access": "Write",
       "destructive": true,
       "inputSchema": {
@@ -12554,6 +12911,13 @@
           "expectedVersion": {
             "type": "integer",
             "minimum": 0
+          },
+          "pinned": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "default": null
           }
         },
         "required": [
@@ -20059,6 +20423,15 @@
             ],
             "additionalProperties": false,
             "default": null
+          },
+          "factStatus": {
+            "enum": [
+              "Unspecified",
+              "Tentative",
+              "Confirmed"
+            ],
+            "default": "Unspecified",
+            "description": "Editorial certainty independent of date precision. Use Tentative for guesses or provisional plans, including exact dates. Confirmed requires an established decision; Unspecified makes no certainty claim."
           }
         },
         "required": [
@@ -23922,6 +24295,73 @@
           "surfaceVersion": {
             "type": "string",
             "default": "4.0"
+          },
+          "pinnedMemories": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "global": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string"
+                    },
+                    "body": {
+                      "type": "string",
+                      "maxLength": 65536
+                    },
+                    "version": {
+                      "type": "integer"
+                    },
+                    "updatedAtUtc": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "pinned": {
+                      "type": "boolean",
+                      "default": false
+                    },
+                    "isDeleted": {
+                      "type": "boolean",
+                      "default": false
+                    }
+                  },
+                  "required": [
+                    "key",
+                    "body",
+                    "version",
+                    "updatedAtUtc"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "continuityName": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "continuity": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/properties/pinnedMemories/properties/global/items"
+                }
+              },
+              "instructions": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "global",
+              "continuity",
+              "instructions"
+            ],
+            "additionalProperties": false,
+            "default": null
           }
         },
         "required": [
@@ -24035,6 +24475,73 @@
           "surfaceVersion": {
             "type": "string",
             "default": "4.0"
+          },
+          "pinnedMemories": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "global": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string"
+                    },
+                    "body": {
+                      "type": "string",
+                      "maxLength": 65536
+                    },
+                    "version": {
+                      "type": "integer"
+                    },
+                    "updatedAtUtc": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "pinned": {
+                      "type": "boolean",
+                      "default": false
+                    },
+                    "isDeleted": {
+                      "type": "boolean",
+                      "default": false
+                    }
+                  },
+                  "required": [
+                    "key",
+                    "body",
+                    "version",
+                    "updatedAtUtc"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "continuityName": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "continuity": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/properties/pinnedMemories/properties/global/items"
+                }
+              },
+              "instructions": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "global",
+              "continuity",
+              "instructions"
+            ],
+            "additionalProperties": false,
+            "default": null
           }
         },
         "required": [
@@ -28009,6 +28516,31 @@
                 "isOccurrence": {
                   "type": "boolean",
                   "default": false
+                },
+                "factStatus": {
+                  "enum": [
+                    "Unspecified",
+                    "Tentative",
+                    "Confirmed"
+                  ],
+                  "default": "Unspecified",
+                  "description": "Editorial certainty independent of date precision. Use Tentative for guesses or provisional plans, including exact dates. Confirmed requires an established decision; Unspecified makes no certainty claim."
+                },
+                "storyBeginsStatus": {
+                  "enum": [
+                    "Unspecified",
+                    "Tentative",
+                    "Confirmed"
+                  ],
+                  "default": "Unspecified"
+                },
+                "storyEndsStatus": {
+                  "enum": [
+                    "Unspecified",
+                    "Tentative",
+                    "Confirmed"
+                  ],
+                  "default": "Unspecified"
                 }
               },
               "required": [
@@ -29036,6 +29568,66 @@
       }
     },
     {
+      "name": "vault_capabilities",
+      "description": "Reports running server features, read-only mode, build identity, catalog fingerprint and tool names. Reconnect and refresh tools/list when cached declarations differ.",
+      "access": "Read",
+      "destructive": false,
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "surfaceVersion": {
+            "type": "string"
+          },
+          "serverBuild": {
+            "type": "string"
+          },
+          "schemaMigration": {
+            "type": "string"
+          },
+          "catalogFingerprint": {
+            "type": "string"
+          },
+          "readOnly": {
+            "type": "boolean"
+          },
+          "tools": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "features": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "boolean"
+            }
+          },
+          "startupMemoryDelivery": {
+            "type": "string"
+          },
+          "refreshInstructions": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "surfaceVersion",
+          "serverBuild",
+          "schemaMigration",
+          "catalogFingerprint",
+          "readOnly",
+          "tools",
+          "features",
+          "startupMemoryDelivery",
+          "refreshInstructions"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
       "name": "vault_health",
       "description": "Reports v4 readiness, schema and integrity issues, pending writes, backup recency, storage capacity, and global/selected-continuity private memory counts with instructions to load both sets. Call memory_read using the returned arguments before working.",
       "access": "Read",
@@ -29289,6 +29881,22 @@
                     "default": 10,
                     "minimum": 1,
                     "maximum": 100
+                  },
+                  "text": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "default": null,
+                    "maxLength": 500
+                  },
+                  "pinnedOnly": {
+                    "type": "boolean",
+                    "default": false
+                  },
+                  "includeDeleted": {
+                    "type": "boolean",
+                    "default": false
                   }
                 },
                 "required": [
@@ -29328,6 +29936,22 @@
                     "default": 10,
                     "minimum": 1,
                     "maximum": 100
+                  },
+                  "text": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "default": null,
+                    "maxLength": 500
+                  },
+                  "pinnedOnly": {
+                    "type": "boolean",
+                    "default": false
+                  },
+                  "includeDeleted": {
+                    "type": "boolean",
+                    "default": false
                   }
                 },
                 "required": [
@@ -29337,6 +29961,73 @@
               },
               "instructions": {
                 "type": "string"
+              },
+              "pinnedMemories": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "global": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "key": {
+                          "type": "string"
+                        },
+                        "body": {
+                          "type": "string",
+                          "maxLength": 65536
+                        },
+                        "version": {
+                          "type": "integer"
+                        },
+                        "updatedAtUtc": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "pinned": {
+                          "type": "boolean",
+                          "default": false
+                        },
+                        "isDeleted": {
+                          "type": "boolean",
+                          "default": false
+                        }
+                      },
+                      "required": [
+                        "key",
+                        "body",
+                        "version",
+                        "updatedAtUtc"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "continuityName": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "continuity": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/properties/memories/properties/pinnedMemories/properties/global/items"
+                    }
+                  },
+                  "instructions": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "global",
+                  "continuity",
+                  "instructions"
+                ],
+                "additionalProperties": false,
+                "default": null
               }
             },
             "required": [

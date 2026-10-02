@@ -22,9 +22,11 @@ public static class V4ContractCatalog
 
     public static IReadOnlyList<V4ToolDefinition> Tools { get; } =
     [
+        R<V4EmptyRequest, V4CapabilitiesResult>("vault_capabilities", "Reports running server features, read-only mode, build identity, catalog fingerprint and tool names. Reconnect and refresh tools/list when cached declarations differ."),
+        W<V4MemoryDeleteRequest>("memory_delete", "Deletes a private memory by scope, key, and expectedVersion; removes its body and pin. Retries use the same mutationToken. Deleted keys retain a version tombstone (memory_read includeDeleted=true); memory_save with that version can reuse the key with new content. Backups retain their prior snapshots.", true),
         R<V4EmptyRequest, V4HealthResult>("vault_health", "Reports v4 readiness, schema and integrity issues, pending writes, backup recency, storage capacity, and global/selected-continuity private memory counts with instructions to load both sets. Call memory_read using the returned arguments before working."),
-        R<V4MemoryReadRequest, V4MemoryPage>("memory_read", "Reads full private AI note bodies in Global or selected Continuity scope. Omit key to load all; follow nextCursor until hasMore=false. These notes are shared by Vault AI clients and hidden from the viewer and ordinary search."),
-        W<V4MemorySaveRequest>("memory_save", "Saves private AI context in Global or selected Continuity scope, separate from visible record notes. Use a stable lowercase key and expectedVersion=0 to create; read first and use its version to replace the full body. Keep mutationToken stable on retries. Body maximum 65536 characters.", true),
+        R<V4MemoryReadRequest, V4MemoryPage>("memory_read", "Reads full shared private AI notes in Global or selected Continuity scope. Search key/body using text (literal, case-insensitive), filter pinnedOnly, or select one key. Follow nextCursor until hasMore=false. includeDeleted includes empty version tombstones. Hidden from the viewer and ordinary search."),
+        W<V4MemorySaveRequest>("memory_save", "Creates or edits shared private AI context. expectedVersion=0 creates; use the read version to replace the body. pinned=true delivers standing instructions in startup/session/health responses; false unpins; omission preserves pin state. Each scope allows 32 pins and 32768 total pinned body characters, with no truncation. Body maximum 65536 characters. Keep mutationToken stable on retries.", true),
         R<V4ContinuityListRequest, V4Page<V4ContinuitySummary>>("continuity_list", "Lists continuity names and clock summaries with bounded keyset paging."),
         R<V4SessionSetRequest, V4SessionView>("session_set", "Selects continuity by exact name and optionally sets an exact currentTime or date-only currentDate for this connection, or clears the override."),
         R<V4EmptyRequest, V4SessionView>("session_get", "Returns this connection's selected continuity and effective clock provenance."),
@@ -378,6 +380,7 @@ public static class V4ContractCatalog
             case "interval": value["minimum"] = 1; value["maximum"] = 10000; break;
             case "until": value["pattern"] = "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"; break;
             case "expectedVersion": value["minimum"] = 1; break;
+            case "factStatus": value["description"] = "Editorial certainty independent of date precision. Use Tentative for guesses or provisional plans, including exact dates. Confirmed requires an established decision; Unspecified makes no certainty claim."; break;
             case "confidence": value["minimum"] = 0; value["maximum"] = 1; break;
             case "biologicalRate": case "experiencedRate": value["minimum"] = 0; break;
             case "sharePartsPerMillion": value["minimum"] = 0; value["maximum"] = 1_000_000; break;

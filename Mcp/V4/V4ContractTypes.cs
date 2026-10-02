@@ -85,7 +85,7 @@ public sealed record V4ClockView(
     string Source, string? LocalDisplay = null, DateOnly? CurrentDate = null);
 
 public sealed record V4SessionView(
-    string? ContinuityName, V4ClockView Clock, string SurfaceVersion = "4.0");
+    string? ContinuityName, V4ClockView Clock, string SurfaceVersion = "4.0", V4PinnedMemories? PinnedMemories = null);
 
 [System.Text.Json.Serialization.JsonConverter(typeof(V4StoryDateInputJsonConverter))]
 public sealed record V4StoryDateInput(
@@ -147,7 +147,8 @@ public sealed record V4TimelineItem(
     string? Boundary = null, V4StoryDateView? BoundaryDate = null,
     bool HasCustomDescription = false, bool IsMembershipTransition = false,
     V4StoryDateView? StoryBegins = null, V4StoryDateView? StoryEnds = null,
-    V4EventRecurrence? Recurrence = null, bool IsOccurrence = false);
+    V4EventRecurrence? Recurrence = null, bool IsOccurrence = false,
+    V4FactStatus FactStatus = V4FactStatus.Unspecified, V4FactStatus StoryBeginsStatus = V4FactStatus.Unspecified, V4FactStatus StoryEndsStatus = V4FactStatus.Unspecified);
 
 public sealed record V4TimelineResult(
     IReadOnlyList<V4TimelineItem> Items, string? NextCursor, bool HasMore,
@@ -160,14 +161,23 @@ public sealed record V4MutationResult(
     V4BackupSummary? Backup = null, V4MemoryReceipt? Memory = null);
 
 public enum V4MemoryScope { Global, Continuity }
-public sealed record V4MemoryReadRequest(V4MemoryScope Scope, string? Key = null, string? Cursor = null, int Limit = 10);
-public sealed record V4MemorySaveRequest(string MutationToken, V4MemoryScope Scope, string Key, string Body, int ExpectedVersion);
+public sealed record V4MemoryReadRequest(V4MemoryScope Scope, string? Key = null, string? Cursor = null, int Limit = 10,
+    string? Text = null, bool PinnedOnly = false, bool IncludeDeleted = false);
+public sealed record V4MemorySaveRequest(string MutationToken, V4MemoryScope Scope, string Key, string Body, int ExpectedVersion,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] bool? Pinned = null);
+public sealed record V4MemoryDeleteRequest(string MutationToken, V4MemoryScope Scope, string Key, int ExpectedVersion);
 public sealed record V4MemoryReceipt(V4MemoryScope Scope, string Key, int Version);
-public sealed record V4MemoryNote(string Key, string Body, int Version, DateTime UpdatedAtUtc);
+public sealed record V4MemoryNote(string Key, string Body, int Version, DateTime UpdatedAtUtc, bool Pinned = false, bool IsDeleted = false);
+public sealed record V4PinnedMemories(IReadOnlyList<V4MemoryNote> Global, string? ContinuityName,
+    IReadOnlyList<V4MemoryNote> Continuity, string Instructions);
 public sealed record V4MemoryPage(V4MemoryScope Scope, string? ContinuityName,
     IReadOnlyList<V4MemoryNote> Items, string? NextCursor, bool HasMore);
 public sealed record V4MemoryHealth(int GlobalCount, int? SelectedContinuityCount, string? SelectedContinuityName,
-    string ReadTool, V4MemoryReadRequest GlobalRead, V4MemoryReadRequest? SelectedContinuityRead, string Instructions);
+    string ReadTool, V4MemoryReadRequest GlobalRead, V4MemoryReadRequest? SelectedContinuityRead, string Instructions,
+    V4PinnedMemories? PinnedMemories = null);
+public sealed record V4CapabilitiesResult(string SurfaceVersion, string ServerBuild, string SchemaMigration,
+    string CatalogFingerprint, bool ReadOnly, IReadOnlyList<string> Tools, IReadOnlyDictionary<string, bool> Features,
+    string StartupMemoryDelivery, string RefreshInstructions);
 
 public sealed record V4BackupSummary(
     string CreatedAtUtc, long DatabaseBytes, string DatabaseSha256,
@@ -396,9 +406,10 @@ public sealed record V4EventRecordRequest(
     string? Description = null, double? NarrativeOrder = null,
     IReadOnlyList<V4EventParticipantInput>? Participants = null,
     IReadOnlyList<V4EventLocationInput>? Locations = null,
-    IReadOnlyList<string>? Projects = null, V4EventRecurrence? Recurrence = null);
+    IReadOnlyList<string>? Projects = null, V4EventRecurrence? Recurrence = null, V4FactStatus FactStatus = V4FactStatus.Unspecified);
 public enum V4RecurrenceFrequency { Daily, Weekly, Monthly, Yearly }
 public sealed record V4EventRecurrence(V4RecurrenceFrequency Frequency, int Interval = 1, string? Until = null);
+public enum V4FactStatus { Unspecified, Tentative, Confirmed }
 public enum V4ProjectBoundary { StoryBegins, StoryEnds }
 public sealed record V4EventUpdateRequest(
     string MutationToken, string Event, int ExpectedVersion,
@@ -406,15 +417,15 @@ public sealed record V4EventUpdateRequest(
     string? WorldEvent = null, double? NarrativeOrder = null,
     V4ProjectBoundary? ProjectBoundary = null, V4EventRecurrence? Recurrence = null,
     bool ClearDescription = false, bool ClearWorldEvent = false,
-    bool ClearNarrativeOrder = false, bool ClearProjectBoundary = false, bool ClearRecurrence = false);
+    bool ClearNarrativeOrder = false, bool ClearProjectBoundary = false, bool ClearRecurrence = false, V4FactStatus? FactStatus = null);
 public sealed record V4EntityEventAddRequest(
     string MutationToken, string Entity, string Title, V4StoryDateInput Occurred,
     string? WorldEvent = null, string? Description = null, double? NarrativeOrder = null,
-    IReadOnlyList<string>? Projects = null, V4ProjectBoundary? ProjectBoundary = null, V4EventRecurrence? Recurrence = null);
+    IReadOnlyList<string>? Projects = null, V4ProjectBoundary? ProjectBoundary = null, V4EventRecurrence? Recurrence = null, V4FactStatus FactStatus = V4FactStatus.Unspecified);
 public sealed record V4RelationshipEventAddRequest(
     string MutationToken, string RelationshipRef, string Title, V4StoryDateInput Occurred,
     string? WorldEvent = null, string? Description = null, double? NarrativeOrder = null,
-    IReadOnlyList<string>? Projects = null, V4EventRecurrence? Recurrence = null);
+    IReadOnlyList<string>? Projects = null, V4EventRecurrence? Recurrence = null, V4FactStatus FactStatus = V4FactStatus.Unspecified);
 public sealed record V4EventProjectApplyRequest(
     string MutationToken, string Event, IReadOnlyList<string> Projects,
     V4TagAction Action, string? Role = null, string? Notes = null);

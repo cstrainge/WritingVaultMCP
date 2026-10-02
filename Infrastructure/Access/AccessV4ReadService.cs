@@ -328,7 +328,9 @@ public sealed partial class AccessV4ReadService(
         IReadOnlyList<string>? Warnings = null, string Discriminator = "record",
         bool RelationshipDirected = false, string? TransitionDescription = null,
         string? ProjectBoundary = null, StoryDate? StoryBegins = null, StoryDate? StoryEnds = null,
-        V4EventRecurrence? Recurrence = null, bool IsOccurrence = false, StoryDate? BirthdayDeath = null);
+        V4EventRecurrence? Recurrence = null, bool IsOccurrence = false, StoryDate? BirthdayDeath = null,
+        V4FactStatus FactStatus = V4FactStatus.Unspecified,
+        V4FactStatus StoryBeginsStatus = V4FactStatus.Unspecified, V4FactStatus StoryEndsStatus = V4FactStatus.Unspecified);
     private sealed record TimelineDetailEntry(string Key, TimelineRow Row, string? Boundary = null, DateTime? BoundaryAt = null);
     private sealed record TimelinePageEntry(string Key, V4TimelineItem? Item, V4ReferenceSummary? Undated);
     private sealed record PeriodDefinition(string Table, string Type, string FallbackTitle, V4TimelineLane Lane,

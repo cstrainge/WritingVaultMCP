@@ -6,6 +6,8 @@ The exact input and output schemas, limits, examples, access flags, and destruct
 
 ## Read workflow
 
+- Pinned standing instructions: global bodies arrive in the MCP initialize `instructions`; `session_set`, `session_get`, and `vault_health.memories.pinnedMemories` return complete global and selected-continuity bodies. Hosts decide whether initialize instructions reach the model, so call health at the start of work and use the session response when switching continuities. Pins are shared across AI clients using this Vault. Unpinned notes remain searchable context.
+- `vault_capabilities` describes the actual connection's build, catalog fingerprint, available tool names, feature flags, and read-only mode. Compare it with cached tool declarations, then reconnect and refresh `tools/list` if they differ.
 - `vault_health` reports schema, integrity, queue, backup, and capacity status without paths. Its `memories` field gives global and selected-continuity counts plus ready-to-use `memory_read` arguments. Load both scopes before working; follow every `nextCursor` to load the complete bodies.
 - `memory_read` returns private AI notes, shared by Vault clients but excluded from the viewer, ordinary search, record snapshots, and public history. `scope=Global` works without selecting a continuity; `scope=Continuity` uses `session_set`. Omit `key` to load all notes, or provide a stable key to read one. Pages contain at most ten complete bodies. No selected continuity means a null count, not zero. Switching continuity requires loading that continuity's memories again.
 - `continuity_list`, `session_set`, and `session_get` establish and inspect connection-local continuity and artificial time.
@@ -22,6 +24,9 @@ Record pages include an opaque observed revision. Use `changes_since` with that 
 ## Core writes
 
 - Private AI memories: `memory_save` takes `scope`, `key`, `body`, `expectedVersion`, and `mutationToken`. Keys are 1–100 lowercase letters/digits/dots/underscores/hyphens, beginning with a letter or digit; bodies are nonblank and at most 65,536 characters. Use `expectedVersion=0` to create a key, then the version from `memory_read` to replace its body. The result's `memory` receipt returns the saved key, scope, and version. Retries use the same mutation token and input, including scope. Private notes are included in normal database backups; they are hidden UI context, not encrypted or isolated by AI identity.
+  - Set `pinned=true` for standing instructions; `false` unpins, omission preserves the existing pin state. Each scope allows 32 pinned notes and 32,768 total body characters; exceeding this rejects the save instead of truncating instructions.
+  - Search using `memory_read.text` (literal case-insensitive key/body matching), or filter `pinnedOnly=true`. `memory_delete` requires the current version and clears the body and pin. It retains an empty version tombstone for retry/concurrency safety; `includeDeleted=true` reads that version so `memory_save` can reuse the key. Existing backups retain their prior contents.
+- Story certainty: `event_record`, `entity_event_add`, and `relationship_event_add` accept `factStatus=Unspecified|Tentative|Confirmed`; `event_update` can change it independently of the date. Exact dates are not evidence of confirmation. Existing facts remain Unspecified until explicitly reviewed. Event pages, project boundary fields, and timeline entries expose this status; the viewer labels provisional facts and project spans **Tentative**.
 - Continuities: `continuity_create`, `continuity_update`, `continuity_clock_set`
 - Backups: `vault_backup_create`
 - Variant groups: `variant_group_create`, `variant_group_update`, `entity_variant_group_set`

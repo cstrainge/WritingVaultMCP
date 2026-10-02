@@ -92,7 +92,9 @@ internal static class AccessSchemaDefinition
     public const string ProjectStoryEventChecksum = "9D114896D9F0EC60259AF607A4D6433CCC76E7BF0488A571676A4B15DC01B290";
     public const string SpeciesMigrationId = "20261002_014_species";
     public const string SpeciesChecksum = "B3DDA7793EF550D5BB84C4D87095247E7B7A89C68D25F6D83626119B938E9685";
-    public const string MigrationId = "20261002_015_private_memories";
+    public const string PrivateMemoryMigrationId = "20261002_015_private_memories";
+    public const string PrivateMemoryChecksum = "D6F0FE5A47EE216FB3D00134E4EA515AA6436962ECED527B66216CEC9CD093B3";
+    public const string MigrationId = "20261002_016_memory_bootstrap";
     public const string ApplicationVersion = "4.0.0";
 
     private static AccessColumnDefinition C(
@@ -132,6 +134,7 @@ internal static class AccessSchemaDefinition
             C("Id", "AUTOINCREMENT", true), C("ScopeKey", "TEXT(40)", true),
             C("ContinuityId", "LONG"), C("MemoryKey", "TEXT(100)", true),
             C("Body", "LONGTEXT", true), C("Version", "LONG", true),
+            C("Pinned", "YESNO", true, "0"), C("Removed", "YESNO", true, "0"),
             C("CreatedAtUtc", "DATETIME", true), C("UpdatedAtUtc", "DATETIME", true)
         ], ["Id"]),
         new("SchemaMigrations",
@@ -232,6 +235,7 @@ internal static class AccessSchemaDefinition
             C("Description", "LONGTEXT"),
             C("NarrativeOrder", "DOUBLE"),
             C("RecurrenceFrequency", "TEXT(10)"), C("RecurrenceInterval", "LONG"), C("RecurrenceUntil", "DATETIME"),
+            C("FactStatus", "TEXT(20)", false, "'Unspecified'"),
             .. StoryDate("Event")
         ], ["EntityId"]),
 
@@ -284,6 +288,7 @@ internal static class AccessSchemaDefinition
             C("Description", "LONGTEXT"),
             C("NarrativeOrder", "DOUBLE"),
             C("RecurrenceFrequency", "TEXT(10)"), C("RecurrenceInterval", "LONG"), C("RecurrenceUntil", "DATETIME"),
+            C("FactStatus", "TEXT(20)", false, "'Unspecified'"),
             .. StoryDate("Event")]), ["Id"]),
 
         new("EntityTags",
@@ -538,6 +543,7 @@ internal static class AccessSchemaDefinition
             C("Description", "LONGTEXT"),
             C("NarrativeOrder", "DOUBLE"),
             C("RecurrenceFrequency", "TEXT(10)"), C("RecurrenceInterval", "LONG"), C("RecurrenceUntil", "DATETIME"),
+            C("FactStatus", "TEXT(20)", false, "'Unspecified'"),
             .. StoryDate("Event")]), ["Id"]),
 
         new("RelationshipEventProjects", EntityColumns(

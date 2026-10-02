@@ -81,6 +81,7 @@ public sealed partial class AccessV4ApplicationService
                 await insert.ExecuteNonQueryAsync(token).ConfigureAwait(false);
                 var id = await IdentityAsync(context, token).ConfigureAwait(false);
                 await WriteRecurrenceAsync(context, "RelationshipEvents", "Id", id, request.Recurrence, token);
+                await WriteFactStatusAsync(context, "RelationshipEvents", "Id", id, request.FactStatus, token);
                 var eventTarget = new V4ResolvedTarget("RelationshipEvent", id, string.Empty, request.Title.Trim(), continuity, false);
                 foreach (var project in projects)
                     await ApplyOneProjectAsync(context, eventTarget, project.StorageKey, true, null, null, token)

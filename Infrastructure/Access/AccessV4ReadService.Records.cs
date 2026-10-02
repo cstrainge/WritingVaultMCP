@@ -70,9 +70,9 @@ public sealed partial class AccessV4ReadService
                 await using var connection = connectionFactory.Create();
                 await connection.OpenAsync(token);
                 using var boundaries = new AccessCommand(connection,
-                    "SELECT [ProjectBoundary],[EventKind],[EventLowerBound],[EventUpperBound],[EventLowerInclusive],[EventUpperInclusive],[EventOriginalText],[EventCalendarId] FROM [EntityEvents] WHERE [EntityId]=? AND [IsDeleted]=False AND [ProjectBoundary] IS NOT NULL")
+                    "SELECT [ProjectBoundary],[EventKind],[EventLowerBound],[EventUpperBound],[EventLowerInclusive],[EventUpperInclusive],[EventOriginalText],[EventCalendarId],[FactStatus] FROM [EntityEvents] WHERE [EntityId]=? AND [IsDeleted]=False AND [ProjectBoundary] IS NOT NULL")
                     .Add(OleDbType.Integer, target.StorageKey);
-                var dates = await boundaries.QueryAsync(r => (Role: r.GetString(0), Date: ReadDate(r, 1, "Event")), token);
+                var dates = await boundaries.QueryAsync(r => (Role: r.GetString(0), Date: ReadDate(r, 1, "Event"), Status: r.IsDBNull(8) ? "Unspecified" : r.GetString(8)), token);
                 if (dates.Count > 0)
                 {
                     var begins = dates.SingleOrDefault(row => row.Role == "StoryBegins").Date;
@@ -80,6 +80,8 @@ public sealed partial class AccessV4ReadService
                     fields["storyRange"] = JsonSerializer.SerializeToElement(StoryDateView(ProjectSpan(begins, ends)), TransitionDateJson);
                     fields["storyBegins"] = JsonSerializer.SerializeToElement(begins is null ? null : StoryDateView(begins), TransitionDateJson);
                     fields["storyEnds"] = JsonSerializer.SerializeToElement(ends is null ? null : StoryDateView(ends), TransitionDateJson);
+                    fields["storyBeginsStatus"] = JsonSerializer.SerializeToElement(dates.SingleOrDefault(row => row.Role == "StoryBegins").Status);
+                    fields["storyEndsStatus"] = JsonSerializer.SerializeToElement(dates.SingleOrDefault(row => row.Role == "StoryEnds").Status);
                 }
             }
             var include = request.Include is { Count: > 0 } ? request.Include : DefaultEntitySections(target.ResourceType);
