@@ -10,7 +10,7 @@ public sealed class V4ContractTests
     [Fact]
     public void CatalogIsCompleteUniqueAndUsesCommonMutationEnvelope()
     {
-        Assert.Equal(86, V4ContractCatalog.Tools.Count);
+        Assert.Equal(87, V4ContractCatalog.Tools.Count);
         Assert.Equal(V4ContractCatalog.Tools.Count,
             V4ContractCatalog.Tools.Select(tool => tool.Name).Distinct(StringComparer.Ordinal).Count());
 

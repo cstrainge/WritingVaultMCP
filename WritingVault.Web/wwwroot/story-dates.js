@@ -88,6 +88,9 @@
       return { description: `${input.upperInclusive ? 'On or before' : 'Before'} ${upper.timed ? time(upper.date) + ' on ' : ''}${fullDate(upper.date)}`, context: original };
     if (kind === 'After' && lower)
       return { description: `${input.lowerInclusive ? 'On or after' : 'After'} ${lower.timed ? time(lower.date) + ' on ' : ''}${fullDate(lower.date)}`, context: original };
+    if (kind === 'Circa' && lower && upper && !lower.timed && !upper.timed &&
+        input.upperInclusive === false && upper.date - lower.date === dayMs)
+      return { description: original || `Circa ${fullDate(lower.date)}` };
     if (kind === 'Circa' && lower && upper)
       return { description: original || `Around ${span(lower, upper, lower.timed || upper.timed).replace(/^From /, '').replace(/\.$/, '')}.` };
     if (['Range', 'KnownRange', 'UncertainRange'].includes(kind) && lower && upper) {

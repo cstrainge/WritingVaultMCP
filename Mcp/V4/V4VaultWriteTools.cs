@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Text.Json;
 using ModelContextProtocol.Server;
 using WritingVaultMcp.Application;
@@ -37,11 +37,11 @@ public sealed class V4VaultWriteTools(
     [McpServerTool(Name="variant_group_update",Destructive=true,Idempotent=true,UseStructuredContent=true)] public Task<V4MutationResult> VariantUpdate(V4VariantGroupUpdateRequest request,CancellationToken t)=>Map(legacy.PatchVariantGroup(new(request.MutationToken,request.VariantGroupRef,request.ExpectedVersion,S(request.Changes,"name"),S(request.Changes,"notes")),t),t);
     [McpServerTool(Name="entity_variant_group_set",Destructive=true,Idempotent=true,UseStructuredContent=true)] public Task<V4MutationResult> VariantSet(V4EntityVariantGroupSetRequest request,CancellationToken t)=>Map(legacy.SetVariantGroup(new(request.MutationToken,request.EntityRef,request.VariantGroupRef,request.ExpectedVersion),t),t);
     [McpServerTool(Name="entity_create",Idempotent=true,UseStructuredContent=true)] public Task<V4MutationResult> EntityCreate(V4EntityCreateRequest request,CancellationToken t)
-    {var f=request.Fields??new();return Map(legacy.CreateEntity(new(request.MutationToken,Enum.Parse<CanonEntityType>(request.EntityKind.ToString()),request.Name,f.Description,f.SecondaryType,f.TimeZoneId,Date(f.Birth),Date(f.Death),Date(f.Occurred),f.BirthLocation,f.BirthLocationDetail,request.VariantGroupRef,f.NarrativeOrder,f.MiddleNames,f.FamilyName,f.PreferredName,f.Gender,f.Pronouns,f.Species,f.Occupation,f.Nationality,f.PhysicalDescription,f.PersonalitySummary),t),t);}
+    {var f=request.Fields??new();return Map(legacy.CreateEntity(new(request.MutationToken,Enum.Parse<CanonEntityType>(request.EntityKind.ToString()),request.Name,f.Description,f.SecondaryType,f.TimeZoneId,Date(f.Birth),Date(f.Death),Date(f.Occurred),f.BirthLocation,f.BirthLocationDetail,request.VariantGroupRef,f.NarrativeOrder,f.MiddleNames,f.FamilyName,f.PreferredName,f.Gender,f.Pronouns,f.Species,f.Occupation,f.Nationality,f.PhysicalDescription,f.PersonalitySummary,f.BirthdayRecurring),t),t);}
     [McpServerTool(Name="entity_update",Destructive=true,Idempotent=true,UseStructuredContent=true)] public Task<V4MutationResult> EntityUpdate(V4EntityUpdateRequest request,CancellationToken t)=>Map(legacy.PatchEntity(new(
         request.MutationToken,request.Ref,request.ExpectedVersion,S(request.Changes,"name"),S(request.Changes,"description"),S(request.Changes,"secondaryType"),S(request.Changes,"timeZoneId"),
         SD(request.Changes,"birth"),SD(request.Changes,"death"),SD(request.Changes,"occurred"),S(request.Changes,"birthLocation"),S(request.Changes,"birthLocationDetail"),
-        DN(request.Changes,"narrativeOrder"),S(request.Changes,"middleNames"),S(request.Changes,"familyName"),S(request.Changes,"preferredName"),S(request.Changes,"gender"),S(request.Changes,"pronouns"),S(request.Changes,"species"),S(request.Changes,"occupation"),S(request.Changes,"nationality"),S(request.Changes,"physicalDescription"),S(request.Changes,"personalitySummary")),t),t);
+        DN(request.Changes,"narrativeOrder"),S(request.Changes,"middleNames"),S(request.Changes,"familyName"),S(request.Changes,"preferredName"),S(request.Changes,"gender"),S(request.Changes,"pronouns"),S(request.Changes,"species"),S(request.Changes,"occupation"),S(request.Changes,"nationality"),S(request.Changes,"physicalDescription"),S(request.Changes,"personalitySummary"),B(request.Changes,"birthdayRecurring")),t),t);
     [McpServerTool(Name="entity_duplicate_to_continuity",Idempotent=true,UseStructuredContent=true)] public Task<V4MutationResult> Duplicate(V4EntityDuplicateRequest request,CancellationToken t)=>Map(legacy.DuplicateEntity(new(request.MutationToken,request.SourceRef,request.TargetContinuityName,request.Name),t),t);
     [McpServerTool(Name="tag_create",Idempotent=true,UseStructuredContent=true)] public Task<V4MutationResult> TagCreate(V4TagCreateRequest request,CancellationToken t)=>Map(legacy.CreateTag(new(request.MutationToken,request.Name,request.Description),t),t);
     [McpServerTool(Name="tag_update",Destructive=true,Idempotent=true,UseStructuredContent=true)] public Task<V4MutationResult> TagUpdate(V4TagUpdateRequest request,CancellationToken t)=>Map(legacy.PatchTag(new(request.MutationToken,request.TagRef,request.ExpectedVersion,S(request.Changes,"name"),S(request.Changes,"description")),t),t);
@@ -54,6 +54,7 @@ public sealed class V4VaultWriteTools(
     [McpServerTool(Name="note_add",Idempotent=true,UseStructuredContent=true)] public Task<V4MutationResult> NoteAdd(V4NoteAddRequest request,CancellationToken t)=>Map(application.AddNoteAsync(new(request.MutationToken,session.RequireContinuityId(),request.Target,request.Body,request.Title,request.Format,session.ClientLabel),t),t);
     [McpServerTool(Name="note_update",Destructive=true,Idempotent=true,UseStructuredContent=true)] public Task<V4MutationResult> NoteUpdate(V4NoteUpdateRequest request,CancellationToken t)=>Map(records.UpdateNoteAsync(request,t),t);
     [McpServerTool(Name="event_record",Idempotent=true,UseStructuredContent=true)] public Task<V4MutationResult> EventRecord(V4EventRecordRequest request,CancellationToken t)=>Map(application.RecordWorldEventAsync(request,session.RequireContinuityId(),session.ClientLabel,t),t);
+    [McpServerTool(Name="event_update",Destructive=true,Idempotent=true,UseStructuredContent=true)] public Task<V4MutationResult> EventUpdate(V4EventUpdateRequest request,CancellationToken t)=>Map(application.UpdateEventAsync(request,session.RequireContinuityId(),session.ClientLabel,t),t);
     [McpServerTool(Name="entity_event_add",Idempotent=true,UseStructuredContent=true)] public Task<V4MutationResult> EntityEvent(V4EntityEventAddRequest request,CancellationToken t)=>Map(application.RecordEntityEventAsync(request,session.RequireContinuityId(),session.ClientLabel,t),t);
     [McpServerTool(Name="event_project_apply",Destructive=true,Idempotent=true,UseStructuredContent=true)] public Task<V4MutationResult> EventProjects(V4EventProjectApplyRequest request,CancellationToken t)=>Map(application.ApplyEventProjectsAsync(new(request.MutationToken,session.RequireContinuityId(),request.Event,request.Projects,request.Action==V4TagAction.Add,request.Role,request.Notes,session.ClientLabel),t),t);
     [McpServerTool(Name="entity_alias_add",Idempotent=true,UseStructuredContent=true)] public Task<V4MutationResult> Alias(V4AliasAddRequest request,CancellationToken t)=>Map(legacy.AddAlias(new(request.MutationToken,request.Entity,request.Alias,request.Notes),t),t);
@@ -143,6 +144,9 @@ public sealed class V4VaultWriteTools(
         !changes.TryGetValue(key, out var value) ? null :
         new(true, value.ValueKind == JsonValueKind.Null ? null :
             Date(value.Deserialize<V4StoryDateInput>()));
+
+    private static PatchField<bool>? B(IReadOnlyDictionary<string, JsonElement> changes, string key) =>
+        !changes.TryGetValue(key, out var value) ? null : new(true, value.GetBoolean());
 
     private static PatchField<double?>? DN(
         IReadOnlyDictionary<string, JsonElement> changes, string key) =>

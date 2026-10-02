@@ -49,7 +49,7 @@ public sealed class SemanticVaultWriteTools(
             request.Description, request.SecondaryType, request.TimeZoneId, request.Birth, request.Death, request.Occurred,
             birthLocation?.Id, request.BirthLocationDetail, group?.Id, Label, request.NarrativeOrder,
             request.MiddleNames, request.FamilyName, request.PreferredName, request.Gender, request.Pronouns,
-            request.Species, request.Occupation, request.Nationality, request.PhysicalDescription, request.PersonalitySummary), token);
+            request.Species, request.Occupation, request.Nationality, request.PhysicalDescription, request.PersonalitySummary, request.BirthdayRecurring), token);
     }, token);
 
     [McpServerTool(Name = "entity_patch", Destructive = true, Idempotent = true, OpenWorld = false, UseStructuredContent = true), Description("Patches an entity by semantic reference with explicit field state and expectedVersion.")]
@@ -64,7 +64,7 @@ public sealed class SemanticVaultWriteTools(
             request.Birth, request.Death, request.Occurred, birthLocation, request.BirthLocationDetail,
             request.NarrativeOrder, request.MiddleNames, request.FamilyName, request.PreferredName, request.Gender,
             request.Pronouns, request.Species, request.Occupation, request.Nationality,
-            request.PhysicalDescription, request.PersonalitySummary), token);
+            request.PhysicalDescription, request.PersonalitySummary, request.BirthdayRecurring), token);
     }, token);
 
     [McpServerTool(Name = "entity_duplicate_to_continuity", Destructive = false, Idempotent = true, OpenWorld = false, UseStructuredContent = true), Description("Copies core fields to a named target continuity as an independent entity.")]

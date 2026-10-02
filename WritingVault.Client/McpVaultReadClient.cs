@@ -164,7 +164,7 @@ internal sealed class McpVaultReadClient(McpClient client) : IVaultReadClient
         {
             ["limit"] = Math.Clamp(request.Limit, 1, 500), ["includeUndated"] = request.IncludeUndated,
             ["mode"] = request.Mode, ["resolution"] = request.Resolution,
-            ["undatedOnly"] = request.UndatedOnly, ["expandRanges"] = request.ExpandRanges
+            ["undatedOnly"] = request.UndatedOnly, ["expandRanges"] = request.ExpandRanges, ["expandRecurrences"] = request.ExpandRecurrences
         };
         if (request.From is not null) arguments["from"] = request.From;
         if (request.To is not null) arguments["to"] = request.To;

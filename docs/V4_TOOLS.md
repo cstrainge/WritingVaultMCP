@@ -27,10 +27,12 @@ Every page-shaped read includes an opaque observed revision. Use `changes_since`
 - Tags: `tag_create`, `tag_update`, `tag_apply`
 - Sources and claims: `source_create`, `source_update`, `source_snapshot_add`, `claim_create`, `claim_update`
 - Notes: `note_add`, `note_update`, `note_source_link`
-- Events: `event_record`, `entity_event_add`, `relationship_event_add`, `event_project_apply`
+- Events: `event_record`, `entity_event_add`, `relationship_event_add`, `event_update`, `event_project_apply`
 - General links: `entity_alias_add`, `entity_source_link`, `entity_source_unlink`, `project_entity_link`
 
 All three event creation tools accept zero or more projects. An event with no project remains visible in its continuity. `event_project_apply` changes project associations later without copying or re-owning the event. A relationship event belongs to one shared relationship, appears from each active participant's page, and may link to a world event even when it falls outside a known membership period.
+
+Project-owned events use `entity_event_add` with the project as `entity`. Give the two boundary events `projectBoundary: "StoryBegins"` and `"StoryEnds"`; their independently fuzzy dates drive the book span. Use `event_update` with `expectedVersion` to correct dates, links, boundary roles, or repeat schedules. Exact single-day events accept daily, weekly, monthly, or yearly `recurrence` with an optional inclusive `until` date. `entity_update.changes.birthdayRecurring: true` enables annual birthdays until death for a character with an exact Gregorian birth date. Repeats populate the visible date window without extending automatic bounds. See [event and project semantics](V4_CONTRACT.md#event-and-project-semantics).
 
 ## Graph, place, and time writes
 

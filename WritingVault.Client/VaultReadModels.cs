@@ -115,6 +115,8 @@ public sealed record VaultStoryDate(
     string Kind, string Display, string? Lower, string? Upper,
     bool LowerInclusive, bool UpperInclusive, string CalendarId, string? OriginalText = null);
 
+public sealed record VaultEventRecurrence(string Frequency, int Interval = 1, string? Until = null);
+
 public sealed record VaultTimelineItem(
     string Ref, string Kind, string Title, string? Summary, string Lane,
     VaultStoryDate Occurred, IReadOnlyList<VaultReference> Related,
@@ -122,7 +124,10 @@ public sealed record VaultTimelineItem(
     IReadOnlyList<string>? Warnings = null,
     IReadOnlyList<VaultReference>? Projects = null,
     bool ContainsHighlight = false,
-    string? Boundary = null, VaultStoryDate? BoundaryDate = null);
+    string? Boundary = null, VaultStoryDate? BoundaryDate = null,
+    bool HasCustomDescription = false, bool IsMembershipTransition = false,
+    VaultStoryDate? StoryBegins = null, VaultStoryDate? StoryEnds = null,
+    VaultEventRecurrence? Recurrence = null, bool IsOccurrence = false);
 
 public sealed record VaultTimelinePage(
     IReadOnlyList<VaultTimelineItem> Items, string? NextCursor, bool HasMore,
@@ -140,7 +145,7 @@ public sealed record VaultTimelineRequest(
     IReadOnlyList<string>? EntityEventKinds = null,
     bool UndatedOnly = false,
     string? HighlightRef = null,
-    bool ExpandRanges = false);
+    bool ExpandRanges = false, bool ExpandRecurrences = true);
 
 public sealed record VaultSourceSnapshotTextPage(
     string SnapshotRef, string Text, string? NextCursor, bool HasMore,

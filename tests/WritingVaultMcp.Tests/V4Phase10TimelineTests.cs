@@ -161,7 +161,7 @@ public sealed class V4Phase10TimelineTests
             EntityEventKinds: [V4RecordKind.Location]));
         Assert.Equal("Square floods", Assert.Single(locationEvents.Items).Title);
         await Assert.ThrowsAsync<VaultValidationException>(() => reads.TimelineAsync(new(
-            EntityEventKinds: [V4RecordKind.Project])));
+            EntityEventKinds: [V4RecordKind.WorldEvent])));
     }
 
     [Fact]

@@ -15,6 +15,61 @@ namespace WritingVaultMcp.Tests;
 public sealed class V4Phase7ProtocolTests
 {
     [Fact]
+    public async Task ProjectDatesRecurrenceAndBirthdayFlagsRoundTripThroughMcp()
+    {
+        await using var vault = await TestVault.CreateAsync();
+        await vault.Service.CreateContinuityAsync(new(Guid.NewGuid().ToString(), "Story schedule protocol", "UTC"));
+        await using var client = await Client(vault, false);
+        await client.CallToolAsync("session_set", new Dictionary<string, object?> { ["continuityName"] = "Story schedule protocol" });
+        async Task<CallToolResult> Write(string tool, Dictionary<string, object?> arguments)
+        {
+            arguments["mutationToken"] = Guid.NewGuid().ToString("N");
+            var result = await client.CallToolAsync(tool, arguments);
+            Assert.NotEqual(true, result.IsError);
+            using var json = JsonDocument.Parse(result.StructuredContent!.ToString()!);
+            Assert.True(json.RootElement.GetProperty("success").GetBoolean(), result.StructuredContent.ToString());
+            return result;
+        }
+        var book = FirstAffected(await Write("entity_create", new() { ["entityKind"] = "Project", ["name"] = "Protocol book" }));
+        var beginning = FirstAffected(await Write("entity_event_add", new()
+        {
+            ["entity"] = book.Ref, ["title"] = "Story begins", ["projectBoundary"] = "StoryBegins",
+            ["occurred"] = new { kind = "Circa", value = "2024-01-01", originalText = "Around New Year" }
+        }));
+        var recurring = FirstAffected(await Write("event_record", new()
+        {
+            ["title"] = "Protocol repeat", ["occurred"] = "2024-01-01",
+            ["recurrence"] = new { frequency = "Daily", until = "2024-01-03" }
+        }));
+        await Write("event_update", new()
+        {
+            ["event"] = recurring.Ref, ["expectedVersion"] = recurring.Version,
+            ["recurrence"] = new { frequency = "Weekly", interval = 2, until = "2024-01-29" }
+        });
+        var character = FirstAffected(await Write("entity_create", new()
+        {
+            ["entityKind"] = "Character", ["name"] = "Protocol birthday",
+            ["fields"] = new { birth = "2000-01-02", death = "2025-01-02", birthdayRecurring = true }
+        }));
+        await Write("entity_update", new()
+        {
+            ["ref"] = character.Ref, ["expectedVersion"] = character.Version,
+            ["changes"] = new { birthdayRecurring = false }
+        });
+        var timeline = await client.CallToolAsync("timeline_get", new Dictionary<string, object?>
+        {
+            ["from"] = "2024-01-01", ["to"] = "2024-12-31", ["includeUndated"] = false
+        });
+        using var page = JsonDocument.Parse(timeline.StructuredContent!.ToString()!);
+        var items = page.RootElement.GetProperty("items").EnumerateArray().ToArray();
+        Assert.Equal(["2024-01-01", "2024-01-15", "2024-01-29"], items.Where(item => item.GetProperty("ref").GetString() == recurring.Ref)
+            .Select(item => item.GetProperty("occurred").GetProperty("lower").GetString()));
+        Assert.DoesNotContain(items, item => item.GetProperty("title").GetString() == "Protocol birthday — birthday");
+        var span = Assert.Single(items, item => item.GetProperty("kind").GetString() == "Project");
+        Assert.Equal("Circa", span.GetProperty("storyBegins").GetProperty("kind").GetString());
+    }
+
+    [Fact]
     public async Task SurfaceSelectorAdvertisesExactV4CatalogAndReadOnlyOmitsMutations()
     {
         await using var vault=await TestVault.CreateAsync();

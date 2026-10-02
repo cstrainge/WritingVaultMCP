@@ -217,6 +217,7 @@ public sealed partial class AccessV4ReadService(
         StoryDateKind.Month => date.LowerBound?.ToString("yyyy-MM", CultureInfo.InvariantCulture) ?? "Unknown",
         StoryDateKind.Year => date.LowerBound?.ToString("yyyy", CultureInfo.InvariantCulture) ?? "Unknown",
         StoryDateKind.Before => $"Before {date.UpperBound:yyyy-MM-dd}", StoryDateKind.After => $"After {date.LowerBound:yyyy-MM-dd}",
+        StoryDateKind.Circa when date.UpperBound == date.LowerBound?.AddDays(1) => $"Circa {date.LowerBound:yyyy-MM-dd}",
         StoryDateKind.Circa => $"Circa {date.LowerBound:yyyy-MM-dd}–{date.UpperBound:yyyy-MM-dd}",
         _ => $"{date.LowerBound:yyyy-MM-dd}–{date.UpperBound:yyyy-MM-dd}"
     };
@@ -324,7 +325,9 @@ public sealed partial class AccessV4ReadService(
         double? NarrativeOrder, int Version, bool Deleted, int OwnerId,
         int? RelatedEntityId = null, string? RelatedEntityType = null, string? RelatedLabel = null,
         IReadOnlyList<string>? Warnings = null, string Discriminator = "record",
-        bool RelationshipDirected = false, string? TransitionDescription = null);
+        bool RelationshipDirected = false, string? TransitionDescription = null,
+        string? ProjectBoundary = null, StoryDate? StoryBegins = null, StoryDate? StoryEnds = null,
+        V4EventRecurrence? Recurrence = null, bool IsOccurrence = false, StoryDate? BirthdayDeath = null);
     private sealed record TimelineDetailEntry(string Key, TimelineRow Row, string? Boundary = null, DateTime? BoundaryAt = null);
     private sealed record TimelinePageEntry(string Key, V4TimelineItem? Item, V4ReferenceSummary? Undated);
     private sealed record PeriodDefinition(string Table, string Type, string FallbackTitle, V4TimelineLane Lane,

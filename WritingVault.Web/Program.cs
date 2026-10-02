@@ -180,7 +180,7 @@ app.MapGet("/api/history", (HttpContext context, string? reference, string? curs
 
 app.MapGet("/api/timeline", (HttpContext context, string? from, string? to, string? lanes, string? kinds, string? entityEventKinds,
     string? focusRefs, string? highlightRef, string? projects, string? locations, string? tags, string? text,
-    string? mode, string? resolution, string? cursor, bool? undatedOnly, bool? includeUndated, bool? expandRanges,
+    string? mode, string? resolution, string? cursor, bool? undatedOnly, bool? includeUndated, bool? expandRanges, bool? expandRecurrences,
     int? limit, ViewerSessionStore store, CancellationToken token) => Guard(async () =>
 {
     static string[]? Values(string? value) => string.IsNullOrWhiteSpace(value)
@@ -194,7 +194,7 @@ app.MapGet("/api/timeline", (HttpContext context, string? from, string? to, stri
             Projects: Values(projects), Locations: Values(locations), Tags: Values(tags), Text: text,
             IncludeUndated: includeUndated ?? true, Mode: mode ?? "Calendar", Resolution: resolution ?? "Detail",
             Cursor: cursor, Limit: Math.Clamp(limit ?? 100, 1, 500), UndatedOnly: undatedOnly ?? false,
-            HighlightRef: highlightRef, ExpandRanges: expandRanges ?? false);
+            HighlightRef: highlightRef, ExpandRanges: expandRanges ?? false, ExpandRecurrences: expandRecurrences ?? true);
         return Results.Ok(await session.Interactive.TimelineAsync(request, token));
     }
     finally { session.Reads.Release(); }

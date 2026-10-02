@@ -20,7 +20,7 @@ public sealed partial class AccessVaultService
             request.PreferredName?.Specified == true, request.Gender?.Specified == true,
             request.Pronouns?.Specified == true, request.Species?.Specified == true,
             request.Occupation?.Specified == true, request.Nationality?.Specified == true,
-            request.PhysicalDescription?.Specified == true, request.PersonalitySummary?.Specified == true
+            request.PhysicalDescription?.Specified == true, request.PersonalitySummary?.Specified == true, request.BirthdayRecurring?.Specified == true
         };
         if (!fields.Any(value => value)) return Task.FromResult(new VaultMutationResult(false, "patch.empty", Message: "At least one field must be specified."));
         if (request.Name?.Specified == true && string.IsNullOrWhiteSpace(request.Name.Value)) return Task.FromResult(new VaultMutationResult(false, "validation.name", Message: "Name cannot be null or blank."));
@@ -115,6 +115,11 @@ public sealed partial class AccessVaultService
                 {
                     if (entity.Type != CanonEntityType.WorldEvent) throw new VaultCommandException("patch.unsupported_field", "NarrativeOrder is supported only for world events.");
                     assignments.Add("[NarrativeOrder]=?"); parameters.Add((OleDbType.Double, request.NarrativeOrder.Value, null));
+                }
+                if (request.BirthdayRecurring?.Specified == true)
+                {
+                    if (entity.Type != CanonEntityType.Character) throw new VaultCommandException("patch.unsupported_field", "BirthdayRecurring is supported only for characters.");
+                    assignments.Add("[BirthdayRecurring]=?"); parameters.Add((OleDbType.Boolean, request.BirthdayRecurring.Value, null));
                 }
                 void AddCharacterField(PatchField<string>? field, string column, OleDbType type, int? size)
                 {

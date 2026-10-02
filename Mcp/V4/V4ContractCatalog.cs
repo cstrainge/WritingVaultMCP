@@ -33,7 +33,7 @@ public static class V4ContractCatalog
         R<V4RecordRefRequest, V4ReferenceSummary>("record_locate", "Locates an explicit semantic record reference across active continuities for internal links without changing the session."),
         R<V4SourceSnapshotViewRequest, V4SourceSnapshotViewResult>("source_snapshot_view", "Pages verified cached source text without exposing a local file path."),
         R<V4ListRelatedRequest, V4Page<V4ReferenceSummary>>("list_related", "Pages one named relation from a continuity or semantic record reference."),
-        R<V4TimelineRequest, V4TimelineResult>("timeline_get", "Returns bounded calendar or narrative timeline items for a viewport; historical data does not require a clock."),
+        R<V4TimelineRequest, V4TimelineResult>("timeline_get", "Returns calendar or narrative timeline items, including project spans and repeated occurrences inside the requested viewport. Without a viewport, only stored dates establish the range; repeat stop dates never extend it. Set expandRecurrences=false when fitting an automatic viewport, then query that viewport with repeats enabled. Historical data does not require a clock."),
         R<V4TagTargetsRequest, V4Page<V4ReferenceSummary>>("tag_targets", "Pages all selected-continuity and vault-global targets carrying one tag."),
         R<V4HistoryRequest, V4Page<V4HistoryEntry>>("history_get", "Reads real-UTC change history by semantic reference or public mutation token."),
         R<V4ChangesSinceRequest, V4ChangesResult>("changes_since", "Waits for or lists committed changes after an opaque revision cursor for viewer freshness."),
@@ -55,7 +55,7 @@ public static class V4ContractCatalog
         W<V4VariantGroupUpdateRequest>("variant_group_update", "Applies sparse versioned changes to a variant group.", true),
         W<V4EntityVariantGroupSetRequest>("entity_variant_group_set", "Assigns or clears an entity's same-kind selected-continuity variant group.", true),
         W<V4EntityCreateRequest>("entity_create", "Creates one of the six canon entity kinds inside the selected continuity."),
-        W<V4EntityUpdateRequest>("entity_update", "Applies an allowlisted sparse versioned patch to one canon entity.", true),
+        W<V4EntityUpdateRequest>("entity_update", "Applies an allowlisted sparse versioned patch to one canon entity. For a character with an exact Gregorian birth date, birthdayRecurring enables annual birthdays through death; changing birth or death automatically updates the schedule.", true),
         W<V4EntityDuplicateRequest>("entity_duplicate_to_continuity", "Creates an independent shallow duplicate in a target continuity."),
         W<V4TagCreateRequest>("tag_create", "Creates a normalized vault-global tag."),
         W<V4TagUpdateRequest>("tag_update", "Applies sparse versioned changes to a vault-global tag.", true),
@@ -68,7 +68,8 @@ public static class V4ContractCatalog
         W<V4NoteAddRequest>("note_add", "Adds a Markdown note to a canon entity or named continuity. " + MarkdownLinkHint),
         W<V4NoteUpdateRequest>("note_update", "Applies sparse versioned changes to a Markdown note. " + MarkdownLinkHint, true),
         W<V4EventRecordRequest>("event_record", "Creates one world event with participants, locations, and zero or more same-continuity project associations atomically."),
-        W<V4EntityEventAddRequest>("entity_event_add", "Adds entity-local event context, optionally linked to a world event and zero or more same-continuity projects."),
+        W<V4EventUpdateRequest>("event_update", "Updates an existing world, entity, or relationship event with an expected version. Set recurrence to mark an exact single-day event as repeating daily, weekly, monthly, or yearly; until is an inclusive YYYY-MM-DD stop date. Missing calendar days are skipped. Clear flags remove optional fields. Project boundary edits immediately change the displayed book span.", true),
+        W<V4EntityEventAddRequest>("entity_event_add", "Adds a character, location, organization, object, or project story event. Exact single-day events can recur daily, weekly, monthly, or yearly through an inclusive until date; missing calendar days are skipped. Projects may designate one StoryBegins and one StoryEnds boundary to drive their timeline span. Other events omit projectBoundary. Optionally link to a world event and same-continuity projects."),
         W<V4EventProjectApplyRequest>("event_project_apply", "Atomically adds or removes project associations for a world, entity, or relationship event.", true),
         W<V4AliasAddRequest>("entity_alias_add", "Adds a normalized alias to a character or organization."),
         W<V4NoteSourceLinkRequest>("note_source_link", "Links a source to a note with locator and commentary."),
@@ -225,6 +226,11 @@ public static class V4ContractCatalog
                     ["file_name"] = "portrait.png"
                 };
             }
+            if (tool.Name == "event_update" && request is JsonObject eventRequest)
+            {
+                eventRequest["event"] = "worldevent:arrival-day~ABCDEFGHJK";
+                eventRequest["recurrence"] = new JsonObject { ["frequency"] = "Yearly", ["interval"] = 1, ["until"] = "2030-09-23" };
+            }
             if (tool.Name == "relationship_membership_period_add" && request is JsonObject membershipRequest)
                 membershipRequest["period"] = new JsonObject
                 {
@@ -360,6 +366,8 @@ public static class V4ContractCatalog
             case "entities": case "kinds": case "tags": case "roles": case "canonStatuses":
             case "entityKinds": case "focusRefs": case "lanes": case "owners":
                 value["maxItems"] = V4ContractLimits.MaximumPageSize; break;
+            case "interval": value["minimum"] = 1; value["maximum"] = 10000; break;
+            case "until": value["pattern"] = "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"; break;
             case "expectedVersion": value["minimum"] = 1; break;
             case "confidence": value["minimum"] = 0; value["maximum"] = 1; break;
             case "biologicalRate": case "experiencedRate": value["minimum"] = 0; break;
@@ -418,6 +426,7 @@ public static class V4ContractCatalog
                          "secondaryType", "timeZoneId", "birthLocation", "birthLocationDetail", "middleNames",
                          "familyName", "preferredName", "gender", "pronouns", "species", "occupation", "nationality"
                      }) properties[field] = Text(V4ContractLimits.MaximumNameLength);
+            properties["birthdayRecurring"] = new JsonObject { ["type"] = "boolean", ["description"] = "Repeat exact Gregorian birthdays annually through the character death date without extending the timeline bounds." };
             properties["birth"] = NullableDate();
             properties["death"] = NullableDate();
             properties["occurred"] = NullableDate();
@@ -484,7 +493,7 @@ public static class V4ContractCatalog
 
     private static JsonObject StoryDateInputSchema() => new()
     {
-        ["description"] = "A compact exact date string, compact year object, or full timezone-free fuzzy story-date object.",
+        ["description"] = "A compact exact date string, compact year object, or full timezone-free fuzzy story-date object. Circa may use value as a nominal calendar day with no invented uncertainty window, or lower/upper for an authored uncertainty interval.",
         ["oneOf"] = new JsonArray
         {
             new JsonObject { ["type"] = "string", ["pattern"] = "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },

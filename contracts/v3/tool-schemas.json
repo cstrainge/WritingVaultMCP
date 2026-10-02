@@ -2944,6 +2944,10 @@
                   "null"
                 ],
                 "default": null
+              },
+              "birthdayRecurring": {
+                "type": "boolean",
+                "default": false
               }
             },
             "required": [
@@ -4109,6 +4113,25 @@
                       "string",
                       "null"
                     ]
+                  }
+                },
+                "required": [
+                  "specified",
+                  "value"
+                ],
+                "default": null
+              },
+              "birthdayRecurring": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "specified": {
+                    "type": "boolean"
+                  },
+                  "value": {
+                    "type": "boolean"
                   }
                 },
                 "required": [

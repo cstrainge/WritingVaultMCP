@@ -46,7 +46,7 @@ public sealed record CreateCanonEntityRequest(
     string? Occupation = null,
     string? Nationality = null,
     string? PhysicalDescription = null,
-    string? PersonalitySummary = null);
+    string? PersonalitySummary = null, bool BirthdayRecurring = false);
 
 public sealed record DuplicateEntityRequest(
     string OperationId, int SourceEntityId, int TargetContinuityId,
@@ -221,7 +221,7 @@ public sealed record PatchEntityRequest(
     PatchField<string>? Occupation = null,
     PatchField<string>? Nationality = null,
     PatchField<string>? PhysicalDescription = null,
-    PatchField<string>? PersonalitySummary = null);
+    PatchField<string>? PersonalitySummary = null, PatchField<bool>? BirthdayRecurring = null);
 
 public sealed record EntitySummary(
     int Id, int ContinuityId, CanonEntityType EntityType, string Name, int Version, bool IsDeleted, DateTime UpdatedAtUtc,

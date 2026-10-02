@@ -49,7 +49,7 @@ public enum V4RecordKind
 
 public enum V4TimelineLane
 {
-    WorldEvents, EntityEvents, Characters, Relationships, Residences,
+    WorldEvents, EntityEvents, Projects, Characters, Relationships, Residences,
     Memberships, OrganizationLocations, Ownership, Custody, ObjectLocations, TemporalEffects,
     RelationshipEvents
 }
@@ -145,7 +145,9 @@ public sealed record V4TimelineItem(
     IReadOnlyList<V4ReferenceSummary>? Projects = null,
     bool ContainsHighlight = false,
     string? Boundary = null, V4StoryDateView? BoundaryDate = null,
-    bool HasCustomDescription = false, bool IsMembershipTransition = false);
+    bool HasCustomDescription = false, bool IsMembershipTransition = false,
+    V4StoryDateView? StoryBegins = null, V4StoryDateView? StoryEnds = null,
+    V4EventRecurrence? Recurrence = null, bool IsOccurrence = false);
 
 public sealed record V4TimelineResult(
     IReadOnlyList<V4TimelineItem> Items, string? NextCursor, bool HasMore,
@@ -266,7 +268,7 @@ public sealed record V4TimelineRequest(
     IReadOnlyList<V4RecordKind>? EntityEventKinds = null,
     bool UndatedOnly = false,
     string? HighlightRef = null,
-    bool ExpandRanges = false);
+    bool ExpandRanges = false, bool ExpandRecurrences = true);
 
 public sealed record V4TagTargetsRequest(
     string Tag, IReadOnlyList<V4RecordKind>? Kinds = null,
@@ -316,7 +318,7 @@ public sealed record V4EntityFields(
     string? MiddleNames = null, string? FamilyName = null, string? PreferredName = null,
     string? Gender = null, string? Pronouns = null, string? Species = null,
     string? Occupation = null, string? Nationality = null,
-    string? PhysicalDescription = null, string? PersonalitySummary = null);
+    string? PhysicalDescription = null, string? PersonalitySummary = null, bool BirthdayRecurring = false);
 
 public sealed record V4ContinuityCreateRequest(
     string MutationToken, string Name, string DefaultTimeZoneId, string? Description = null);
@@ -384,15 +386,25 @@ public sealed record V4EventRecordRequest(
     string? Description = null, double? NarrativeOrder = null,
     IReadOnlyList<V4EventParticipantInput>? Participants = null,
     IReadOnlyList<V4EventLocationInput>? Locations = null,
-    IReadOnlyList<string>? Projects = null);
+    IReadOnlyList<string>? Projects = null, V4EventRecurrence? Recurrence = null);
+public enum V4RecurrenceFrequency { Daily, Weekly, Monthly, Yearly }
+public sealed record V4EventRecurrence(V4RecurrenceFrequency Frequency, int Interval = 1, string? Until = null);
+public enum V4ProjectBoundary { StoryBegins, StoryEnds }
+public sealed record V4EventUpdateRequest(
+    string MutationToken, string Event, int ExpectedVersion,
+    string? Title = null, string? Description = null, V4StoryDateInput? Occurred = null,
+    string? WorldEvent = null, double? NarrativeOrder = null,
+    V4ProjectBoundary? ProjectBoundary = null, V4EventRecurrence? Recurrence = null,
+    bool ClearDescription = false, bool ClearWorldEvent = false,
+    bool ClearNarrativeOrder = false, bool ClearProjectBoundary = false, bool ClearRecurrence = false);
 public sealed record V4EntityEventAddRequest(
     string MutationToken, string Entity, string Title, V4StoryDateInput Occurred,
     string? WorldEvent = null, string? Description = null, double? NarrativeOrder = null,
-    IReadOnlyList<string>? Projects = null);
+    IReadOnlyList<string>? Projects = null, V4ProjectBoundary? ProjectBoundary = null, V4EventRecurrence? Recurrence = null);
 public sealed record V4RelationshipEventAddRequest(
     string MutationToken, string RelationshipRef, string Title, V4StoryDateInput Occurred,
     string? WorldEvent = null, string? Description = null, double? NarrativeOrder = null,
-    IReadOnlyList<string>? Projects = null);
+    IReadOnlyList<string>? Projects = null, V4EventRecurrence? Recurrence = null);
 public sealed record V4EventProjectApplyRequest(
     string MutationToken, string Event, IReadOnlyList<string> Projects,
     V4TagAction Action, string? Role = null, string? Notes = null);

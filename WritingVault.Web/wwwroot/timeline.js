@@ -4,6 +4,7 @@
   const byId = id => document.getElementById(id);
   const kinds = [
     ['WorldEvent', 'World events'], ['RelationshipEvent', 'Relationship events'],
+    ['Project', 'Project spans'], ['ProjectEvent', 'Project events'],
     ['CharacterEvent', 'Character events'],
     ['LocationEvent', 'Location events'], ['OrganizationEvent', 'Organization events'],
     ['ObjectEvent', 'Object events'], ['Character', 'Characters'],
@@ -13,10 +14,11 @@
     ['Custody', 'Custody'], ['ObjectLocation', 'Object locations'], ['TemporalEffect', 'Temporal effects']
   ];
   const eventOwners = new Map([
-    ['CharacterEvent', 'Character'], ['LocationEvent', 'Location'],
+    ['ProjectEvent', 'Project'], ['CharacterEvent', 'Character'], ['LocationEvent', 'Location'],
     ['OrganizationEvent', 'Organization'], ['ObjectEvent', 'Object']
   ]);
   const kindGroups = [
+    ['Projects', ['Project', 'ProjectEvent']],
     ['Events', ['WorldEvent', 'RelationshipEvent', 'CharacterEvent', 'LocationEvent', 'OrganizationEvent', 'ObjectEvent']],
     ['People & relationships', ['Character', 'Relationship', 'RelationshipMembershipPeriod',
       'Residence', 'Membership', 'TemporalEffect']],
@@ -41,7 +43,7 @@
       return 'Membership';
     if (item.kind === 'EntityEvent') {
       const owner = (item.related || []).find(link =>
-        ['Character', 'Location', 'Organization', 'Object'].includes(link.kind));
+        ['Character', 'Location', 'Organization', 'Object', 'Project'].includes(link.kind));
       return owner ? `${owner.kind} event` : 'Entity event';
     }
     return typeNames.get(item.kind) || item.kind.replace(/([a-z])([A-Z])/g, '$1 $2');
@@ -50,8 +52,8 @@
   const unknownRange = item => ['Before', 'After', 'Range'].includes(item.occurred?.kind) ||
     (['KnownRange', 'UncertainRange'].includes(item.occurred?.kind) &&
       (item.occurred.lower === null || item.occurred.upper === null));
-  const uncertainDate = item => ['Circa', 'Before', 'After', 'Month', 'Year', 'Range', 'UncertainRange']
-    .includes(item.occurred?.kind);
+  const uncertainDate = item => (!item.boundaryDate && [item.storyBegins, item.storyEnds].some(date => date && !['ExactDate', 'ExactInstant'].includes(date.kind))) || ['Circa', 'Before', 'After', 'Month', 'Year', 'Range', 'UncertainRange']
+    .includes((item.boundaryDate || item.occurred)?.kind);
   const day = 86_400_000;
   const graphPlotStart = 56;
   const graphPlotEnd = 48;
@@ -312,10 +314,25 @@
       }
       try {
         const graphFilters = { ...this.filters(), resolution: 'Aggregate', includeUndated: false,
-          highlightRef: this.highlightRef, limit: 500 };
+          highlightRef: this.highlightRef, expandRecurrences: !!this.viewport, limit: 500 };
         if (this.viewport) { graphFilters.from = isoDay(this.viewport[0]); graphFilters.to = isoDay(this.viewport[1]); }
-        const graph = await this.query(graphFilters, signal);
+        let graph = await this.query(graphFilters, signal);
         if (generation !== this.generation) return;
+        if (!this.viewport) {
+          this.clock = graph.clock;
+          this.viewport = this.fullDomain(graph.items || []);
+          if (this.viewport) {
+            const fitted = await this.query({ ...graphFilters, expandRecurrences: true,
+              from: isoDay(this.viewport[0]), to: isoDay(this.viewport[1]) }, signal);
+            if (generation !== this.generation) return;
+            if (fitted.observedRevision !== graph.observedRevision) {
+              this.viewport = null;
+              if (attempt < 2) return this.reload(attempt + 1);
+              throw new Error('The timeline changed repeatedly while fitting its dates.');
+            }
+            graph = fitted;
+          }
+        }
         const tableFilters = { ...this.filters(), resolution: 'Detail', expandRanges: true,
           includeUndated: false };
         if (this.range) { tableFilters.from = this.range[0]; tableFilters.to = this.range[1]; }
@@ -889,7 +906,7 @@
           appendDateParts(row, date);
         } else {
           const period = node('td', undefined, 'timeline-period-cell'); period.colSpan = 3;
-          this.appendDate(period, item);
+          this.appendDate(period, item, item.boundaryDate);
           if (uncertainDate(item)) {
             const isSpan = ['Range', 'UncertainRange'].includes(item.occurred.kind);
             const explanation = isSpan ? 'Period; nearby events may overlap' :
@@ -926,10 +943,12 @@
         });
         title.append(locate);
         if (!membershipTransition && (item.boundary === 'Start' || item.boundary === 'Ongoing')) {
-          const full = window.WritingVaultStoryDates.describe(item.occurred);
+          const full = item.kind === 'Project' ? { description: item.occurred.display } : window.WritingVaultStoryDates.describe(item.occurred);
           title.append(node('small', [full.description, full.duration, full.context].filter(Boolean).join(' '), 'timeline-range-full-date'));
         }
-        if (item.boundary !== 'End' && item.summary) title.append(node('small', item.summary));
+        if (item.recurrence) title.append(node('small', this.repeatText(item), 'timeline-repeat'));
+        for (const warning of item.warnings || []) title.append(node('small', warning));
+        if (item.boundary !== 'End' && item.kind !== 'Project' && item.summary) title.append(node('small', item.summary));
         const span = item.boundary ? spanByKey.get(this.rangeIdentity(item)) : null;
         if (this.range && span && item.boundary === 'Start' && span.end === null)
           title.append(node('small', 'End is outside the selected dates.'));
@@ -1047,8 +1066,9 @@
       const detail = byId('timeline-detail'); detail.hidden = false;
       byId('timeline-detail-title').textContent = item.title;
       this.appendDate(byId('timeline-detail-date'), item);
-      byId('timeline-detail-summary').textContent = item.summary || (item.kind === 'Aggregate'
-        ? 'A density cluster. The date selection narrows the table so you can inspect its entries.' : '');
+      byId('timeline-detail-summary').textContent = [item.summary || (item.kind === 'Aggregate'
+        ? 'A density cluster. The date selection narrows the table so you can inspect its entries.' : ''),
+        item.recurrence ? this.repeatText(item) : '', ...(item.warnings || [])].filter(Boolean).join(' ');
       const related = byId('timeline-detail-related'); related.textContent = '';
       if (item.kind !== 'Aggregate') {
         const open = node('button', 'Open record', 'quiet-button'); open.type = 'button';
@@ -1064,13 +1084,20 @@
       }
     }
 
+    repeatText(item) {
+      const repeat = item.recurrence;
+      const unit = { Daily: 'day', Weekly: 'week', Monthly: 'month', Yearly: 'year' }[repeat.frequency];
+      const schedule = repeat.interval === 1 ? `Repeats every ${unit}` : `Repeats every ${repeat.interval} ${unit}s`;
+      return schedule + (repeat.until ? ` through ${repeat.until}.` : '.');
+    }
+
     dateText(item) {
-      const date = window.WritingVaultStoryDates.describe(item.occurred);
+      const date = item.kind === 'Project' ? { description: item.occurred.display } : window.WritingVaultStoryDates.describe(item.occurred);
       return [date.description, item.kind === 'Aggregate' ? null : date.duration, date.context].filter(Boolean).join(' ');
     }
 
-    appendDate(host, item) {
-      const date = window.WritingVaultStoryDates.describe(item.occurred);
+    appendDate(host, item, dateOverride = null) {
+      const date = dateOverride ? window.WritingVaultStoryDates.describe(dateOverride) : item.kind === 'Project' ? { description: item.occurred.display } : window.WritingVaultStoryDates.describe(item.occurred);
       host.textContent = date.description;
       if (item.kind !== 'Aggregate' && date.duration)
         host.append(node('small', date.duration, 'timeline-date-duration'));

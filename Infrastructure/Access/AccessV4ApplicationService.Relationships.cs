@@ -65,6 +65,7 @@ public sealed partial class AccessV4ApplicationService
                 foreach (var project in projects)
                     await RequireCanonEntityAsync(context, project.StorageKey, continuity, "Project", token)
                         .ConfigureAwait(false);
+                ValidateRecurrence(occurred, request.Recurrence);
                 var now = DateTime.UtcNow;
                 using var insert = context.Command(
                     "INSERT INTO [RelationshipEvents] ([RelationshipId],[WorldEventId],[Title],[Description],[NarrativeOrder]," +
@@ -79,6 +80,7 @@ public sealed partial class AccessV4ApplicationService
                 insert.Add(OleDbType.Date, now).Add(OleDbType.Date, now);
                 await insert.ExecuteNonQueryAsync(token).ConfigureAwait(false);
                 var id = await IdentityAsync(context, token).ConfigureAwait(false);
+                await WriteRecurrenceAsync(context, "RelationshipEvents", "Id", id, request.Recurrence, token);
                 var eventTarget = new V4ResolvedTarget("RelationshipEvent", id, string.Empty, request.Title.Trim(), continuity, false);
                 foreach (var project in projects)
                     await ApplyOneProjectAsync(context, eventTarget, project.StorageKey, true, null, null, token)

@@ -56,6 +56,8 @@ public sealed partial class AccessV4ApplicationService(
         }
         catch (V4ResolutionException exception) { return ResolutionFailure(exception); }
 
+        if (request.ProjectBoundary is not null && owner.ResourceType != "Project")
+            return new(false, "validation.project_boundary", Message: "Only project-owned events can define story boundaries.");
         if (projects.Select(project => project.StorageKey).Distinct().Count() != projects.Count)
             return new(false, "validation.projects_duplicate", Message: "The same project cannot appear more than once.");
 
@@ -74,19 +76,22 @@ public sealed partial class AccessV4ApplicationService(
                 foreach (var project in projects)
                     await RequireCanonEntityAsync(context, project.StorageKey, continuity, "Project", token).ConfigureAwait(false);
 
+                ValidateRecurrence(occurred, request.Recurrence, request.ProjectBoundary);
                 var now = DateTime.UtcNow;
                 using var insert = context.Command(
-                        "INSERT INTO [EntityEvents] ([EntityId],[WorldEventId],[Title],[Description],[NarrativeOrder],[EventKind],[EventLowerBound],[EventUpperBound],[EventLowerInclusive],[EventUpperInclusive],[EventOriginalText],[EventCalendarId],[CreatedAtUtc],[UpdatedAtUtc]) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
+                        "INSERT INTO [EntityEvents] ([EntityId],[WorldEventId],[Title],[Description],[NarrativeOrder],[ProjectBoundary],[EventKind],[EventLowerBound],[EventUpperBound],[EventLowerInclusive],[EventUpperInclusive],[EventOriginalText],[EventCalendarId],[CreatedAtUtc],[UpdatedAtUtc]) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
                     .Add(OleDbType.Integer, owner.StorageKey)
                     .Add(OleDbType.Integer, worldEvent?.StorageKey)
                     .Add(OleDbType.VarWChar, request.Title.Trim(), 255)
                     .Add(OleDbType.LongVarWChar, request.Description)
-                    .Add(OleDbType.Double, request.NarrativeOrder);
+                    .Add(OleDbType.Double, request.NarrativeOrder)
+                    .Add(OleDbType.VarWChar, request.ProjectBoundary?.ToString(), 20);
                 AddDate(insert, occurred);
                 insert.Add(OleDbType.Date, now).Add(OleDbType.Date, now);
                 await insert.ExecuteNonQueryAsync(token).ConfigureAwait(false);
                 var id = await IdentityAsync(context, token).ConfigureAwait(false);
 
+                await WriteRecurrenceAsync(context, "EntityEvents", "Id", id, request.Recurrence, token);
                 var eventTarget = new V4ResolvedTarget("EntityEvent", id, string.Empty, request.Title.Trim(), continuity, false);
                 foreach (var project in projects)
                     await ApplyOneProjectAsync(context, eventTarget, project.StorageKey, true, null, null, token).ConfigureAwait(false);
@@ -115,9 +120,10 @@ public sealed partial class AccessV4ApplicationService(
         var operation=references.OperationId(request.MutationToken);
         return await writes.ExecuteAsync(operation,"v4.event.record",request,"event_record",clientLabel,async(context,token)=>
         {
-            await RequireSelectedContinuityAsync(context,continuity,token).ConfigureAwait(false);var now=DateTime.UtcNow;
+            await RequireSelectedContinuityAsync(context,continuity,token).ConfigureAwait(false);ValidateRecurrence(occurred,request.Recurrence);var now=DateTime.UtcNow;
             using var canon=context.Command("INSERT INTO [CanonEntities] ([ContinuityId],[EntityType],[CreatedAtUtc],[UpdatedAtUtc]) VALUES (?,'WorldEvent',?,?)").Add(OleDbType.Integer,continuity).Add(OleDbType.Date,now).Add(OleDbType.Date,now);await canon.ExecuteNonQueryAsync(token);var id=await IdentityAsync(context,token);
             using var world=context.Command("INSERT INTO [WorldEvents] ([EntityId],[Title],[Description],[NarrativeOrder],[EventKind],[EventLowerBound],[EventUpperBound],[EventLowerInclusive],[EventUpperInclusive],[EventOriginalText],[EventCalendarId]) VALUES (?,?,?,?,?,?,?,?,?,?,?)").Add(OleDbType.Integer,id).Add(OleDbType.VarWChar,request.Title.Trim(),255).Add(OleDbType.LongVarWChar,request.Description).Add(OleDbType.Double,request.NarrativeOrder);AddDate(world,occurred);await world.ExecuteNonQueryAsync(token);
+            await WriteRecurrenceAsync(context,"WorldEvents","EntityId",id,request.Recurrence,token);
             foreach(var (target,item) in participants){using var add=context.Command("INSERT INTO [WorldEventParticipants] ([WorldEventId],[ParticipantEntityId],[Role],[Impact],[Outcome],[Notes],[CreatedAtUtc],[UpdatedAtUtc]) VALUES (?,?,?,?,?,?,?,?)").Add(OleDbType.Integer,id).Add(OleDbType.Integer,target.StorageKey).Add(OleDbType.VarWChar,item.Role,100).Add(OleDbType.LongVarWChar,item.Impact).Add(OleDbType.LongVarWChar,item.Outcome).Add(OleDbType.LongVarWChar,item.Notes).Add(OleDbType.Date,now).Add(OleDbType.Date,now);await add.ExecuteNonQueryAsync(token);}
             foreach(var (target,item) in locations){using var add=context.Command("INSERT INTO [WorldEventLocations] ([WorldEventId],[LocationId],[IsPrimary],[Role],[Notes],[CreatedAtUtc],[UpdatedAtUtc]) VALUES (?,?,?,?,?,?,?)").Add(OleDbType.Integer,id).Add(OleDbType.Integer,target.StorageKey).Add(OleDbType.Boolean,item.IsPrimary).Add(OleDbType.VarWChar,item.Role,100).Add(OleDbType.LongVarWChar,item.Notes).Add(OleDbType.Date,now).Add(OleDbType.Date,now);await add.ExecuteNonQueryAsync(token);}
             foreach(var project in projects){using var add=context.Command("INSERT INTO [ProjectEntities] ([ProjectId],[MemberEntityId],[CreatedAtUtc],[UpdatedAtUtc]) VALUES (?,?,?,?)").Add(OleDbType.Integer,project.StorageKey).Add(OleDbType.Integer,id).Add(OleDbType.Date,now).Add(OleDbType.Date,now);await add.ExecuteNonQueryAsync(token);}

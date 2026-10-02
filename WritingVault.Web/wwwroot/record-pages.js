@@ -276,6 +276,14 @@
           appendStoryDate(detail, date);
           fields.append(term, detail); continue;
         }
+        if (['storyRange', 'storyBegins', 'storyEnds'].includes(key)) {
+          if (value) {
+            const term = document.createElement('dt'); term.textContent = label(key);
+            const detail = document.createElement('dd'); detail.textContent = value.display;
+            fields.append(term, detail);
+          }
+          continue;
+        }
         if (isUnsetDetail(value)) continue;
         if (proseKeys.has(key) && typeof value === 'string' && value.trim()) {
           if (summary.kind === 'Note' && key === 'body') {

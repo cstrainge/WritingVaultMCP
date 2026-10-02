@@ -568,6 +568,31 @@
       }
     },
     {
+      "name": "event_update",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "event": "worldevent:arrival-day~ABCDEFGHJK",
+        "expectedVersion": 1,
+        "recurrence": {
+          "frequency": "Yearly",
+          "interval": 1,
+          "until": "2030-09-23"
+        }
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
       "name": "get",
       "request": {},
       "response": {

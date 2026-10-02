@@ -93,10 +93,18 @@ internal static class AccessSchemaMigrations
             AccessSchemaDefinition.ApplicationVersion,
             ImageContentRevisionCommands()),
         new(
-            AccessSchemaDefinition.MigrationId,
-            AccessSchemaDefinition.Checksum,
+            AccessSchemaDefinition.RecordPageSnapshotMigrationId,
+            AccessSchemaDefinition.RecordPageSnapshotChecksum,
             AccessSchemaDefinition.ApplicationVersion,
-            RecordPageSnapshotCommands())
+            RecordPageSnapshotCommands()),
+        new(AccessSchemaDefinition.MigrationId, AccessSchemaDefinition.Checksum,
+            AccessSchemaDefinition.ApplicationVersion,
+            new[] { "ALTER TABLE [EntityEvents] ADD COLUMN [ProjectBoundary] TEXT(20)",
+                "ALTER TABLE [Characters] ADD COLUMN [BirthdayRecurring] YESNO NOT NULL DEFAULT 0" }.Concat(
+                new[] { "WorldEvents", "EntityEvents", "RelationshipEvents" }.SelectMany(table => new[] {
+                    $"ALTER TABLE [{table}] ADD COLUMN [RecurrenceFrequency] TEXT(10)",
+                    $"ALTER TABLE [{table}] ADD COLUMN [RecurrenceInterval] LONG",
+                    $"ALTER TABLE [{table}] ADD COLUMN [RecurrenceUntil] DATETIME" })).ToArray())
     ];
 
     public static AccessSchemaMigration Current => All[^1];

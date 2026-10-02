@@ -61,6 +61,8 @@ public sealed partial class AccessVaultService(
         string name;
         try
         {
+            if (request.BirthdayRecurring && request.EntityType != CanonEntityType.Character)
+                throw new ArgumentException("Recurring birthdays require a character.");
             name = TextNormalization.Required(request.Name, request.EntityType == CanonEntityType.Character ? 100 : 255, nameof(request.Name));
             if (request.EntityType != CanonEntityType.Character && new[]
                 {
@@ -106,6 +108,11 @@ public sealed partial class AccessVaultService(
                 await canon.ExecuteNonQueryAsync(token).ConfigureAwait(false);
                 var id = await IdentityAsync(context, token).ConfigureAwait(false);
                 await InsertSubtypeAsync(context, id, name, request, token).ConfigureAwait(false);
+                if (request.BirthdayRecurring)
+                {
+                    using var birthday = context.Command("UPDATE [Characters] SET [BirthdayRecurring]=True WHERE [EntityId]=?").Add(OleDbType.Integer, id);
+                    await birthday.ExecuteNonQueryAsync(token);
+                }
                 return new VaultMutationOutcome(request.EntityType.ToString(), id.ToString(), 1, "create", new { request.ContinuityId, name });
             }, cancellationToken);
     }
@@ -545,18 +552,18 @@ public sealed partial class AccessVaultService(
                 "INSERT INTO [Characters] ([EntityId],[GivenName],[MiddleNames],[FamilyName],[PreferredName]," +
                 "[BirthKind],[BirthLowerBound],[BirthUpperBound],[BirthLowerInclusive],[BirthUpperInclusive],[BirthOriginalText],[BirthCalendarId]," +
                 "[DeathKind],[DeathLowerBound],[DeathUpperBound],[DeathLowerInclusive],[DeathUpperInclusive],[DeathOriginalText],[DeathCalendarId]," +
-                "[BirthLocationId],[BirthLocationDetail],[Gender],[Pronouns],[Species],[Occupation],[Nationality],[PhysicalDescription],[PersonalitySummary]) " +
+                "[BirthLocationId],[BirthLocationDetail],[Gender],[Pronouns],[Species],[Occupation],[Nationality],[PhysicalDescription],[PersonalitySummary],[BirthdayRecurring]) " +
                 "SELECT ?,?,[MiddleNames],[FamilyName],[PreferredName]," +
                 "[BirthKind],[BirthLowerBound],[BirthUpperBound],[BirthLowerInclusive],[BirthUpperInclusive],[BirthOriginalText],[BirthCalendarId]," +
                 "[DeathKind],[DeathLowerBound],[DeathUpperBound],[DeathLowerInclusive],[DeathUpperInclusive],[DeathOriginalText],[DeathCalendarId]," +
-                "Null,[BirthLocationDetail],[Gender],[Pronouns],[Species],[Occupation],[Nationality],[PhysicalDescription],[PersonalitySummary] FROM [Characters] WHERE [EntityId]=?",
+                "Null,[BirthLocationDetail],[Gender],[Pronouns],[Species],[Occupation],[Nationality],[PhysicalDescription],[PersonalitySummary],[BirthdayRecurring] FROM [Characters] WHERE [EntityId]=?",
             CanonEntityType.Organization =>
                 "INSERT INTO [Organizations] ([EntityId],[Name],[OrganizationType],[Description]) SELECT ?,?,[OrganizationType],[Description] FROM [Organizations] WHERE [EntityId]=?",
             CanonEntityType.Object =>
                 "INSERT INTO [Objects] ([EntityId],[Name],[ObjectType],[Description]) SELECT ?,?,[ObjectType],[Description] FROM [Objects] WHERE [EntityId]=?",
             CanonEntityType.WorldEvent =>
-                "INSERT INTO [WorldEvents] ([EntityId],[Title],[Description],[NarrativeOrder],[EventKind],[EventLowerBound],[EventUpperBound],[EventLowerInclusive],[EventUpperInclusive],[EventOriginalText],[EventCalendarId]) " +
-                "SELECT ?,?,[Description],[NarrativeOrder],[EventKind],[EventLowerBound],[EventUpperBound],[EventLowerInclusive],[EventUpperInclusive],[EventOriginalText],[EventCalendarId] FROM [WorldEvents] WHERE [EntityId]=?",
+                "INSERT INTO [WorldEvents] ([EntityId],[Title],[Description],[NarrativeOrder],[EventKind],[EventLowerBound],[EventUpperBound],[EventLowerInclusive],[EventUpperInclusive],[EventOriginalText],[EventCalendarId],[RecurrenceFrequency],[RecurrenceInterval],[RecurrenceUntil]) " +
+                "SELECT ?,?,[Description],[NarrativeOrder],[EventKind],[EventLowerBound],[EventUpperBound],[EventLowerInclusive],[EventUpperInclusive],[EventOriginalText],[EventCalendarId],[RecurrenceFrequency],[RecurrenceInterval],[RecurrenceUntil] FROM [WorldEvents] WHERE [EntityId]=?",
             _ => throw new ArgumentOutOfRangeException(nameof(type))
         };
         using var insert = context.Command(sql)

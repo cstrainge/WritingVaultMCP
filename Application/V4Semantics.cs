@@ -243,6 +243,14 @@ public static class V4StoryDateParser
 
     private static StoryDate Bounded(V4StoryDateValue input, StoryDateKind kind, string calendar)
     {
+        if (kind == StoryDateKind.Circa && input.Value is not null)
+        {
+            NoBounds(input);
+            // A nominal calendar day for plotting; Circa retains approximation,
+            // without inventing an author-supplied uncertainty window.
+            return StoryDate.ExactDate(ParseDate(input.Value, "value"), input.OriginalText) with
+                { Kind = StoryDateKind.Circa, CalendarId = calendar };
+        }
         if (input.Value is not null) throw Error("date.shape", "value", $"{kind} uses lower and upper, not value.");
         var lower = ParseBoundary(Required(input.Lower, "lower"), "lower");
         var upper = ParseBoundary(Required(input.Upper, "upper"), "upper");

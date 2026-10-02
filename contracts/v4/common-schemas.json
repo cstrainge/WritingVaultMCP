@@ -319,7 +319,7 @@
       "additionalProperties": false
     },
     "storyDateInput": {
-      "description": "A compact exact date string, compact year object, or full timezone-free fuzzy story-date object.",
+      "description": "A compact exact date string, compact year object, or full timezone-free fuzzy story-date object. Circa may use value as a nominal calendar day with no invented uncertainty window, or lower/upper for an authored uncertainty interval.",
       "oneOf": [
         {
           "type": "string",
@@ -936,6 +936,7 @@
           "enum": [
             "WorldEvents",
             "EntityEvents",
+            "Projects",
             "Characters",
             "Relationships",
             "Residences",
@@ -1210,6 +1211,171 @@
           "default": false
         },
         "isMembershipTransition": {
+          "type": "boolean",
+          "default": false
+        },
+        "storyBegins": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "kind": {
+              "enum": [
+                "Unknown",
+                "ExactInstant",
+                "ExactDate",
+                "Month",
+                "Year",
+                "Circa",
+                "Range",
+                "KnownRange",
+                "UncertainRange",
+                "Before",
+                "After"
+              ]
+            },
+            "display": {
+              "type": "string"
+            },
+            "lower": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "upper": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "lowerInclusive": {
+              "type": "boolean"
+            },
+            "upperInclusive": {
+              "type": "boolean"
+            },
+            "calendarId": {
+              "type": "string"
+            },
+            "originalText": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "default": null
+            }
+          },
+          "required": [
+            "kind",
+            "display",
+            "lowerInclusive",
+            "upperInclusive",
+            "calendarId"
+          ],
+          "additionalProperties": false,
+          "default": null
+        },
+        "storyEnds": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "kind": {
+              "enum": [
+                "Unknown",
+                "ExactInstant",
+                "ExactDate",
+                "Month",
+                "Year",
+                "Circa",
+                "Range",
+                "KnownRange",
+                "UncertainRange",
+                "Before",
+                "After"
+              ]
+            },
+            "display": {
+              "type": "string"
+            },
+            "lower": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "upper": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "lowerInclusive": {
+              "type": "boolean"
+            },
+            "upperInclusive": {
+              "type": "boolean"
+            },
+            "calendarId": {
+              "type": "string"
+            },
+            "originalText": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "default": null
+            }
+          },
+          "required": [
+            "kind",
+            "display",
+            "lowerInclusive",
+            "upperInclusive",
+            "calendarId"
+          ],
+          "additionalProperties": false,
+          "default": null
+        },
+        "recurrence": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "frequency": {
+              "enum": [
+                "Daily",
+                "Weekly",
+                "Monthly",
+                "Yearly"
+              ]
+            },
+            "interval": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1,
+              "maximum": 10000
+            },
+            "until": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "default": null,
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            }
+          },
+          "required": [
+            "frequency"
+          ],
+          "additionalProperties": false,
+          "default": null
+        },
+        "isOccurrence": {
           "type": "boolean",
           "default": false
         }

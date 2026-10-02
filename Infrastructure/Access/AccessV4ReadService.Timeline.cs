@@ -42,7 +42,7 @@ public sealed partial class AccessV4ReadService
     }
 
     private static bool TimelineType(string type) => type.ToUpperInvariant() is
-        "WORLDEVENT" or "ENTITYEVENT" or "RELATIONSHIPEVENT" or "CHARACTER" or "CHARACTERRELATIONSHIP" or
+        "PROJECT" or "WORLDEVENT" or "ENTITYEVENT" or "RELATIONSHIPEVENT" or "CHARACTER" or "CHARACTERRELATIONSHIP" or
         "RELATIONSHIPMEMBERSHIPPERIOD" or
         "CHARACTERRESIDENCE" or "ORGANIZATIONMEMBERSHIP" or "ORGANIZATIONLOCATION" or
         "OBJECTOWNERSHIPPERIOD" or "OBJECTCUSTODYPERIOD" or "OBJECTLOCATIONPERIOD" or
@@ -59,9 +59,9 @@ public sealed partial class AccessV4ReadService
                 throw new VaultValidationException([new("timeline.filter_too_large", "filters", "A timeline filter list cannot exceed 100 values.")]);
             if (request.EntityEventKinds is { } ownerKinds && ownerKinds.Any(kind =>
                     kind is not (V4RecordKind.Character or V4RecordKind.Location or
-                        V4RecordKind.Organization or V4RecordKind.Object)))
+                        V4RecordKind.Organization or V4RecordKind.Object or V4RecordKind.Project)))
                 throw new VaultValidationException([new("timeline.entity_event_kind", "entityEventKinds",
-                    "Entity event kinds must be Character, Location, Organization, or Object.")]);
+                    "Entity event kinds must be Character, Location, Organization, Object, or Project.")]);
             var from = request.From is null ? null : ParseInput(request.From);
             var to = request.To is null ? null : ParseInput(request.To);
             var viewportLower = from?.LowerBound ?? from?.UpperBound;
@@ -94,6 +94,7 @@ public sealed partial class AccessV4ReadService
             bool ContainsHighlight(TimelineRow row) => highlight is not null && MatchesFocus(row, highlight.Value);
             var cachedDetail = request.Resolution == V4TimelineResolution.Aggregate ? null : snapshot.Detail(scope);
             var filtered = new List<(string Key, TimelineRow Row)>();
+            var candidates = new List<TimelineRow>();
             if (cachedDetail is null) foreach (var row in rows)
             {
                 if (row.Deleted) continue;
@@ -111,6 +112,10 @@ public sealed partial class AccessV4ReadService
                 if (projectFilter.Count > 0 && !associations.MatchesProjects(row, projectFilter)) continue;
                 if (locationFilter.Count > 0 && !locationFilter.Contains(row.RelatedEntityId ?? -1) &&
                     !associations.Matches(row, locationFilter)) continue;
+                candidates.Add(row);
+            }
+            if (cachedDetail is null) foreach (var row in request.ExpandRecurrences ? ExpandRecurringRows(candidates, viewportLower, viewportUpper) : candidates)
+            {
                 if (!TimelineOverlaps(row.Date, viewportLower, lowerInclusive, viewportUpper, upperInclusive)) continue;
                 var key = TimelineKey(row, request.Mode);
                 filtered.Add((key, row));
@@ -140,7 +145,10 @@ public sealed partial class AccessV4ReadService
                         if (item.Boundary is null) return projected;
                         return projected with { Boundary = item.Boundary,
                             BoundaryDate = item.BoundaryAt is { } at
-                                ? BoundaryDateView(item.Row.Date, at) : StoryDateView(item.Row.Date) };
+                                ? item.Row.Type == "Project" && item.Boundary == "Start" && item.Row.StoryBegins is { } begins
+                                    ? StoryDateView(begins)
+                                    : item.Row.Type == "Project" && item.Boundary == "End" && item.Row.StoryEnds is { } ends
+                                        ? StoryDateView(ends) : BoundaryDateView(item.Row.Date, at) : StoryDateView(item.Row.Date) };
                     }).ToArray();
                 var detailUndated = selectedRows.Where(item => item.Row.Date.Kind == StoryDateKind.Unknown)
                     .Select(item => TimelineSummary(item.Row, associations)).ToArray();
@@ -261,7 +269,10 @@ public sealed partial class AccessV4ReadService
         return new(reference, row.Type, TimelineTitle(row, associations), row.Summary, row.Lane, StoryDateView(row.Date),
             related.DistinctBy(item => item.Ref).ToArray(), row.NarrativeOrder, row.Deleted, row.Warnings, projects,
             Boundary: boundary, HasCustomDescription: !string.IsNullOrWhiteSpace(row.TransitionDescription),
-            IsMembershipTransition: boundary is not null);
+            IsMembershipTransition: boundary is not null,
+            StoryBegins: row.StoryBegins is null ? null : StoryDateView(row.StoryBegins),
+            StoryEnds: row.StoryEnds is null ? null : StoryDateView(row.StoryEnds),
+            Recurrence: row.Recurrence, IsOccurrence: row.IsOccurrence);
     }
 
     private static IEnumerable<TimelineDetailEntry> ExpandDetailEntries(
@@ -580,6 +591,9 @@ public sealed partial class AccessV4ReadService
                     index.References[row.Id] = new(references.ReferenceFromKnownRecord(row.Type, row.Id, row.Label),
                         Kind(row.Type), row.Label, ContinuityName: session.ContinuityName,
                         Version: row.Version, IsDeleted: row.Deleted);
+            foreach (var row in timelineRows.Where(row => !row.Deleted &&
+                (row.Type == "Project" || row.Type == "EntityEvent" && row.RelatedEntityType == "Project")))
+                index.Add(row.Type, row.Id, row.OwnerId, project: true);
             foreach (var link in pendingLinks)
                 index.Add(link.Type, link.Event, link.Target, link.Project, link.Role, link.Notes);
             var relationshipLabels = timelineRows.Where(row => row.Type == "CharacterRelationship")
@@ -594,6 +608,14 @@ public sealed partial class AccessV4ReadService
                         ContinuityName: session.ContinuityName));
             return index;
         }, token).ConfigureAwait(false);
+    }
+
+    private static StoryDate ProjectSpan(StoryDate? start, StoryDate? end)
+    {
+        var display = $"{(start is null ? "Unspecified start" : DisplayDate(start))} – {(end is null ? "Unspecified end" : DisplayDate(end))}";
+        return new(start?.LowerBound is null && end?.UpperBound is null ? StoryDateKind.Unknown : StoryDateKind.KnownRange,
+            start?.LowerBound, end?.UpperBound, start?.LowerInclusive ?? true, end?.UpperInclusive ?? false,
+            display, start?.CalendarId ?? end?.CalendarId ?? "Gregorian");
     }
 
     private async Task<IReadOnlyList<TimelineRow>> LoadTimelineRowsAsync(int continuity, CancellationToken token)
@@ -614,14 +636,29 @@ public sealed partial class AccessV4ReadService
                 "SELECT w.[EntityId],w.[Title],w.[Description],w.[EventKind],w.[EventLowerBound],w.[EventUpperBound],w.[EventLowerInclusive],w.[EventUpperInclusive],w.[EventOriginalText],w.[EventCalendarId],w.[NarrativeOrder],c.[Version],c.[IsDeleted] FROM [WorldEvents] AS w INNER JOIN [CanonEntities] AS c ON w.[EntityId]=c.[Id] WHERE c.[ContinuityId]=?",
                 "WorldEvent", V4TimelineLane.WorldEvents, "Event", true).ConfigureAwait(false);
             using (var events = new AccessCommand(connection,
-                       "SELECT e.[Id],e.[Title],e.[Description],e.[EventKind],e.[EventLowerBound],e.[EventUpperBound],e.[EventLowerInclusive],e.[EventUpperInclusive],e.[EventOriginalText],e.[EventCalendarId],e.[NarrativeOrder],e.[Version],e.[IsDeleted],e.[EntityId],c.[EntityType]," + EntityLabelExpression("c") +
+                       "SELECT e.[Id],e.[Title],e.[Description],e.[EventKind],e.[EventLowerBound],e.[EventUpperBound],e.[EventLowerInclusive],e.[EventUpperInclusive],e.[EventOriginalText],e.[EventCalendarId],e.[NarrativeOrder],e.[Version],(e.[IsDeleted] OR c.[IsDeleted]),e.[EntityId],c.[EntityType]," + EntityLabelExpression("c") + ",e.[ProjectBoundary]" +
                        " FROM (((((( [EntityEvents] AS e INNER JOIN [CanonEntities] AS c ON e.[EntityId]=c.[Id]) LEFT JOIN [Projects] AS p ON c.[Id]=p.[EntityId]) LEFT JOIN [Locations] AS l ON c.[Id]=l.[EntityId]) LEFT JOIN [Characters] AS ch ON c.[Id]=ch.[EntityId]) LEFT JOIN [Organizations] AS o ON c.[Id]=o.[EntityId]) LEFT JOIN [Objects] AS ob ON c.[Id]=ob.[EntityId]) LEFT JOIN [WorldEvents] AS w ON c.[Id]=w.[EntityId] WHERE c.[ContinuityId]=?")
                    .Add(OleDbType.Integer, continuity))
             {
                 rows.AddRange(await events.QueryAsync(r => new TimelineRow(r.GetInt32(0), "EntityEvent", r.GetString(1),
                     r.IsDBNull(2) ? null : r.GetString(2), V4TimelineLane.EntityEvents, ReadDate(r, 3, "Event"),
-                    r.IsDBNull(10) ? null : r.GetDouble(10), r.GetInt32(11), r.GetBoolean(12), r.GetInt32(13),
-                    r.GetInt32(13), r.GetString(14), r.GetString(15)), token).ConfigureAwait(false));
+                    r.IsDBNull(10) ? null : r.GetDouble(10), r.GetInt32(11), Convert.ToBoolean(r.GetValue(12), CultureInfo.InvariantCulture), r.GetInt32(13),
+                    r.GetInt32(13), r.GetString(14), r.GetString(15), ProjectBoundary: r.IsDBNull(16) ? null : r.GetString(16)), token).ConfigureAwait(false));
+            }
+            using (var projects = new AccessCommand(connection,
+                "SELECT p.[EntityId],p.[Name],c.[Version],c.[IsDeleted] FROM [Projects] AS p INNER JOIN [CanonEntities] AS c ON p.[EntityId]=c.[Id] WHERE c.[ContinuityId]=?").Add(OleDbType.Integer, continuity))
+            {
+                var boundaries = rows.Where(row => row.Type == "EntityEvent" && !row.Deleted && row.ProjectBoundary is not null)
+                    .ToLookup(row => row.OwnerId);
+                foreach (var project in await projects.QueryAsync(r => (Id: r.GetInt32(0), Name: r.GetString(1), Version: r.GetInt32(2), Deleted: r.GetBoolean(3)), token))
+                {
+                    var start = boundaries[project.Id].SingleOrDefault(row => row.ProjectBoundary == "StoryBegins")?.Date;
+                    var end = boundaries[project.Id].SingleOrDefault(row => row.ProjectBoundary == "StoryEnds")?.Date;
+                    if (start is null && end is null) continue;
+                    var span = ProjectSpan(start, end);
+                    rows.Add(new(project.Id, "Project", project.Name, span.OriginalText, V4TimelineLane.Projects, span,
+                        null, project.Version, project.Deleted, project.Id, StoryBegins: start, StoryEnds: end));
+                }
             }
             using (var relationshipEvents = new AccessCommand(connection,
                        "SELECT e.[Id],e.[Title],e.[Description],e.[EventKind],e.[EventLowerBound],e.[EventUpperBound]," +
@@ -638,21 +675,33 @@ public sealed partial class AccessV4ReadService
                     r.GetBoolean(12) || r.GetBoolean(14), r.GetInt32(13)), token).ConfigureAwait(false));
             }
             using (var characters = new AccessCommand(connection,
-                       "SELECT ch.[EntityId],IIf(ch.[PreferredName] Is Null,ch.[GivenName],ch.[PreferredName]),c.[Version],c.[IsDeleted],ch.[BirthKind],ch.[BirthLowerBound],ch.[BirthUpperBound],ch.[BirthLowerInclusive],ch.[BirthUpperInclusive],ch.[BirthOriginalText],ch.[BirthCalendarId],ch.[DeathKind],ch.[DeathLowerBound],ch.[DeathUpperBound],ch.[DeathLowerInclusive],ch.[DeathUpperInclusive],ch.[DeathOriginalText],ch.[DeathCalendarId] FROM [Characters] AS ch INNER JOIN [CanonEntities] AS c ON ch.[EntityId]=c.[Id] WHERE c.[ContinuityId]=?")
+                       "SELECT ch.[EntityId],IIf(ch.[PreferredName] Is Null,ch.[GivenName],ch.[PreferredName]),c.[Version],c.[IsDeleted],ch.[BirthKind],ch.[BirthLowerBound],ch.[BirthUpperBound],ch.[BirthLowerInclusive],ch.[BirthUpperInclusive],ch.[BirthOriginalText],ch.[BirthCalendarId],ch.[DeathKind],ch.[DeathLowerBound],ch.[DeathUpperBound],ch.[DeathLowerInclusive],ch.[DeathUpperInclusive],ch.[DeathOriginalText],ch.[DeathCalendarId],ch.[BirthdayRecurring] FROM [Characters] AS ch INNER JOIN [CanonEntities] AS c ON ch.[EntityId]=c.[Id] WHERE c.[ContinuityId]=?")
                    .Add(OleDbType.Integer, continuity))
             {
                 foreach (var row in await characters.QueryAsync(r => new
                          {
                              Id = r.GetInt32(0), Name = r.GetString(1), Version = r.GetInt32(2), Deleted = r.GetBoolean(3),
-                             Birth = ReadDate(r, 4, "Birth"), Death = ReadDate(r, 11, "Death")
+                             Birth = ReadDate(r, 4, "Birth"), Death = ReadDate(r, 11, "Death"), RepeatBirthday = r.GetBoolean(18)
                          }, token).ConfigureAwait(false))
                 {
                     rows.Add(new(row.Id, "Character", row.Name + " — birth", null, V4TimelineLane.Characters, row.Birth,
-                        null, row.Version, row.Deleted, row.Id, Discriminator: "birth"));
+                        null, row.Version, row.Deleted, row.Id, Discriminator: "birth",
+                        Recurrence: row.RepeatBirthday ? new V4EventRecurrence(V4RecurrenceFrequency.Yearly,
+                            Until: row.Death.UpperBound is { } deathEnd
+                                ? (row.Death.UpperInclusive ? deathEnd : deathEnd.AddTicks(-1)).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) : null) : null,
+                        BirthdayDeath: row.RepeatBirthday ? row.Death : null));
                     if (row.Death.Kind != StoryDateKind.Unknown)
                         rows.Add(new(row.Id, "Character", row.Name + " — death", null, V4TimelineLane.Characters, row.Death,
                             null, row.Version, row.Deleted, row.Id, Discriminator: "death"));
                 }
+            }
+            foreach (var (table, type, key) in new[] { ("WorldEvents", "WorldEvent", "EntityId"), ("EntityEvents", "EntityEvent", "Id"), ("RelationshipEvents", "RelationshipEvent", "Id") })
+            {
+                using var schedules = new AccessCommand(connection, $"SELECT [{key}],[RecurrenceFrequency],[RecurrenceInterval],[RecurrenceUntil] FROM [{table}] WHERE [RecurrenceFrequency] IS NOT NULL");
+                var byId = (await schedules.QueryAsync(r => (Id: r.GetInt32(0), Recurrence: new V4EventRecurrence(
+                    Enum.Parse<V4RecurrenceFrequency>(r.GetString(1)), r.GetInt32(2), r.IsDBNull(3) ? null : r.GetDateTime(3).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture))), token)).ToDictionary(row => row.Id, row => row.Recurrence);
+                for (var i = 0; i < rows.Count; i++)
+                    if (rows[i].Type == type && byId.TryGetValue(rows[i].Id, out var recurrence)) rows[i] = rows[i] with { Recurrence = recurrence };
             }
             await AddPeriodRowsAsync(connection, continuity, rows, token).ConfigureAwait(false);
             return rows;
@@ -977,7 +1026,7 @@ public sealed partial class AccessV4ReadService
     }
     private static string TimelineScope(int continuity, V4TimelineRequest request, string revision)
     {
-        var fields = $"c:{continuity}|revision:{revision}|m:{request.Mode}|r:{request.Resolution}|expandRanges:{request.ExpandRanges}|from:{request.From}|to:{request.To}|lanes:{string.Join(',', request.Lanes ?? [])}|kinds:{string.Join(',', request.Kinds ?? [])}|entityEventKinds:{string.Join(',', request.EntityEventKinds ?? [])}|focus:{string.Join(',', request.FocusRefs ?? [])}|highlight:{request.HighlightRef}|tags:{string.Join(',', request.Tags ?? [])}|projects:{string.Join(',', request.Projects ?? [])}|locations:{string.Join(',', request.Locations ?? [])}|text:{request.Text}|undated:{request.IncludeUndated}|undatedOnly:{request.UndatedOnly}";
+        var fields = $"c:{continuity}|revision:{revision}|m:{request.Mode}|r:{request.Resolution}|expandRanges:{request.ExpandRanges}|expandRecurrences:{request.ExpandRecurrences}|from:{request.From}|to:{request.To}|lanes:{string.Join(',', request.Lanes ?? [])}|kinds:{string.Join(',', request.Kinds ?? [])}|entityEventKinds:{string.Join(',', request.EntityEventKinds ?? [])}|focus:{string.Join(',', request.FocusRefs ?? [])}|highlight:{request.HighlightRef}|tags:{string.Join(',', request.Tags ?? [])}|projects:{string.Join(',', request.Projects ?? [])}|locations:{string.Join(',', request.Locations ?? [])}|text:{request.Text}|undated:{request.IncludeUndated}|undatedOnly:{request.UndatedOnly}";
         return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(fields)));
     }
 }

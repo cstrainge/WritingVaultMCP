@@ -58,7 +58,24 @@ public sealed partial class AccessV4ReadService
             var details = await vault.GetEntityAsync(target.StorageKey, request.IncludeDeleted, token).ConfigureAwait(false)
                 ?? throw new V4ResolutionException("record.not_found", "The record was not found.");
             var safe = await v3Mapper.DictionaryAsync(details.Fields, details.Summary.EntityType.ToString(), token).ConfigureAwait(false);
-            var fields = ToJsonFields(safe, "EntityId", "ContinuityId", "DeletedOperationId");
+            var fields = ToJsonFields(safe, "EntityId", "ContinuityId", "DeletedOperationId").ToDictionary(pair => pair.Key, pair => pair.Value);
+            if (target.ResourceType == "Project")
+            {
+                await using var connection = connectionFactory.Create();
+                await connection.OpenAsync(token);
+                using var boundaries = new AccessCommand(connection,
+                    "SELECT [ProjectBoundary],[EventKind],[EventLowerBound],[EventUpperBound],[EventLowerInclusive],[EventUpperInclusive],[EventOriginalText],[EventCalendarId] FROM [EntityEvents] WHERE [EntityId]=? AND [IsDeleted]=False AND [ProjectBoundary] IS NOT NULL")
+                    .Add(OleDbType.Integer, target.StorageKey);
+                var dates = await boundaries.QueryAsync(r => (Role: r.GetString(0), Date: ReadDate(r, 1, "Event")), token);
+                if (dates.Count > 0)
+                {
+                    var begins = dates.SingleOrDefault(row => row.Role == "StoryBegins").Date;
+                    var ends = dates.SingleOrDefault(row => row.Role == "StoryEnds").Date;
+                    fields["storyRange"] = JsonSerializer.SerializeToElement(StoryDateView(ProjectSpan(begins, ends)), TransitionDateJson);
+                    fields["storyBegins"] = JsonSerializer.SerializeToElement(begins is null ? null : StoryDateView(begins), TransitionDateJson);
+                    fields["storyEnds"] = JsonSerializer.SerializeToElement(ends is null ? null : StoryDateView(ends), TransitionDateJson);
+                }
+            }
             var include = request.Include is { Count: > 0 } ? request.Include : DefaultEntitySections(target.ResourceType);
             if (include.Count > V4ContractLimits.MaximumIncludeSections)
                 throw new VaultValidationException([new("include.too_many", "include", "Too many overview sections were requested.")]);
@@ -830,11 +847,16 @@ public sealed partial class AccessV4ReadService
                    $"SELECT TOP {take} e.[Id],e.[Title],e.[Version],e.[IsDeleted],x.[Role],x.[Notes] FROM [EntityEventProjects] AS x INNER JOIN [EntityEvents] AS e ON x.[EntityEventId]=e.[Id] WHERE x.[ProjectId]=? AND e.[Id]>? AND x.[IsDeleted]=False" + DeletionSql("e", deletion) + " ORDER BY e.[Id]")
                .Add(OleDbType.Integer, project).Add(OleDbType.Integer, afterKind == 2 ? afterId : 0))
             rows.AddRange(await locals.QueryAsync(r => new RelationRow(r.GetInt32(0), "EntityEvent", r.GetString(1), "entity event", r.GetInt32(2), r.GetBoolean(3), ((long)2 << 32) | (uint)r.GetInt32(0), r.IsDBNull(4)?null:r.GetString(4), r.IsDBNull(5)?null:r.GetString(5)), token).ConfigureAwait(false));
+        if (afterKind < 3)
+        using (var owned = new AccessCommand(connection,
+                   $"SELECT TOP {take} e.[Id],e.[Title],e.[Version],e.[IsDeleted],e.[ProjectBoundary] FROM [EntityEvents] AS e WHERE e.[EntityId]=? AND e.[Id]>?" + DeletionSql("e", deletion) + " ORDER BY e.[Id]")
+               .Add(OleDbType.Integer, project).Add(OleDbType.Integer, afterKind == 2 ? afterId : 0))
+            rows.AddRange(await owned.QueryAsync(r => new RelationRow(r.GetInt32(0), "EntityEvent", r.GetString(1), "project story event", r.GetInt32(2), r.GetBoolean(3), ((long)2 << 32) | (uint)r.GetInt32(0), r.IsDBNull(4) ? null : r.GetString(4)), token));
         using (var relationshipEvents = new AccessCommand(connection,
                    $"SELECT TOP {take} e.[Id],e.[Title],e.[Version],e.[IsDeleted],x.[Role],x.[Notes] FROM ([RelationshipEventProjects] AS x INNER JOIN [RelationshipEvents] AS e ON x.[RelationshipEventId]=e.[Id]) INNER JOIN [CharacterRelationships] AS rel ON e.[RelationshipId]=rel.[Id] WHERE x.[ProjectId]=? AND e.[Id]>? AND x.[IsDeleted]=False AND rel.[IsDeleted]=False" + DeletionSql("e", deletion) + " ORDER BY e.[Id]")
                .Add(OleDbType.Integer, project).Add(OleDbType.Integer, afterKind == 3 ? afterId : 0))
             rows.AddRange(await relationshipEvents.QueryAsync(r => new RelationRow(r.GetInt32(0), "RelationshipEvent", r.GetString(1), "relationship event", r.GetInt32(2), r.GetBoolean(3), ((long)3 << 32) | (uint)r.GetInt32(0), r.IsDBNull(4)?null:r.GetString(4), r.IsDBNull(5)?null:r.GetString(5)), token).ConfigureAwait(false));
-        return rows.Where(row => row.Key > after).OrderBy(row => row.Key).Take(take).ToArray();
+        return rows.Where(row => row.Key > after).DistinctBy(row => row.Key).OrderBy(row => row.Key).Take(take).ToArray();
     }
 
     public Task<V4Page<V4ReferenceSummary>> TagTargetsAsync(V4TagTargetsRequest request, CancellationToken token = default) =>

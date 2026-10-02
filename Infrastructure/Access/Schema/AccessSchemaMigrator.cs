@@ -135,12 +135,14 @@ public sealed class AccessSchemaMigrator(IAccessConnectionFactory connectionFact
             .ToArray();
         if (pending.Length == 0) return false;
 
+        var addressedColumns = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var addressedIndexes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var addressedChecks = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var addressedTables = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var addressedForeignKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var command in pending.SelectMany(migration => migration.Commands))
         {
+            if (TryParseAddColumn(command) is { } column) addressedColumns.Add($"{column.Table}.{column.Name}");
             if (TryParseIndex(command) is { } index) addressedIndexes.Add($"{index.Table}.{index.Name}");
             if (TryParseConstraint(command) is { } constraint) addressedChecks.Add(constraint);
             if (TryParseCreateTable(command) is { } table)
@@ -152,6 +154,7 @@ public sealed class AccessSchemaMigrator(IAccessConnectionFactory connectionFact
         }
         var canUpgrade = verification.Issues.All(issue =>
             (issue.Code == "schema.migration_missing" && missingMigrationIds.Contains(issue.ObjectName)) ||
+            (issue.Code == "schema.column_missing" && addressedColumns.Contains(issue.ObjectName)) ||
             (issue.Code == "schema.table_missing" && addressedTables.Contains(issue.ObjectName)) ||
             (issue.Code == "schema.index_missing" && addressedIndexes.Contains(issue.ObjectName)) ||
             (issue.Code == "schema.foreign_key_missing" && addressedForeignKeys.Contains(issue.ObjectName)) ||
@@ -173,6 +176,9 @@ public sealed class AccessSchemaMigrator(IAccessConnectionFactory connectionFact
         string command,
         CancellationToken cancellationToken)
     {
+        if (TryParseAddColumn(command) is { } column && connection.GetSchema("Columns").Rows.Cast<System.Data.DataRow>()
+            .Any(row => string.Equals(row["TABLE_NAME"]?.ToString(), column.Table, StringComparison.OrdinalIgnoreCase) &&
+                        string.Equals(row["COLUMN_NAME"]?.ToString(), column.Name, StringComparison.OrdinalIgnoreCase))) return;
         if (TryParseCreateTable(command) is { } table &&
             AccessSchemaInspector.GetUserTableNames(connection).Contains(table)) return;
         if (TryParseIndex(command) is { } index)
@@ -196,6 +202,12 @@ public sealed class AccessSchemaMigrator(IAccessConnectionFactory connectionFact
             if (command.Contains(" ADD CONSTRAINT ", StringComparison.OrdinalIgnoreCase) && exists) return;
         }
         await ExecuteDdlAsync(connection, command, cancellationToken).ConfigureAwait(false);
+    }
+
+    private static (string Table, string Name)? TryParseAddColumn(string command)
+    {
+        var match = Regex.Match(command, @"^ALTER TABLE \[(?<table>[^\]]+)\] ADD COLUMN \[(?<column>[^\]]+)\]", RegexOptions.IgnoreCase);
+        return match.Success ? (match.Groups["table"].Value, match.Groups["column"].Value) : null;
     }
 
     private static (string Name, string Table)? TryParseIndex(string command)
