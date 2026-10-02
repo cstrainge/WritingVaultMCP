@@ -334,9 +334,16 @@
           }
         }
         const tableFilters = { ...this.filters(), resolution: 'Detail', expandRanges: true,
-          includeUndated: false };
+          includeUndated: false, expandRecurrences: !!this.range };
         if (this.range) { tableFilters.from = this.range[0]; tableFilters.to = this.range[1]; }
-        const table = await this.allEntries(tableFilters, graph.observedRevision, signal, generation, 'the chronology');
+        let table = await this.allEntries(tableFilters, graph.observedRevision, signal, generation, 'the chronology');
+        if (table && !this.range && generation === this.generation) {
+          // The table includes Now even beyond the last stored event. Use that
+          // same finite horizon for repeats, independent of graph zoom/padding.
+          const end = this.recurrenceTableEnd(table.items || [], table.clock);
+          if (end !== null) table = await this.allEntries({ ...tableFilters,
+            expandRecurrences: true, to: end }, graph.observedRevision, signal, generation, 'the chronology');
+        }
         if (generation !== this.generation) return;
         if (!table) {
           if (attempt < 2) return this.reload(attempt + 1);
@@ -437,6 +444,16 @@
         button.addEventListener('click', () => { this.selectedEntities.delete(ref); this.persist(); this.renderEntities(); this.reload(); });
         host.append(button);
       }
+    }
+
+    recurrenceTableEnd(items, clock) {
+      const values = items.flatMap(item => {
+        const [lower, upper] = bounds(item);
+        return [lower, upper !== null && item.occurred.upperInclusive === false ? upper - 1 : upper];
+      }).filter(Number.isFinite);
+      const now = dateValue(window.WritingVaultStoryDates.clockLocalDateTime(clock));
+      if (now !== null) values.push(now);
+      return values.length ? isoDay(Math.max(...values)) : null;
     }
 
     fullDomain(items) {
