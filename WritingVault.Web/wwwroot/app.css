@@ -320,9 +320,9 @@ button.vault-card { width: 100%; text-align: left; color: var(--ink); cursor: po
 .timeline-range-striped { background: repeating-linear-gradient(135deg, var(--accent) 0 3px, var(--surface) 3px 6px); }
 .timeline-range-solid { background: var(--accent); }
 .timeline-range-checkered { background: conic-gradient(var(--accent) 25%, var(--surface) 0 50%, var(--accent) 0 75%, var(--surface) 0) 0 0 / 8px 8px; }
-.timeline-range-arrow { position: absolute; z-index: 1; width: 14px; height: 8px; fill: var(--accent); pointer-events: none; }
+.timeline-range-arrow { position: absolute; z-index: 1; width: 22px; height: 10px; fill: var(--accent); pointer-events: none; }
 .timeline-range-arrow-start { top: var(--range-boundary-y); }
-.timeline-range-arrow-end { top: calc(var(--range-boundary-y) - 8px); }
+.timeline-range-arrow-end { top: calc(var(--range-boundary-y) - 10px); }
 #timeline-table th:nth-child(2), #timeline-table .timeline-calendar-year { width: 5.2rem; }
 #timeline-table th:nth-child(3), #timeline-table .timeline-calendar-month { width: 7.5rem; }
 #timeline-table th:nth-child(4), #timeline-table .timeline-calendar-day { width: 8rem; }

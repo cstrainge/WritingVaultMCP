@@ -846,7 +846,7 @@
       byId('timeline-order-note').hidden = !all.some(uncertainDate);
       const tracks = this.rangeTracks(all);
       const spanByKey = new Map(tracks.spans.map(span => [span.key, span]));
-      const trackWidth = Math.max(48, tracks.lanes * 18 + 30);
+      const trackWidth = Math.max(56, tracks.lanes * 18 + 38);
       byId('timeline-table').style.setProperty('--range-gutter-width', `${trackWidth}px`);
       const starts = new Map();
       for (const span of tracks.spans) {
@@ -869,7 +869,7 @@
       const appendNow = (index, crossingSpans) => {
         const row = node('tr', undefined, 'timeline-now-row');
         row.setAttribute('aria-label', `Now: ${window.WritingVaultStoryDates.clockTime(this.clock)}`);
-        row.append(this.rangeGutter(all, crossingSpans, index - .5));
+        row.append(this.rangeGutter(all, crossingSpans, index - .5, trackWidth));
         const dateOnly = this.clock?.status === 'DateOnly';
         const date = window.WritingVaultStoryDates.chronologyDate({ kind: dateOnly ? 'ExactDate' : 'ExactInstant',
           lower: dateOnly ? localNow.slice(0, 10) : localNow,
@@ -899,7 +899,7 @@
         if (item.boundary) row.classList.add(`timeline-boundary-${item.boundary.toLowerCase()}`);
         if (uncertainDate(item)) row.classList.add('timeline-uncertain');
         if (this.highlightRef && intersects(item, this.highlightRef)) row.classList.add('highlighted');
-        row.append(this.rangeGutter(all, activeSpans, index));
+        row.append(this.rangeGutter(all, activeSpans, index, trackWidth));
         const date = window.WritingVaultStoryDates.chronologyDate(item.boundaryDate || item.occurred, previousDate);
         previousDate = date.next;
         if (date.kind === 'parts') {
@@ -1029,7 +1029,7 @@
         item.occurred?.kind, item.occurred?.lower, item.occurred?.upper]);
     }
 
-    rangeGutter(items, active, index) {
+    rangeGutter(items, active, index, width) {
       const cell = node('td', undefined, 'timeline-range-gutter');
       if (!active.length) return cell;
       for (const span of active) {
@@ -1041,15 +1041,21 @@
         bar.style.left = `${x}px`;
         // Boundary tips share a fixed offset beside the first line of text.
         // Only the bar stretches when a row wraps onto additional lines.
-        bar.style.top = starts ? 'var(--range-boundary-y)' : '0';
-        bar.style.bottom = ends ? 'calc(100% - var(--range-boundary-y))' : '0';
+        bar.style.top = starts ? 'calc(var(--range-boundary-y) + 10px)' : '0';
+        bar.style.bottom = ends ? 'calc(100% - var(--range-boundary-y) + 10px)' : '0';
         cell.append(bar);
         if (starts || ends) {
-          const arrow = svgNode('svg', { viewBox: '0 0 14 8',
+          const arrowWidth = width - x - 22;
+          const arrow = svgNode('svg', { viewBox: `0 0 ${arrowWidth} 10`,
             class: `timeline-range-arrow ${starts ? 'timeline-range-arrow-start' : 'timeline-range-arrow-end'}`,
             'aria-hidden': 'true', focusable: 'false' });
           arrow.style.left = `${x - 4.5}px`;
-          arrow.append(svgNode('path', { d: starts ? 'M 0 0 H 14 L 0 8 Z' : 'M 0 8 H 14 L 0 0 Z' }));
+          arrow.style.width = `${arrowWidth}px`;
+          // Extend the horizontal arm to a shared right edge, keeping the
+          // diagonal head the same size regardless of the stem's lane.
+          arrow.append(svgNode('path', { d: starts ?
+            `M 0 0 H ${arrowWidth} L ${arrowWidth - 13} 10 H 0 Z` :
+            `M 0 10 H ${arrowWidth} L ${arrowWidth - 13} 0 H 0 Z` }));
           cell.append(arrow);
         }
       }
