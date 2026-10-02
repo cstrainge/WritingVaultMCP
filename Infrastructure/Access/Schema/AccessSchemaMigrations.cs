@@ -105,11 +105,19 @@ internal static class AccessSchemaMigrations
                     $"ALTER TABLE [{table}] ADD COLUMN [RecurrenceFrequency] TEXT(10)",
                     $"ALTER TABLE [{table}] ADD COLUMN [RecurrenceInterval] LONG",
                     $"ALTER TABLE [{table}] ADD COLUMN [RecurrenceUntil] DATETIME" })).ToArray()),
+        new(AccessSchemaDefinition.SpeciesMigrationId, AccessSchemaDefinition.SpeciesChecksum,
+            AccessSchemaDefinition.ApplicationVersion, SpeciesCommands()),
         new(AccessSchemaDefinition.MigrationId, AccessSchemaDefinition.Checksum,
-            AccessSchemaDefinition.ApplicationVersion, SpeciesCommands())
+            AccessSchemaDefinition.ApplicationVersion, PrivateMemoryCommands())
     ];
 
     public static AccessSchemaMigration Current => All[^1];
+
+    private static IReadOnlyList<string> PrivateMemoryCommands() =>
+        AccessSchemaDefinition.Tables.Where(t => t.Name == "PrivateMemories").Select(t => t.CreateSql())
+            .Concat(AccessSchemaDefinition.Indexes.Where(i => i.Table == "PrivateMemories").Select(i => i.CreateSql()))
+            .Concat(AccessSchemaDefinition.ForeignKeys.Where(k => k.DependentTable == "PrivateMemories").Select(k => k.CreateSql()))
+            .Concat(AccessSchemaDefinition.CheckConstraints.Where(c => c.Table == "PrivateMemories").Select(c => c.CreateSql())).ToArray();
 
     private static IReadOnlyList<string> SpeciesCommands() =>
         AccessSchemaDefinition.Tables.Where(t => t.Name == "Species").Select(t => t.CreateSql())

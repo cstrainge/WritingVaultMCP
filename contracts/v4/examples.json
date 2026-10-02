@@ -866,6 +866,48 @@
       }
     },
     {
+      "name": "memory_read",
+      "request": {
+        "scope": "Global"
+      },
+      "response": {
+        "scope": "Global",
+        "continuityName": "Lostville",
+        "items": [
+          {
+            "key": "example",
+            "body": "## Example\n\nMarkdown note.",
+            "version": 1,
+            "updatedAtUtc": "example"
+          }
+        ],
+        "nextCursor": "example",
+        "hasMore": false
+      }
+    },
+    {
+      "name": "memory_save",
+      "request": {
+        "mutationToken": "example-20260928-001",
+        "scope": "Global",
+        "key": "writing-preferences",
+        "body": "## Example\n\nMarkdown note.",
+        "expectedVersion": 0
+      },
+      "response": {
+        "success": false,
+        "code": "example",
+        "affected": [
+          {
+            "ref": "character:aurora~ABCDEFGHJK",
+            "kind": "Continuity",
+            "label": "example"
+          }
+        ],
+        "replayed": false
+      }
+    },
+    {
       "name": "note_add",
       "request": {
         "mutationToken": "example-20260928-001",

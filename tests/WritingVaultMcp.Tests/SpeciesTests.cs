@@ -125,7 +125,7 @@ public sealed class SpeciesTests
                 "ALTER TABLE [Characters] DROP COLUMN [SpeciesId]", "ALTER TABLE [Characters] DROP COLUMN [Race]",
                 "DROP TABLE [Species]", "ALTER TABLE [Characters] ADD COLUMN [Species] TEXT(100)",
                 "UPDATE [Characters] SET [Species]='Old free text'",
-                $"DELETE FROM [SchemaMigrations] WHERE [MigrationId]='{AccessSchemaDefinition.MigrationId}'" })
+                $"DELETE FROM [SchemaMigrations] WHERE [MigrationId]='{AccessSchemaDefinition.SpeciesMigrationId}'" })
             { using var command = connection.CreateCommand(); command.CommandText = sql; await command.ExecuteNonQueryAsync(); }
         }
         var migrator = new AccessSchemaMigrator(vault.Factory, TimeProvider.System);

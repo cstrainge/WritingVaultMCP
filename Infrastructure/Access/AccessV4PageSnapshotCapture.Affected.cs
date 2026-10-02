@@ -54,6 +54,7 @@ internal sealed partial class AccessV4PageSnapshotCapture
     private async Task CaptureAffectedCoreAsync(VaultWriteContext context,
         VaultMutationOutcome outcome, CancellationToken token)
     {
+        if (outcome.ResourceType == "PrivateMemory") return;
         var candidates = new HashSet<(string Type, int Key, int ContinuityId)>();
         var inspected = new HashSet<(string Type, int Key)>();
         var allContinuities = await ContinuityIdsAsync(context, token).ConfigureAwait(false);

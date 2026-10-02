@@ -69,7 +69,11 @@ internal static class RequestSafetyValidator
                 return $"{propertyPath} exceeds {patchLimit} characters.";
             if (propertyValue is int number &&
                 (property.Name.EndsWith("Id", StringComparison.Ordinal) || property.Name == "ExpectedVersion") && number <= 0)
-                return $"{propertyPath} must be positive.";
+            {
+                // Private memories use zero as an explicit create-if-absent version.
+                if (!(value is Mcp.V4.V4MemorySaveRequest && property.Name == "ExpectedVersion" && number == 0))
+                    return $"{propertyPath} must be positive.";
+            }
             if (property.Name == "EntityIds" && propertyValue is IEnumerable entityIds)
             {
                 foreach (var id in entityIds)

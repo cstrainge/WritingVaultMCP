@@ -864,6 +864,33 @@
           ],
           "additionalProperties": false,
           "default": null
+        },
+        "memory": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "scope": {
+              "enum": [
+                "Global",
+                "Continuity"
+              ]
+            },
+            "key": {
+              "type": "string"
+            },
+            "version": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "scope",
+            "key",
+            "version"
+          ],
+          "additionalProperties": false,
+          "default": null
         }
       },
       "required": [

@@ -1,6 +1,6 @@
 {
   "surfaceVersion": "4.0",
-  "toolCount": 87,
+  "toolCount": 89,
   "tools": [
     {
       "name": "changes_since",
@@ -880,6 +880,33 @@
             ],
             "additionalProperties": false,
             "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
+            ],
+            "additionalProperties": false,
+            "default": null
           }
         },
         "required": [
@@ -1261,6 +1288,33 @@
             ],
             "additionalProperties": false,
             "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
+            ],
+            "additionalProperties": false,
+            "default": null
           }
         },
         "required": [
@@ -1549,6 +1603,33 @@
               "retentionCount",
               "assetCount",
               "assetBytes"
+            ],
+            "additionalProperties": false,
+            "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
             ],
             "additionalProperties": false,
             "default": null
@@ -1944,6 +2025,33 @@
               "retentionCount",
               "assetCount",
               "assetBytes"
+            ],
+            "additionalProperties": false,
+            "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
             ],
             "additionalProperties": false,
             "default": null
@@ -2349,6 +2457,33 @@
             ],
             "additionalProperties": false,
             "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
+            ],
+            "additionalProperties": false,
+            "default": null
           }
         },
         "required": [
@@ -2636,6 +2771,33 @@
               "retentionCount",
               "assetCount",
               "assetBytes"
+            ],
+            "additionalProperties": false,
+            "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
             ],
             "additionalProperties": false,
             "default": null
@@ -2989,6 +3151,33 @@
             ],
             "additionalProperties": false,
             "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
+            ],
+            "additionalProperties": false,
+            "default": null
           }
         },
         "required": [
@@ -3297,6 +3486,33 @@
             ],
             "additionalProperties": false,
             "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
+            ],
+            "additionalProperties": false,
+            "default": null
           }
         },
         "required": [
@@ -3579,6 +3795,33 @@
             ],
             "additionalProperties": false,
             "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
+            ],
+            "additionalProperties": false,
+            "default": null
           }
         },
         "required": [
@@ -3855,6 +4098,33 @@
               "retentionCount",
               "assetCount",
               "assetBytes"
+            ],
+            "additionalProperties": false,
+            "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
             ],
             "additionalProperties": false,
             "default": null
@@ -4291,6 +4561,33 @@
             ],
             "additionalProperties": false,
             "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
+            ],
+            "additionalProperties": false,
+            "default": null
           }
         },
         "required": [
@@ -4567,6 +4864,33 @@
               "retentionCount",
               "assetCount",
               "assetBytes"
+            ],
+            "additionalProperties": false,
+            "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
             ],
             "additionalProperties": false,
             "default": null
@@ -4999,6 +5323,33 @@
             ],
             "additionalProperties": false,
             "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
+            ],
+            "additionalProperties": false,
+            "default": null
           }
         },
         "required": [
@@ -5274,6 +5625,33 @@
               "retentionCount",
               "assetCount",
               "assetBytes"
+            ],
+            "additionalProperties": false,
+            "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
             ],
             "additionalProperties": false,
             "default": null
@@ -5723,6 +6101,33 @@
             ],
             "additionalProperties": false,
             "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
+            ],
+            "additionalProperties": false,
+            "default": null
           }
         },
         "required": [
@@ -6157,6 +6562,33 @@
             ],
             "additionalProperties": false,
             "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
+            ],
+            "additionalProperties": false,
+            "default": null
           }
         },
         "required": [
@@ -6424,6 +6856,33 @@
               "retentionCount",
               "assetCount",
               "assetBytes"
+            ],
+            "additionalProperties": false,
+            "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
             ],
             "additionalProperties": false,
             "default": null
@@ -7150,6 +7609,33 @@
             ],
             "additionalProperties": false,
             "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
+            ],
+            "additionalProperties": false,
+            "default": null
           }
         },
         "required": [
@@ -7425,6 +7911,33 @@
               "retentionCount",
               "assetCount",
               "assetBytes"
+            ],
+            "additionalProperties": false,
+            "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
             ],
             "additionalProperties": false,
             "default": null
@@ -7721,6 +8234,33 @@
               "retentionCount",
               "assetCount",
               "assetBytes"
+            ],
+            "additionalProperties": false,
+            "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
             ],
             "additionalProperties": false,
             "default": null
@@ -8239,6 +8779,33 @@
             ],
             "additionalProperties": false,
             "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
+            ],
+            "additionalProperties": false,
+            "default": null
           }
         },
         "required": [
@@ -8603,6 +9170,33 @@
               "retentionCount",
               "assetCount",
               "assetBytes"
+            ],
+            "additionalProperties": false,
+            "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
             ],
             "additionalProperties": false,
             "default": null
@@ -9376,6 +9970,33 @@
             ],
             "additionalProperties": false,
             "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
+            ],
+            "additionalProperties": false,
+            "default": null
           }
         },
         "required": [
@@ -10074,6 +10695,33 @@
               "retentionCount",
               "assetCount",
               "assetBytes"
+            ],
+            "additionalProperties": false,
+            "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
             ],
             "additionalProperties": false,
             "default": null
@@ -10912,6 +11560,33 @@
             ],
             "additionalProperties": false,
             "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
+            ],
+            "additionalProperties": false,
+            "default": null
           }
         },
         "required": [
@@ -11708,6 +12383,446 @@
             ],
             "additionalProperties": false,
             "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
+            ],
+            "additionalProperties": false,
+            "default": null
+          }
+        },
+        "required": [
+          "success",
+          "code",
+          "affected",
+          "replayed"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "memory_read",
+      "description": "Reads full private AI note bodies in Global or selected Continuity scope. Omit key to load all; follow nextCursor until hasMore=false. These notes are shared by Vault AI clients and hidden from the viewer and ordinary search.",
+      "access": "Read",
+      "destructive": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "scope": {
+            "enum": [
+              "Global",
+              "Continuity"
+            ]
+          },
+          "key": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": null
+          },
+          "cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": null,
+            "maxLength": 512
+          },
+          "limit": {
+            "type": "integer",
+            "default": 10,
+            "minimum": 1,
+            "maximum": 10
+          }
+        },
+        "required": [
+          "scope"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "scope": {
+            "enum": [
+              "Global",
+              "Continuity"
+            ]
+          },
+          "continuityName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string"
+                },
+                "body": {
+                  "type": "string",
+                  "maxLength": 65536
+                },
+                "version": {
+                  "type": "integer"
+                },
+                "updatedAtUtc": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              },
+              "required": [
+                "key",
+                "body",
+                "version",
+                "updatedAtUtc"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "hasMore": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "scope",
+          "items",
+          "hasMore"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "memory_save",
+      "description": "Saves private AI context in Global or selected Continuity scope, separate from visible record notes. Use a stable lowercase key and expectedVersion=0 to create; read first and use its version to replace the full body. Keep mutationToken stable on retries. Body maximum 65536 characters.",
+      "access": "Write",
+      "destructive": true,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "mutationToken": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+          },
+          "scope": {
+            "enum": [
+              "Global",
+              "Continuity"
+            ]
+          },
+          "key": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string",
+            "maxLength": 65536
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "mutationToken",
+          "scope",
+          "key",
+          "body",
+          "expectedVersion"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "affected": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "ref": {
+                  "type": "string"
+                },
+                "kind": {
+                  "enum": [
+                    "Continuity",
+                    "Project",
+                    "Location",
+                    "Character",
+                    "Organization",
+                    "Object",
+                    "WorldEvent",
+                    "Source",
+                    "SourceSnapshot",
+                    "Claim",
+                    "Tag",
+                    "Note",
+                    "Image",
+                    "VariantGroup",
+                    "Relationship",
+                    "RelationshipType",
+                    "Residence",
+                    "Membership",
+                    "OrganizationLocation",
+                    "Ownership",
+                    "OwnershipPrincipal",
+                    "Custody",
+                    "ObjectLocation",
+                    "EntityEvent",
+                    "TemporalEffect",
+                    "RelationshipEvent",
+                    "RelationshipMembershipPeriod",
+                    "RelationshipParticipant",
+                    "Species"
+                  ]
+                },
+                "label": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "context": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null
+                },
+                "continuityName": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null
+                },
+                "version": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ],
+                  "default": null
+                },
+                "isDeleted": {
+                  "type": "boolean",
+                  "default": false
+                },
+                "associationRole": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null
+                },
+                "associationNotes": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null
+                }
+              },
+              "required": [
+                "ref",
+                "kind",
+                "label"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "replayed": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": null
+          },
+          "error": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              },
+              "retryable": {
+                "type": "boolean",
+                "default": false
+              },
+              "details": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": null
+                    },
+                    "reason": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": null
+                    },
+                    "rejectedValue": {
+                      "default": null
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "default": null
+              },
+              "candidates": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "$ref": "#/properties/affected/items"
+                },
+                "default": null,
+                "maxItems": 10
+              },
+              "recovery": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ],
+            "additionalProperties": false,
+            "default": null
+          },
+          "backup": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "createdAtUtc": {
+                "type": "string"
+              },
+              "databaseBytes": {
+                "type": "integer"
+              },
+              "databaseSha256": {
+                "type": "string"
+              },
+              "schemaMigration": {
+                "type": "string"
+              },
+              "schemaValid": {
+                "type": "boolean"
+              },
+              "integrityValid": {
+                "type": "boolean"
+              },
+              "retentionCount": {
+                "type": "integer"
+              },
+              "assetCount": {
+                "type": "integer"
+              },
+              "assetBytes": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "createdAtUtc",
+              "databaseBytes",
+              "databaseSha256",
+              "schemaMigration",
+              "schemaValid",
+              "integrityValid",
+              "retentionCount",
+              "assetCount",
+              "assetBytes"
+            ],
+            "additionalProperties": false,
+            "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
+            ],
+            "additionalProperties": false,
+            "default": null
           }
         },
         "required": [
@@ -11988,6 +13103,33 @@
               "retentionCount",
               "assetCount",
               "assetBytes"
+            ],
+            "additionalProperties": false,
+            "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
             ],
             "additionalProperties": false,
             "default": null
@@ -12273,6 +13415,33 @@
               "retentionCount",
               "assetCount",
               "assetBytes"
+            ],
+            "additionalProperties": false,
+            "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
             ],
             "additionalProperties": false,
             "default": null
@@ -12564,6 +13733,33 @@
               "retentionCount",
               "assetCount",
               "assetBytes"
+            ],
+            "additionalProperties": false,
+            "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
             ],
             "additionalProperties": false,
             "default": null
@@ -12951,6 +14147,33 @@
             ],
             "additionalProperties": false,
             "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
+            ],
+            "additionalProperties": false,
+            "default": null
           }
         },
         "required": [
@@ -13325,6 +14548,33 @@
               "retentionCount",
               "assetCount",
               "assetBytes"
+            ],
+            "additionalProperties": false,
+            "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
             ],
             "additionalProperties": false,
             "default": null
@@ -13739,6 +14989,33 @@
             ],
             "additionalProperties": false,
             "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
+            ],
+            "additionalProperties": false,
+            "default": null
           }
         },
         "required": [
@@ -14041,6 +15318,33 @@
               "retentionCount",
               "assetCount",
               "assetBytes"
+            ],
+            "additionalProperties": false,
+            "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
             ],
             "additionalProperties": false,
             "default": null
@@ -14361,6 +15665,33 @@
               "retentionCount",
               "assetCount",
               "assetBytes"
+            ],
+            "additionalProperties": false,
+            "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
             ],
             "additionalProperties": false,
             "default": null
@@ -14749,6 +16080,33 @@
               "retentionCount",
               "assetCount",
               "assetBytes"
+            ],
+            "additionalProperties": false,
+            "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
             ],
             "additionalProperties": false,
             "default": null
@@ -15379,6 +16737,33 @@
             ],
             "additionalProperties": false,
             "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
+            ],
+            "additionalProperties": false,
+            "default": null
           }
         },
         "required": [
@@ -15686,6 +17071,33 @@
               "retentionCount",
               "assetCount",
               "assetBytes"
+            ],
+            "additionalProperties": false,
+            "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
             ],
             "additionalProperties": false,
             "default": null
@@ -16182,6 +17594,33 @@
             ],
             "additionalProperties": false,
             "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
+            ],
+            "additionalProperties": false,
+            "default": null
           }
         },
         "required": [
@@ -16460,6 +17899,33 @@
               "retentionCount",
               "assetCount",
               "assetBytes"
+            ],
+            "additionalProperties": false,
+            "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
             ],
             "additionalProperties": false,
             "default": null
@@ -16745,6 +18211,33 @@
               "retentionCount",
               "assetCount",
               "assetBytes"
+            ],
+            "additionalProperties": false,
+            "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
             ],
             "additionalProperties": false,
             "default": null
@@ -17351,6 +18844,33 @@
               "retentionCount",
               "assetCount",
               "assetBytes"
+            ],
+            "additionalProperties": false,
+            "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
             ],
             "additionalProperties": false,
             "default": null
@@ -18002,6 +19522,33 @@
             ],
             "additionalProperties": false,
             "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
+            ],
+            "additionalProperties": false,
+            "default": null
           }
         },
         "required": [
@@ -18285,6 +19832,33 @@
               "retentionCount",
               "assetCount",
               "assetBytes"
+            ],
+            "additionalProperties": false,
+            "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
             ],
             "additionalProperties": false,
             "default": null
@@ -18723,6 +20297,33 @@
               "retentionCount",
               "assetCount",
               "assetBytes"
+            ],
+            "additionalProperties": false,
+            "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
             ],
             "additionalProperties": false,
             "default": null
@@ -19351,6 +20952,33 @@
             ],
             "additionalProperties": false,
             "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
+            ],
+            "additionalProperties": false,
+            "default": null
           }
         },
         "required": [
@@ -19730,6 +21358,33 @@
               "retentionCount",
               "assetCount",
               "assetBytes"
+            ],
+            "additionalProperties": false,
+            "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
             ],
             "additionalProperties": false,
             "default": null
@@ -20238,6 +21893,33 @@
             ],
             "additionalProperties": false,
             "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
+            ],
+            "additionalProperties": false,
+            "default": null
           }
         },
         "required": [
@@ -20509,6 +22191,33 @@
               "retentionCount",
               "assetCount",
               "assetBytes"
+            ],
+            "additionalProperties": false,
+            "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
             ],
             "additionalProperties": false,
             "default": null
@@ -21266,6 +22975,33 @@
             ],
             "additionalProperties": false,
             "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
+            ],
+            "additionalProperties": false,
+            "default": null
           }
         },
         "required": [
@@ -21541,6 +23277,33 @@
               "retentionCount",
               "assetCount",
               "assetBytes"
+            ],
+            "additionalProperties": false,
+            "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
             ],
             "additionalProperties": false,
             "default": null
@@ -21831,6 +23594,33 @@
               "retentionCount",
               "assetCount",
               "assetBytes"
+            ],
+            "additionalProperties": false,
+            "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
             ],
             "additionalProperties": false,
             "default": null
@@ -22553,6 +24343,33 @@
             ],
             "additionalProperties": false,
             "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
+            ],
+            "additionalProperties": false,
+            "default": null
           }
         },
         "required": [
@@ -22833,6 +24650,33 @@
               "retentionCount",
               "assetCount",
               "assetBytes"
+            ],
+            "additionalProperties": false,
+            "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
             ],
             "additionalProperties": false,
             "default": null
@@ -23245,6 +25089,33 @@
             ],
             "additionalProperties": false,
             "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
+            ],
+            "additionalProperties": false,
+            "default": null
           }
         },
         "required": [
@@ -23626,6 +25497,33 @@
             ],
             "additionalProperties": false,
             "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
+            ],
+            "additionalProperties": false,
+            "default": null
           }
         },
         "required": [
@@ -23916,6 +25814,33 @@
             ],
             "additionalProperties": false,
             "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
+            ],
+            "additionalProperties": false,
+            "default": null
           }
         },
         "required": [
@@ -24188,6 +26113,33 @@
               "retentionCount",
               "assetCount",
               "assetBytes"
+            ],
+            "additionalProperties": false,
+            "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
             ],
             "additionalProperties": false,
             "default": null
@@ -24677,6 +26629,33 @@
               "retentionCount",
               "assetCount",
               "assetBytes"
+            ],
+            "additionalProperties": false,
+            "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
             ],
             "additionalProperties": false,
             "default": null
@@ -26400,6 +28379,33 @@
             ],
             "additionalProperties": false,
             "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
+            ],
+            "additionalProperties": false,
+            "default": null
           }
         },
         "required": [
@@ -26694,6 +28700,33 @@
             ],
             "additionalProperties": false,
             "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
+            ],
+            "additionalProperties": false,
+            "default": null
           }
         },
         "required": [
@@ -26964,6 +28997,33 @@
             ],
             "additionalProperties": false,
             "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
+            ],
+            "additionalProperties": false,
+            "default": null
           }
         },
         "required": [
@@ -26977,7 +29037,7 @@
     },
     {
       "name": "vault_health",
-      "description": "Reports v4 readiness, schema and integrity issues, pending writes, backup recency, and storage capacity without exposing paths.",
+      "description": "Reports v4 readiness, schema and integrity issues, pending writes, backup recency, storage capacity, and global/selected-continuity private memory counts with instructions to load both sets. Call memory_read using the returned arguments before working.",
       "access": "Read",
       "destructive": false,
       "inputSchema": {
@@ -27175,6 +29235,118 @@
           "imageImportReady": {
             "type": "boolean",
             "default": false
+          },
+          "memories": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "globalCount": {
+                "type": "integer"
+              },
+              "selectedContinuityCount": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "selectedContinuityName": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "readTool": {
+                "type": "string"
+              },
+              "globalRead": {
+                "type": "object",
+                "properties": {
+                  "scope": {
+                    "enum": [
+                      "Global",
+                      "Continuity"
+                    ]
+                  },
+                  "key": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "default": null
+                  },
+                  "cursor": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "default": null,
+                    "maxLength": 512
+                  },
+                  "limit": {
+                    "type": "integer",
+                    "default": 10,
+                    "minimum": 1,
+                    "maximum": 100
+                  }
+                },
+                "required": [
+                  "scope"
+                ],
+                "additionalProperties": false
+              },
+              "selectedContinuityRead": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "scope": {
+                    "enum": [
+                      "Global",
+                      "Continuity"
+                    ]
+                  },
+                  "key": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "default": null
+                  },
+                  "cursor": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "default": null,
+                    "maxLength": 512
+                  },
+                  "limit": {
+                    "type": "integer",
+                    "default": 10,
+                    "minimum": 1,
+                    "maximum": 100
+                  }
+                },
+                "required": [
+                  "scope"
+                ],
+                "additionalProperties": false
+              },
+              "instructions": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "globalCount",
+              "readTool",
+              "globalRead",
+              "instructions"
+            ],
+            "additionalProperties": false,
+            "default": null
           }
         },
         "required": [
@@ -27465,6 +29637,33 @@
               "retentionCount",
               "assetCount",
               "assetBytes"
+            ],
+            "additionalProperties": false,
+            "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
             ],
             "additionalProperties": false,
             "default": null
@@ -27764,6 +29963,33 @@
               "retentionCount",
               "assetCount",
               "assetBytes"
+            ],
+            "additionalProperties": false,
+            "default": null
+          },
+          "memory": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "Global",
+                  "Continuity"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "scope",
+              "key",
+              "version"
             ],
             "additionalProperties": false,
             "default": null

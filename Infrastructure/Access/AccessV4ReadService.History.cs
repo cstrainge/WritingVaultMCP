@@ -45,7 +45,7 @@ public sealed partial class AccessV4ReadService
             var before = request.Cursor is null ? long.MaxValue : cursors.Decode(request.Cursor, "history", scope).Position;
             var revision = await RevisionAsync(token).ConfigureAwait(false);
             await using var connection = connectionFactory.Create(); await connection.OpenAsync(token).ConfigureAwait(false);
-            var predicate = operationId is not null ? "[OperationId]=?" : "[RecordType]=? AND [RecordKey]=?";
+            var predicate = (operationId is not null ? "[OperationId]=?" : "[RecordType]=? AND [RecordKey]=?") + " AND [RecordType]<>'PrivateMemory'";
             using var command = new AccessCommand(connection,
                 $"SELECT TOP {request.Limit + 1} [Id],[ChangedAtUtc],[ClientLabel],[Action],[RecordType],[RecordKey],[VersionBefore],[VersionAfter],[ChangeJson] FROM [ChangeLog] WHERE {predicate} AND [Id]<? ORDER BY [Id] DESC");
             if (operationId is not null) command.Add(OleDbType.VarWChar, operationId, 36);

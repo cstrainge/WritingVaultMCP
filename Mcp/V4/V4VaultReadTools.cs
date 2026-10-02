@@ -24,7 +24,8 @@ public sealed class V4VaultReadTools(
     AccessSchemaVerifier schema,
     AccessIntegrityVerifier integrity,
     VaultWriteCoordinator coordinator,
-    CoordinatedVaultBackupService backup)
+    CoordinatedVaultBackupService backup,
+    AccessV4MemoryService memories)
 {
     [McpServerTool(Name="vault_health",UseStructuredContent=true),Description("Reports v4 readiness and storage capacity without exposing paths.")]
     public Task<V4HealthResult> Health(V4EmptyRequest request,CancellationToken token=default)=>Safe(async()=>
@@ -33,8 +34,11 @@ public sealed class V4VaultReadTools(
         var issues=s.Issues.Select(x=>new V4Error(x.Code,x.Detail)).Concat(i.Issues.Select(x=>new V4Error(x.Code,x.Detail))).ToArray();
         var lastBackup=await backup.FindLatestVerifiedAsync(token);
         return new V4HealthResult(s.IsValid&&i.IsValid,V4ContractCatalog.SurfaceVersion,AccessSchemaDefinition.MigrationId,coordinator.PendingWrites,cap.CapacityBand,cap.RenditionBytes,lastBackup?.ToString("O",System.Globalization.CultureInfo.InvariantCulture),issues,
-            session.ContinuityId is null ? "unscoped" : await reads.RevisionAsync(token), images.ImageImportReady);
+            session.ContinuityId is null ? "unscoped" : await reads.RevisionAsync(token), images.ImageImportReady,
+            await memories.HealthAsync(token));
     });
+    [McpServerTool(Name="memory_read",UseStructuredContent=true),Description("Reads complete private AI memory bodies in Global or selected Continuity scope. Follow nextCursor until hasMore=false; omit key to load all notes.")]
+    public Task<V4MemoryPage> MemoryRead(V4MemoryReadRequest request,CancellationToken token=default)=>Safe(()=>memories.ReadAsync(request,token));
     [McpServerTool(Name="continuity_list",UseStructuredContent=true),Description("Lists continuity names and clock summaries with bounded paging.")]
     public Task<V4Page<V4ContinuitySummary>> Continuities(V4ContinuityListRequest request,CancellationToken token=default)=>Safe(()=>reads.ContinuitiesAsync(request,token));
     [McpServerTool(Name="session_set",UseStructuredContent=true),Description("Selects a continuity by exact name and optionally sets an exact currentTime or date-only currentDate, or clears the session clock.")]

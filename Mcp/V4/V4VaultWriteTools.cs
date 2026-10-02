@@ -14,8 +14,11 @@ namespace WritingVaultMcp.Mcp.V4;
 public sealed class V4VaultWriteTools(
     SemanticVaultWriteTools legacy, V4ResultMapper mapper, AccessV4ApplicationService application,
     AccessV4TemporalService temporal, AccessV4ImageService images, CoordinatedVaultBackupService backup,
-    AccessV4RecordService records, AccessV4RelationshipMergeService merges, VaultSessionContext session)
+    AccessV4RecordService records, AccessV4RelationshipMergeService merges, VaultSessionContext session,
+    AccessV4MemoryService memories)
 {
+    [McpServerTool(Name="memory_save",Destructive=true,Idempotent=true,UseStructuredContent=true)]
+    public Task<V4MutationResult> MemorySave(V4MemorySaveRequest request,CancellationToken token)=>memories.SaveAsync(request,token);
     // Keep these adapters thin: each public method declares one stable MCP operation
     // and translates its v4 request into the existing application command.
     [McpServerTool(Name="continuity_create",Idempotent=true,UseStructuredContent=true)] public Task<V4MutationResult> ContinuityCreate(V4ContinuityCreateRequest request,CancellationToken t)=>Map(legacy.CreateContinuity(new(request.MutationToken,request.Name,request.DefaultTimeZoneId,request.Description),t),t);

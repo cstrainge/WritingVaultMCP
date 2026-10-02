@@ -12,6 +12,10 @@ One MCP connection advertises exactly one complete tool surface. The Debug v4 ex
 
 ## Identity and scope
 
+Private AI memories have their own `Global` and selected `Continuity` scopes and do not attach to canon records. `vault_health.memories` reports `globalCount`, nullable `selectedContinuityCount`, the selected name, `readTool=memory_read`, and `globalRead` / `selectedContinuityRead` arguments. Counts do not load instructions: call the read tool for each available scope, following `nextCursor` until `hasMore=false`. The complete bodies are returned, with no truncation. Read-only clients can load memories but cannot save them. Saved context remains subject to current user instructions.
+
+`memory_save` creates with `expectedVersion=0` or replaces with the last read positive version; a stale version fails without overwriting. Its common mutation envelope adds a `memory` receipt (`scope`, `key`, `version`). The scope is part of the idempotency fingerprint. Database migration 015 adds a private table; public record reads, viewer pages, search, history, and snapshots never include its keys or bodies. Backups include the table. These notes are shared Vault context rather than per-client secrets.
+
 Numeric Access keys and operation GUIDs are private storage details. Public requests and responses use continuity names, natural names where safe, and opaque semantic references such as `character:aurora~ABCDEFGHJK`. Meaningful domain identifiers remain valid, including `referenceTimeZoneId`, `timeZoneId`, and `calendarId`.
 
 The selected continuity is implicit for continuity-scoped calls. A semantic reference is authoritative and must have the expected record kind and belong to the permitted scope. Supplying a reference in a natural-name field does not change the field's expected kind.

@@ -157,7 +157,17 @@ public sealed record V4TimelineResult(
 public sealed record V4MutationResult(
     bool Success, string Code, IReadOnlyList<V4ReferenceSummary> Affected,
     bool Replayed, string? Message = null, V4Error? Error = null,
-    V4BackupSummary? Backup = null);
+    V4BackupSummary? Backup = null, V4MemoryReceipt? Memory = null);
+
+public enum V4MemoryScope { Global, Continuity }
+public sealed record V4MemoryReadRequest(V4MemoryScope Scope, string? Key = null, string? Cursor = null, int Limit = 10);
+public sealed record V4MemorySaveRequest(string MutationToken, V4MemoryScope Scope, string Key, string Body, int ExpectedVersion);
+public sealed record V4MemoryReceipt(V4MemoryScope Scope, string Key, int Version);
+public sealed record V4MemoryNote(string Key, string Body, int Version, DateTime UpdatedAtUtc);
+public sealed record V4MemoryPage(V4MemoryScope Scope, string? ContinuityName,
+    IReadOnlyList<V4MemoryNote> Items, string? NextCursor, bool HasMore);
+public sealed record V4MemoryHealth(int GlobalCount, int? SelectedContinuityCount, string? SelectedContinuityName,
+    string ReadTool, V4MemoryReadRequest GlobalRead, V4MemoryReadRequest? SelectedContinuityRead, string Instructions);
 
 public sealed record V4BackupSummary(
     string CreatedAtUtc, long DatabaseBytes, string DatabaseSha256,
@@ -214,7 +224,7 @@ public sealed record V4HealthResult(
     bool Ready, string ToolSurfaceVersion, string SchemaMigration,
     int PendingWrites, string DatabaseCapacityBand, long ImageRenditionBytes,
     string? LastSuccessfulBackupUtc, IReadOnlyList<V4Error> Issues,
-    string ObservedRevision, bool ImageImportReady = false);
+    string ObservedRevision, bool ImageImportReady = false, V4MemoryHealth? Memories = null);
 
 public sealed record V4Change(
     string Scope, string Kind, string? Ref, string Action,

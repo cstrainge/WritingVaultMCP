@@ -208,6 +208,7 @@ internal static class VaultProcessHost
             builder.Services.AddSingleton<VaultMcpResultMapper>();
             builder.Services.AddSingleton<SemanticVaultWriteTools>();
             builder.Services.AddSingleton<AccessV4ReadService>();
+            builder.Services.AddSingleton<AccessV4MemoryService>();
             builder.Services.AddSingleton<AccessV4RelationshipMergeService>();
             builder.Services.AddSingleton<AccessV4SourceSnapshotService>();
             builder.Services.AddSingleton<AccessV4TemporalService>();

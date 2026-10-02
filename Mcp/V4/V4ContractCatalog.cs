@@ -22,7 +22,9 @@ public static class V4ContractCatalog
 
     public static IReadOnlyList<V4ToolDefinition> Tools { get; } =
     [
-        R<V4EmptyRequest, V4HealthResult>("vault_health", "Reports v4 readiness, schema and integrity issues, pending writes, backup recency, and storage capacity without exposing paths."),
+        R<V4EmptyRequest, V4HealthResult>("vault_health", "Reports v4 readiness, schema and integrity issues, pending writes, backup recency, storage capacity, and global/selected-continuity private memory counts with instructions to load both sets. Call memory_read using the returned arguments before working."),
+        R<V4MemoryReadRequest, V4MemoryPage>("memory_read", "Reads full private AI note bodies in Global or selected Continuity scope. Omit key to load all; follow nextCursor until hasMore=false. These notes are shared by Vault AI clients and hidden from the viewer and ordinary search."),
+        W<V4MemorySaveRequest>("memory_save", "Saves private AI context in Global or selected Continuity scope, separate from visible record notes. Use a stable lowercase key and expectedVersion=0 to create; read first and use its version to replace the full body. Keep mutationToken stable on retries. Body maximum 65536 characters.", true),
         R<V4ContinuityListRequest, V4Page<V4ContinuitySummary>>("continuity_list", "Lists continuity names and clock summaries with bounded keyset paging."),
         R<V4SessionSetRequest, V4SessionView>("session_set", "Selects continuity by exact name and optionally sets an exact currentTime or date-only currentDate for this connection, or clears the override."),
         R<V4EmptyRequest, V4SessionView>("session_get", "Returns this connection's selected continuity and effective clock provenance."),
@@ -118,6 +120,8 @@ public static class V4ContractCatalog
         foreach (var tool in Tools.OrderBy(value => value.Name, StringComparer.Ordinal))
         {
             var inputSchema = ExportSchema(tool.RequestType);
+            if (tool.Name == "memory_save") inputSchema["properties"]!["expectedVersion"]!["minimum"] = 0;
+            if (tool.Name == "memory_read") inputSchema["properties"]!["limit"]!["maximum"] = 10;
             if (tool.Name is "relationship_membership_period_add" or "organization_membership_add" &&
                 inputSchema is JsonObject membership)
             {
@@ -215,6 +219,11 @@ public static class V4ContractCatalog
         {
             var request = ExampleFor(ExportSchema(tool.RequestType), tool.Name, true);
             var response = ExampleFor(ExportSchema(tool.ResponseType), tool.Name, false);
+            if (tool.Name == "memory_save" && request is JsonObject memoryRequest)
+            {
+                memoryRequest["key"] = "writing-preferences";
+                memoryRequest["expectedVersion"] = 0;
+            }
             if (tool.Name is ("image_attach" or "story_image_attach" or "image_replace") && request is JsonObject imageRequest)
             {
                 imageRequest.Remove("image");

@@ -6,7 +6,8 @@ The exact input and output schemas, limits, examples, access flags, and destruct
 
 ## Read workflow
 
-- `vault_health` reports schema, integrity, queue, backup, and capacity status without paths.
+- `vault_health` reports schema, integrity, queue, backup, and capacity status without paths. Its `memories` field gives global and selected-continuity counts plus ready-to-use `memory_read` arguments. Load both scopes before working; follow every `nextCursor` to load the complete bodies.
+- `memory_read` returns private AI notes, shared by Vault clients but excluded from the viewer, ordinary search, record snapshots, and public history. `scope=Global` works without selecting a continuity; `scope=Continuity` uses `session_set`. Omit `key` to load all notes, or provide a stable key to read one. Pages contain at most ten complete bodies. No selected continuity means a null count, not zero. Switching continuity requires loading that continuity's memories again.
 - `continuity_list`, `session_set`, and `session_get` establish and inspect connection-local continuity and artificial time.
 - `search` finds records across selected kinds. `get` returns one cohesive bounded overview. `record_locate` resolves an explicit semantic reference across continuities for viewer links without changing the MCP session. `record_snapshot_list` finds retained historical page versions; `record_snapshot_get` reads one saved page with its notes and associations. `list_related` pages any clipped current section. `source_snapshot_view` pages verified cached source text explicitly; `includeDeleted` permits an intentionally opened deleted snapshot to show its cached text.
 - `timeline_get` returns calendar or narrative chronology, including fuzzy ranges and undated records. Historical chronology works with an unset clock.
@@ -16,10 +17,11 @@ The exact input and output schemas, limits, examples, access flags, and destruct
 - `relationship_merge_preview` shows both legacy relationship identities, periods, events and their context, Markdown notes, linked claims, and audit counts. It returns a review token only when the proposed merge has no conflicts.
 - `image_list` remains scoped to the selected continuity and accepts canon-entity and story-record owners. `image_search` includes both image storage kinds and can search across continuities when explicitly requested. `image_view` accepts an explicit semantic image reference from any active continuity and returns a bounded thumbnail, display, or verified original image block; optional `revision` pins retained image content. `image_revision_history` lists the available positive content revisions without bytes. Cross-continuity reads do not change the selected continuity.
 
-Every page-shaped read includes an opaque observed revision. Use `changes_since` with that revision. If it reports expiry or an unknown change, refresh the visible page.
+Record pages include an opaque observed revision. Use `changes_since` with that revision. If it reports expiry or an unknown change, refresh the visible page. Private memories use their own versions and paging, and do not appear in the visible change feed.
 
 ## Core writes
 
+- Private AI memories: `memory_save` takes `scope`, `key`, `body`, `expectedVersion`, and `mutationToken`. Keys are 1–100 lowercase letters/digits/dots/underscores/hyphens, beginning with a letter or digit; bodies are nonblank and at most 65,536 characters. Use `expectedVersion=0` to create a key, then the version from `memory_read` to replace its body. The result's `memory` receipt returns the saved key, scope, and version. Retries use the same mutation token and input, including scope. Private notes are included in normal database backups; they are hidden UI context, not encrypted or isolated by AI identity.
 - Continuities: `continuity_create`, `continuity_update`, `continuity_clock_set`
 - Backups: `vault_backup_create`
 - Variant groups: `variant_group_create`, `variant_group_update`, `entity_variant_group_set`

@@ -90,7 +90,9 @@ internal static class AccessSchemaDefinition
     public const string RecordPageSnapshotChecksum = "2235B7EE2541A40E982ACF556875E7CBE7E9E7F9C8B7686C05437CD0DB6420B6";
     public const string ProjectStoryEventMigrationId = "20261002_013_project_story_events";
     public const string ProjectStoryEventChecksum = "9D114896D9F0EC60259AF607A4D6433CCC76E7BF0488A571676A4B15DC01B290";
-    public const string MigrationId = "20261002_014_species";
+    public const string SpeciesMigrationId = "20261002_014_species";
+    public const string SpeciesChecksum = "B3DDA7793EF550D5BB84C4D87095247E7B7A89C68D25F6D83626119B938E9685";
+    public const string MigrationId = "20261002_015_private_memories";
     public const string ApplicationVersion = "4.0.0";
 
     private static AccessColumnDefinition C(
@@ -126,6 +128,12 @@ internal static class AccessSchemaDefinition
 
     public static IReadOnlyList<AccessTableDefinition> Tables { get; } =
     [
+        new("PrivateMemories", [
+            C("Id", "AUTOINCREMENT", true), C("ScopeKey", "TEXT(40)", true),
+            C("ContinuityId", "LONG"), C("MemoryKey", "TEXT(100)", true),
+            C("Body", "LONGTEXT", true), C("Version", "LONG", true),
+            C("CreatedAtUtc", "DATETIME", true), C("UpdatedAtUtc", "DATETIME", true)
+        ], ["Id"]),
         new("SchemaMigrations",
         [
             C("MigrationId", "TEXT(100)", true),
@@ -657,6 +665,8 @@ internal static class AccessSchemaDefinition
 
     public static IReadOnlyList<AccessIndexDefinition> Indexes { get; } =
     [
+        new("UX_PrivateMemories_Scope_Key", "PrivateMemories", ["ScopeKey", "MemoryKey"], true),
+        new("IX_PrivateMemories_Continuity", "PrivateMemories", ["ContinuityId"]),
         new("UX_Continuities_NormalizedName", "Continuities", ["NormalizedName"], true),
         new("IX_VariantGroups_ContinuityType", "VariantGroups", ["ContinuityId", "EntityType"]),
         new("IX_CanonEntities_ContinuityType", "CanonEntities", ["ContinuityId", "EntityType"]),
@@ -754,6 +764,7 @@ internal static class AccessSchemaDefinition
 
     public static IReadOnlyList<AccessForeignKeyDefinition> ForeignKeys { get; } =
     [
+        new("FK_PrivateMemories_Continuity", "PrivateMemories", "ContinuityId", "Continuities"),
         new("FK_RecordPageSnapshots_Context", "RecordPageSnapshots", "ContextContinuityId", "Continuities"),
         new("FK_RecordPageDependencies_Context", "RecordPageDependencies", "ContextContinuityId", "Continuities"),
         new("FK_Clock_Continuity", "ContinuityClocks", "ContinuityId", "Continuities"),

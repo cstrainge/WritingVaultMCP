@@ -298,7 +298,8 @@ public sealed class V4Phase4ReadModelTests
         var tools=new V4VaultReadTools(reads,snapshots,temporal,new AccessV4ImageService(vault.Factory,vault.Coordinator,references,
             new V4TargetResolver(new AccessV4SemanticResolver(vault.Factory,vault.Coordinator,references)),session,reads,vault.Cursors,vault.StorageRoot,vault.DatabasePath),
             new AccessV4RelationshipMergeService(vault.Factory,vault.Coordinator,references,session),
-            references,session,vault.Schema,vault.Integrity,vault.Coordinator,new(vault.Factory,vault.Coordinator,vault.StorageRoot,3));
+            references,session,vault.Schema,vault.Integrity,vault.Coordinator,new(vault.Factory,vault.Coordinator,vault.StorageRoot,3),
+            new(vault.Factory,vault.Coordinator,references,session,vault.Cursors));
         var result=await tools.Get(new(await references.ReferenceAsync("Character",character)));
         Assert.Equal("Unset",result.Fields["currentTemporalState"].GetProperty("status").GetString());
         Assert.Equal("TimelineUnset",result.Fields["age"].GetProperty("status").GetString());
