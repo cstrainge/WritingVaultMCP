@@ -35,6 +35,11 @@ internal static class V4McpContractFilters
                     tool.InputSchema=published[tool.Name];
                     tool.OutputSchema=publishedOutputs[tool.Name];
                     tool.Description=definitions[tool.Name].Description;
+                    if (tool.Name is "image_attach" or "story_image_attach" or "image_replace")
+                    {
+                        tool.Meta ??= new JsonObject();
+                        tool.Meta["openai/fileParams"] = new JsonArray("file");
+                    }
                 }
                 return result;
             });

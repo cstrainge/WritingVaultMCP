@@ -105,9 +105,9 @@ public static class V4ContractCatalog
         W<V4TemporalEffectUpdateRequest>("character_temporal_effect_update", "Applies versioned changes to a temporal-age effect and revalidates overlap.", true),
         W<V4VersionedRecordRequest>("record_soft_delete", "Soft-deletes an allowlisted semantic record after version and blocker checks.", true),
         W<V4VersionedRecordRequest>("record_restore", "Restores an allowlisted semantic record and rechecks its invariants.", true),
-        W<V4ImageAttachRequest>("image_attach", "Attaches one bounded image to any canon entity and creates safe viewing renditions."),
-        W<V4StoryImageAttachRequest>("story_image_attach", "Attaches one bounded image to a continuity, shared relationship, entity event, or relationship event."),
-        W<V4ImageReplaceRequest>("image_replace", "Replaces the current image bytes with an immutable new content revision, retaining all prior originals and renditions."),
+        W<V4ImageAttachRequest>("image_attach", "Attaches one PNG, JPEG, or WebP to a canon entity. Supply exactly one host-provided file or legacy inline image (20 MiB maximum). Keep mutationToken and file_id stable across retries; never invent file URLs."),
+        W<V4StoryImageAttachRequest>("story_image_attach", "Attaches one PNG, JPEG, or WebP to a continuity, relationship, or event. Supply exactly one host-provided file or legacy inline image (20 MiB maximum). Keep mutationToken and file_id stable across retries; never invent file URLs."),
+        W<V4ImageReplaceRequest>("image_replace", "Replaces image content while retaining prior revisions. Supply exactly one host-provided file or legacy inline image (PNG/JPEG/WebP, 20 MiB maximum), plus expectedVersion. Keep mutationToken and file_id stable across retries; never invent file URLs."),
         W<V4ImageUpdateRequest>("image_update", "Updates versioned image metadata or primary designation.", true)
     ];
 
@@ -140,7 +140,7 @@ public static class V4ContractCatalog
                         ["not"] = new JsonObject { ["required"] = new JsonArray("period") }
                     });
             }
-            tools.Add(new JsonObject
+            var descriptor = new JsonObject
             {
                 ["name"] = tool.Name,
                 ["description"] = tool.Description,
@@ -148,7 +148,10 @@ public static class V4ContractCatalog
                 ["destructive"] = tool.Destructive,
                 ["inputSchema"] = inputSchema,
                 ["outputSchema"] = ExportOutputSchema(tool.ResponseType)
-            });
+            };
+            if (tool.Name is "image_attach" or "story_image_attach" or "image_replace")
+                descriptor["_meta"] = new JsonObject { ["openai/fileParams"] = new JsonArray("file") };
+            tools.Add(descriptor);
         }
 
         return new JsonObject
@@ -211,12 +214,15 @@ public static class V4ContractCatalog
         {
             var request = ExampleFor(ExportSchema(tool.RequestType), tool.Name, true);
             var response = ExampleFor(ExportSchema(tool.ResponseType), tool.Name, false);
-            if (tool.Name is ("image_attach" or "story_image_attach") && request is JsonObject imageRequest)
+            if (tool.Name is ("image_attach" or "story_image_attach" or "image_replace") && request is JsonObject imageRequest)
             {
-                imageRequest["image"] = new JsonObject
+                imageRequest.Remove("image");
+                imageRequest["file"] = new JsonObject
                 {
-                    ["mediaType"] = "image/png",
-                    ["dataBase64"] = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAAB"
+                    ["download_url"] = "https://host-provided.example/temporary-authorized-file",
+                    ["file_id"] = "host-provided-file-id",
+                    ["mime_type"] = "image/png",
+                    ["file_name"] = "portrait.png"
                 };
             }
             if (tool.Name == "relationship_membership_period_add" && request is JsonObject membershipRequest)
@@ -297,6 +303,7 @@ public static class V4ContractCatalog
     {
         if (context.TypeInfo.Type == typeof(V4StoryDateInput)) return StoryDateInputSchema();
         if (context.TypeInfo.Type == typeof(V4InlineImageInput)) return InlineImageSchema();
+        if (context.TypeInfo.Type == typeof(V4HostFileInput)) return HostFileSchema();
         if (node is not JsonObject value) return node;
 
         if (context.TypeInfo.Type == typeof(V4TimelineRequest) && context.PropertyInfo is null &&
@@ -511,10 +518,24 @@ public static class V4ContractCatalog
         }
     };
 
+    private static JsonObject HostFileSchema() => new()
+    {
+        ["type"] = "object", ["additionalProperties"] = false,
+        ["description"] = "Host-authorized file. Use the file object supplied by the MCP client; do not manufacture its URL or ID. Supply file or image, never both.",
+        ["properties"] = new JsonObject
+        {
+            ["download_url"] = new JsonObject { ["type"] = "string" },
+            ["file_id"] = new JsonObject { ["type"] = "string" },
+            ["mime_type"] = new JsonObject { ["type"] = "string" },
+            ["file_name"] = new JsonObject { ["type"] = "string" }
+        },
+        ["required"] = new JsonArray("download_url", "file_id")
+    };
+
     private static JsonObject InlineImageSchema() => new()
     {
         ["type"] = "object", ["additionalProperties"] = false,
-        ["description"] = "Inline image bytes. Phase 1 freezes the supported host representation after ChatGPT and Claude probes.",
+        ["description"] = "Legacy inline image bytes. Supply exactly one of dataBase64 or dataUrl, and omit the host file input.",
         ["properties"] = new JsonObject
         {
             ["mediaType"] = new JsonObject { ["type"] = "string", ["enum"] = new JsonArray("image/png", "image/jpeg", "image/webp") },

@@ -8512,7 +8512,7 @@
     },
     {
       "name": "image_attach",
-      "description": "Attaches one bounded image to any canon entity and creates safe viewing renditions.",
+      "description": "Attaches one PNG, JPEG, or WebP to a canon entity. Supply exactly one host-provided file or legacy inline image (20 MiB maximum). Keep mutationToken and file_id stable across retries; never invent file URLs.",
       "access": "Write",
       "destructive": false,
       "inputSchema": {
@@ -8530,7 +8530,7 @@
           "image": {
             "type": "object",
             "additionalProperties": false,
-            "description": "Inline image bytes. Phase 1 freezes the supported host representation after ChatGPT and Claude probes.",
+            "description": "Legacy inline image bytes. Supply exactly one of dataBase64 or dataUrl, and omit the host file input.",
             "properties": {
               "mediaType": {
                 "type": "string",
@@ -8618,12 +8618,34 @@
           "isPrimary": {
             "type": "boolean",
             "default": false
+          },
+          "file": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "Host-authorized file. Use the file object supplied by the MCP client; do not manufacture its URL or ID. Supply file or image, never both.",
+            "properties": {
+              "download_url": {
+                "type": "string"
+              },
+              "file_id": {
+                "type": "string"
+              },
+              "mime_type": {
+                "type": "string"
+              },
+              "file_name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "download_url",
+              "file_id"
+            ]
           }
         },
         "required": [
           "mutationToken",
-          "entity",
-          "image"
+          "entity"
         ],
         "additionalProperties": false
       },
@@ -8866,6 +8888,11 @@
           "replayed"
         ],
         "additionalProperties": false
+      },
+      "_meta": {
+        "openai/fileParams": [
+          "file"
+        ]
       }
     },
     {
@@ -9225,7 +9252,7 @@
     },
     {
       "name": "image_replace",
-      "description": "Replaces the current image bytes with an immutable new content revision, retaining all prior originals and renditions.",
+      "description": "Replaces image content while retaining prior revisions. Supply exactly one host-provided file or legacy inline image (PNG/JPEG/WebP, 20 MiB maximum), plus expectedVersion. Keep mutationToken and file_id stable across retries; never invent file URLs.",
       "access": "Write",
       "destructive": false,
       "inputSchema": {
@@ -9247,7 +9274,7 @@
           "image": {
             "type": "object",
             "additionalProperties": false,
-            "description": "Inline image bytes. Phase 1 freezes the supported host representation after ChatGPT and Claude probes.",
+            "description": "Legacy inline image bytes. Supply exactly one of dataBase64 or dataUrl, and omit the host file input.",
             "properties": {
               "mediaType": {
                 "type": "string",
@@ -9288,13 +9315,35 @@
           "backgroundColor": {
             "type": "string",
             "default": "#FFFFFF"
+          },
+          "file": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "Host-authorized file. Use the file object supplied by the MCP client; do not manufacture its URL or ID. Supply file or image, never both.",
+            "properties": {
+              "download_url": {
+                "type": "string"
+              },
+              "file_id": {
+                "type": "string"
+              },
+              "mime_type": {
+                "type": "string"
+              },
+              "file_name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "download_url",
+              "file_id"
+            ]
           }
         },
         "required": [
           "mutationToken",
           "imageRef",
-          "expectedVersion",
-          "image"
+          "expectedVersion"
         ],
         "additionalProperties": false
       },
@@ -9537,6 +9586,11 @@
           "replayed"
         ],
         "additionalProperties": false
+      },
+      "_meta": {
+        "openai/fileParams": [
+          "file"
+        ]
       }
     },
     {
@@ -22626,7 +22680,7 @@
     },
     {
       "name": "story_image_attach",
-      "description": "Attaches one bounded image to a continuity, shared relationship, entity event, or relationship event.",
+      "description": "Attaches one PNG, JPEG, or WebP to a continuity, relationship, or event. Supply exactly one host-provided file or legacy inline image (20 MiB maximum). Keep mutationToken and file_id stable across retries; never invent file URLs.",
       "access": "Write",
       "destructive": false,
       "inputSchema": {
@@ -22644,7 +22698,7 @@
           "image": {
             "type": "object",
             "additionalProperties": false,
-            "description": "Inline image bytes. Phase 1 freezes the supported host representation after ChatGPT and Claude probes.",
+            "description": "Legacy inline image bytes. Supply exactly one of dataBase64 or dataUrl, and omit the host file input.",
             "properties": {
               "mediaType": {
                 "type": "string",
@@ -22732,12 +22786,34 @@
           "isPrimary": {
             "type": "boolean",
             "default": false
+          },
+          "file": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "Host-authorized file. Use the file object supplied by the MCP client; do not manufacture its URL or ID. Supply file or image, never both.",
+            "properties": {
+              "download_url": {
+                "type": "string"
+              },
+              "file_id": {
+                "type": "string"
+              },
+              "mime_type": {
+                "type": "string"
+              },
+              "file_name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "download_url",
+              "file_id"
+            ]
           }
         },
         "required": [
           "mutationToken",
-          "owner",
-          "image"
+          "owner"
         ],
         "additionalProperties": false
       },
@@ -22980,6 +23056,11 @@
           "replayed"
         ],
         "additionalProperties": false
+      },
+      "_meta": {
+        "openai/fileParams": [
+          "file"
+        ]
       }
     },
     {
@@ -26325,6 +26406,10 @@
           },
           "observedRevision": {
             "type": "string"
+          },
+          "imageImportReady": {
+            "type": "boolean",
+            "default": false
           }
         },
         "required": [

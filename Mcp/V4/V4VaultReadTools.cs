@@ -33,7 +33,7 @@ public sealed class V4VaultReadTools(
         var issues=s.Issues.Select(x=>new V4Error(x.Code,x.Detail)).Concat(i.Issues.Select(x=>new V4Error(x.Code,x.Detail))).ToArray();
         var lastBackup=await backup.FindLatestVerifiedAsync(token);
         return new V4HealthResult(s.IsValid&&i.IsValid,V4ContractCatalog.SurfaceVersion,AccessSchemaDefinition.MigrationId,coordinator.PendingWrites,cap.CapacityBand,cap.RenditionBytes,lastBackup?.ToString("O",System.Globalization.CultureInfo.InvariantCulture),issues,
-            session.ContinuityId is null ? "unscoped" : await reads.RevisionAsync(token));
+            session.ContinuityId is null ? "unscoped" : await reads.RevisionAsync(token), images.ImageImportReady);
     });
     [McpServerTool(Name="continuity_list",UseStructuredContent=true),Description("Lists continuity names and clock summaries with bounded paging.")]
     public Task<V4Page<V4ContinuitySummary>> Continuities(V4ContinuityListRequest request,CancellationToken token=default)=>Safe(()=>reads.ContinuitiesAsync(request,token));

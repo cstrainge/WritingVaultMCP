@@ -58,6 +58,36 @@ Every mutation has a caller-readable `mutationToken` of at most 100 characters. 
 
 Relationship and organization memberships can record independent `joined` and `left` story dates, including fuzzy or unknown dates. `relationship_membership_period_add` and `organization_membership_add` accept optional `joinDescription` and `leaveDescription` when those transitions are supplied. `relationship_membership_transitions_set` and `organization_membership_transitions_set` can change the dates and descriptions; `clearJoinDescription` and `clearLeaveDescription` restore generic timeline wording. `organization_membership_transition` accepts `leaveDescription` and, when it creates a replacement, `replacementJoinDescription`. A description belongs to one transition, not the whole membership period. Without one, the timeline says that the named character entered or left a relationship, or joined or left the named organization. Simultaneous exact transitions with generic wording may be combined into a natural list in the viewer. The additive schema migration preserves earlier period-only records and backfills named transitions only when an exact legacy date proves them; it does not treat a fuzzy duration bound as a definite join or leave.
 
+## Importing image files
+
+`image_attach`, `story_image_attach`, and `image_replace` accept exactly one non-null `file` or legacy `image` input. The public MCP descriptors advertise `_meta["openai/fileParams"] = ["file"]`. The `file` object declares four snake-case string properties: required `download_url` and `file_id`, optional `mime_type` and `file_name`, matching the [OpenAI file-input contract](https://developers.openai.com/plugins/reference#file-apis). The MCP host supplies this authorized object; assistants must not invent a URL or file ID or transcribe image bytes into a tool call.
+
+Example shape (the file values below are placeholders, not a usable upload):
+
+```json
+{
+  "mutationToken": "attach-portrait-2026-10-01",
+  "entity": "<entity reference returned by the Vault>",
+  "title": "Portrait",
+  "file": {
+    "download_url": "<temporary HTTPS URL supplied by the MCP host>",
+    "file_id": "<file ID supplied by the MCP host>",
+    "mime_type": "image/png",
+    "file_name": "portrait.png"
+  }
+}
+```
+
+Use `owner` instead of `entity` for story attachments. Replacement uses `imageRef` and `expectedVersion` and retains prior originals and renditions. Inline clients may still supply `image: { "mediaType": "image/png", "dataBase64": "..." }` or `dataUrl` instead of `dataBase64`, omitting `file`.
+
+Authenticated clients may supply public HTTPS URLs without hostname setup. Each URL and redirect is checked; DNS resolutions must contain only public addresses and connections are pinned to checked addresses. Private, loopback, link-local, metadata, reserved, and mapped private destinations are blocked. No credentials, cookies, proxy, or authorization headers are forwarded. Deployments may optionally restrict exact origins with the semicolon-separated `WRITINGVAULT_IMAGE_IMPORT_ORIGINS` environment variable (for example, `https://files.example;https://cdn.example`); it is read when the MCP session starts. Omit it for public HTTPS host files.
+
+Downloads have a 30-second total deadline, at most three redirects, and a 20 MiB streaming byte cap even without Content-Length. Decoding verifies PNG/JPEG/WebP bytes, rejects unsupported or multi-frame formats and dimensions over 50 million pixels, and checks any declared image MIME type. The filename is never a storage path. Original bytes use the existing content-addressed asset store; viewing renditions are persisted in the database. Bounded downloads remain in memory until the normal atomic asset write, so network failures leave no staging files to recover.
+
+Owner authorization, metadata, the mutation token, completed replay, and replacement version are checked before download. No database transaction or global write queue is held over network I/O. Commit repeats the owner/version checks and remains atomic. For retry, retain the same `mutationToken`, `file_id`, target, expected version, and business metadata. The temporary URL may rotate; completed retries return the stored result without refetching. The completed mutation journal retains the verified SHA-256 and host file ID. Temporary URLs and host filenames are excluded from fingerprints and persisted journals. Failed downloads do not consume the token.
+
+Import failures use `image.input`, `image.url_not_allowed`, `image.download_denied` (401/403, without assuming expiry), `image.download_failed`, `image.download_timeout`, `image.too_large`, and `image.invalid`. Refresh an unauthorized or expired host URL through the client and retry the same logical action. `vault_health.imageImportReady` reports importer availability, not a guarantee that a specific client's link is reachable. Outbound download links are not part of this change; `image_view` continues returning the existing MCP image content.
+
 ## Markdown links in notes
 
 `note_add.body`, the `body` change in `note_update.changes`, and `relationship_notes_set.notes` store Markdown source. The Debug viewer renders current and pinned record and image links. A pinned record link loads an immutable saved page, including its fields, notes, and associations.

@@ -20,8 +20,11 @@ public sealed partial class AccessV4ImageService(
     AccessV4ReadService reads,
     V4CursorCodec cursors,
     string storageRoot,
-    string databasePath)
+    string databasePath,
+    IHostImageDownloader? hostImageDownloader = null)
 {
+    private readonly IHostImageDownloader downloader = hostImageDownloader ?? HostImageDownloader.FromEnvironment();
+    public bool ImageImportReady => downloader.Ready;
     private const long MaxPixels = 50_000_000;
     internal const long DatabaseWarningBytes = 1_288_490_189; // 1.2 GiB
     internal const long DatabaseHardLimitBytes = 1_610_612_736; // 1.5 GiB
@@ -31,12 +34,14 @@ public sealed partial class AccessV4ImageService(
 
     public async Task<VaultMutationResult> AttachAsync(V4ImageAttachRequest request, CancellationToken token = default)
     {
-        EncodedImage encoded;
+        EncodedImage? encoded = null;
         try
         {
             ValidateText(request.Title,255,"title");ValidateText(request.Caption,V4ContractLimits.MaximumLongTextLength,"caption");
             ValidateText(request.AltText,V4ContractLimits.MaximumLongTextLength,"altText");ValidateText(request.Role,100,"role");
-            ValidateText(request.CanonStatus,50,"canonStatus");encoded = Decode(request.Image, request.BackgroundColor);
+            ValidateText(request.CanonStatus,50,"canonStatus");
+            ValidateImageInput(request.Image, request.File, request.BackgroundColor);
+            if (request.Image is not null) encoded = Decode(request.Image, request.BackgroundColor);
         }
         catch (VaultValidationException e) { return new(false, e.Errors[0].Code, Message: e.Message); }
         var continuity = session.RequireContinuityId();
@@ -44,27 +49,45 @@ public sealed partial class AccessV4ImageService(
         V4ResolvedTarget? source = null;
         try
         {
-            owner = await targets.EntityAsync(request.Entity, continuity, token).ConfigureAwait(false);
-            if (!string.IsNullOrWhiteSpace(request.Source)) source = await targets.SourceAsync(request.Source, token).ConfigureAwait(false);
+            owner = await targets.EntityAsync(request.Entity, continuity, request.File is not null, token).ConfigureAwait(false);
+            if (request.File is null && !string.IsNullOrWhiteSpace(request.Source)) source = await targets.SourceAsync(request.Source, token).ConfigureAwait(false);
         }
         catch (V4ResolutionException e) { return new(false, e.Code, Message: e.Message); }
         string operation;
         try { operation = references.OperationId(request.MutationToken); }
         catch (ArgumentException e) { return new(false, "validation.mutation_token", Message: e.Message); }
-        // OriginalRelativePath is relative to the configured assets root.  Keep
-        // the assets directory itself out of the persisted value so backup,
-        // restore, and image ingestion all resolve the same path contract.
-        var relative = Path.Combine("originals", encoded.Hash[..2], encoded.Hash + encoded.Extension);
-        var absolute = SafeAssetPath(relative);
-        var journalInput = new
+        object journalInput;
+        if (request.File is { } file)
         {
-            request.MutationToken, request.Entity, imageSha256 = encoded.Hash, request.Image.MediaType,
+            journalInput = HostImportInput(request with { File = null, Image = null }, file, owner.Reference, continuity);
+            if (await coordinator.TryReplayAsync(operation, "v4.image.attach", journalInput, token).ConfigureAwait(false) is { } replay)
+                return replay;
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(request.Source)) source = await targets.SourceAsync(request.Source, token).ConfigureAwait(false);
+            }
+            catch (V4ResolutionException error) { return new(false, error.Code, Message: error.Message); }
+            if (await PreflightImportAsync(owner, continuity, source, null, token).ConfigureAwait(false) is { } failure)
+                return failure;
+            var download = await DownloadImageAsync(file, request.BackgroundColor, token).ConfigureAwait(false);
+            if (download.Failure is not null) return download.Failure;
+            encoded = download.Image!;
+        }
+        else journalInput = new
+        {
+            request.MutationToken, request.Entity, imageSha256 = encoded!.Hash, request.Image!.MediaType,
             request.Title, request.Caption, request.AltText, request.Role, request.CanonStatus,
             request.Source, request.BackgroundColor, request.IsPrimary
         };
+        // OriginalRelativePath is relative to the configured assets root.  Keep
+        // the assets directory itself out of the persisted value so backup,
+        // restore, and image ingestion all resolve the same path contract.
+        var relative = Path.Combine("originals", encoded!.Hash[..2], encoded.Hash + encoded.Extension);
+        var absolute = SafeAssetPath(relative);
         var result = await coordinator.ExecuteAsync(operation, "v4.image.attach", journalInput,
             "image_attach", session.ClientLabel, async (context, ct) =>
             {
+                await RequireActiveContinuityAsync(context, continuity, ct).ConfigureAwait(false);
                 var projectedBytes = new FileInfo(databasePath).Length + encoded.Display.Length + encoded.Thumbnail.Length;
                 if (projectedBytes > DatabaseHardLimitBytes)
                     throw new VaultCommandException("capacity.database_limit", "The image renditions would exceed the supported 1.5 GiB database limit.");
@@ -128,7 +151,8 @@ public sealed partial class AccessV4ImageService(
                     .Add(OleDbType.Integer, id))
                     await revision.ExecuteNonQueryAsync(ct).ConfigureAwait(false);
                 return new VaultMutationOutcome("EntityImage", id.ToString(CultureInfo.InvariantCulture), 1, "attach",
-                    new { owner = owner.Reference, isPrimary = effectivePrimary, encoded.Width, encoded.Height, transparencyFlattened = encoded.TransparencyFlattened, createdFile });
+                    new { owner = owner.Reference, isPrimary = effectivePrimary, encoded.Width, encoded.Height, transparencyFlattened = encoded.TransparencyFlattened, createdFile,
+                        imageSha256 = encoded.Hash, hostFileId = request.File?.FileId });
             }, token).ConfigureAwait(false);
         return encoded.TransparencyFlattened && result.Success
             ? result with { Message = "Transparency was flattened onto the requested background in the JPEG viewing renditions." }
@@ -524,16 +548,18 @@ public sealed partial class AccessV4ImageService(
         new(owner.Reference, AccessV4ReadService.Kind(owner.ResourceType), owner.Label, ContinuityName: continuityName ?? session.ContinuityName, IsDeleted: owner.IsDeleted),
         r.Title,r.Caption,r.Alt,r.Role,r.Status,r.Primary,r.Media,r.Width,r.Height,r.Bytes,r.Version,r.Deleted,revision);
 
-    private EncodedImage Decode(V4InlineImageInput input, string background)
+    private EncodedImage Decode(V4InlineImageInput input, string background) =>
+        Decode(DecodePayload(input), input.MediaType, background);
+
+    private EncodedImage Decode(byte[] bytes, string? declaredMediaType, string background)
     {
-        var bytes = DecodePayload(input);
         if (bytes.LongLength > V4ContractLimits.MaximumImageInputBytes) throw Error("image.too_large", "image", "Image input exceeds 20 MB.");
         using var data = SKData.CreateCopy(bytes);
         using var codec = SKCodec.Create(data) ?? throw Error("image.malformed", "image", "The image cannot be identified safely.");
         var info = codec.Info;
         var detected = codec.EncodedFormat switch { SKEncodedImageFormat.Png => "image/png", SKEncodedImageFormat.Jpeg => "image/jpeg", SKEncodedImageFormat.Webp => "image/webp", _ => null };
         if (detected is not ("image/png" or "image/jpeg" or "image/webp")) throw Error("image.type_unsupported", "image.mediaType", "Only PNG, JPEG, and WebP are supported.");
-        if (!string.Equals(input.MediaType, detected, StringComparison.OrdinalIgnoreCase)) throw Error("image.type_mismatch", "image.mediaType", "Declared media type does not match the image bytes.");
+        if (declaredMediaType is not null && !string.Equals(declaredMediaType, detected, StringComparison.OrdinalIgnoreCase)) throw Error("image.type_mismatch", "image.mediaType", "Declared media type does not match the image bytes.");
         if(info.Width<=0||info.Height<=0||(long)info.Width*info.Height>MaxPixels)throw Error("image.pixel_limit","image","Decoded dimensions must be positive and cannot exceed 50 million pixels.");
         if (codec.FrameCount > 1) throw Error("image.frames", "image", "Animated or multi-frame images are not supported.");
         var decodeInfo = new SKImageInfo(info.Width, info.Height, SKColorType.Rgba8888, SKAlphaType.Premul, SKColorSpace.CreateSrgb());

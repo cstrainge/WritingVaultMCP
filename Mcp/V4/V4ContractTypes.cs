@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace WritingVaultMcp.Mcp.V4;
 
@@ -211,7 +212,7 @@ public sealed record V4HealthResult(
     bool Ready, string ToolSurfaceVersion, string SchemaMigration,
     int PendingWrites, string DatabaseCapacityBand, long ImageRenditionBytes,
     string? LastSuccessfulBackupUtc, IReadOnlyList<V4Error> Issues,
-    string ObservedRevision);
+    string ObservedRevision, bool ImageImportReady = false);
 
 public sealed record V4Change(
     string Scope, string Kind, string? Ref, string Action,
@@ -516,19 +517,24 @@ public sealed record V4TemporalEffectUpdateRequest(
 public sealed record V4VersionedRecordRequest(string MutationToken, string Ref, int ExpectedVersion);
 public sealed record V4InlineImageInput(
     string MediaType, string? DataBase64 = null, string? DataUrl = null);
+public sealed record V4HostFileInput(
+    [property: JsonPropertyName("download_url")] string DownloadUrl,
+    [property: JsonPropertyName("file_id")] string FileId,
+    [property: JsonPropertyName("mime_type")] string? MimeType = null,
+    [property: JsonPropertyName("file_name")] string? FileName = null);
 public sealed record V4ImageAttachRequest(
-    string MutationToken, string Entity, V4InlineImageInput Image,
+    string MutationToken, string Entity, V4InlineImageInput? Image = null,
     string? Title = null, string? Caption = null, string? AltText = null,
     string? Role = null, string? CanonStatus = null, string? Source = null,
-    string BackgroundColor = "#FFFFFF", bool IsPrimary = false);
+    string BackgroundColor = "#FFFFFF", bool IsPrimary = false, V4HostFileInput? File = null);
 public sealed record V4StoryImageAttachRequest(
-    string MutationToken, string Owner, V4InlineImageInput Image,
+    string MutationToken, string Owner, V4InlineImageInput? Image = null,
     string? Title = null, string? Caption = null, string? AltText = null,
     string? Role = null, string? CanonStatus = null, string? Source = null,
-    string BackgroundColor = "#FFFFFF", bool IsPrimary = false);
+    string BackgroundColor = "#FFFFFF", bool IsPrimary = false, V4HostFileInput? File = null);
 public sealed record V4ImageUpdateRequest(
     string MutationToken, string ImageRef, int ExpectedVersion,
     IReadOnlyDictionary<string, JsonElement> Changes);
 public sealed record V4ImageReplaceRequest(
     string MutationToken, string ImageRef, int ExpectedVersion,
-    V4InlineImageInput Image, string BackgroundColor = "#FFFFFF");
+    V4InlineImageInput? Image = null, string BackgroundColor = "#FFFFFF", V4HostFileInput? File = null);

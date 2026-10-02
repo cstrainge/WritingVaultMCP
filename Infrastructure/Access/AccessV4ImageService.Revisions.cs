@@ -62,8 +62,12 @@ public sealed partial class AccessV4ImageService
     public async Task<VaultMutationResult> ReplaceAsync(V4ImageReplaceRequest request,
         CancellationToken token = default)
     {
-        EncodedImage encoded;
-        try { encoded = Decode(request.Image, request.BackgroundColor); }
+        EncodedImage? encoded = null;
+        try
+        {
+            ValidateImageInput(request.Image, request.File, request.BackgroundColor);
+            if (request.Image is not null) encoded = Decode(request.Image, request.BackgroundColor);
+        }
         catch (VaultValidationException error)
         { return new(false, error.Errors[0].Code, Message: error.Message); }
         var continuity = session.RequireContinuityId();
@@ -85,15 +89,26 @@ public sealed partial class AccessV4ImageService
         var kind = image.ResourceType;
         var table = kind == "StoryImage" ? "StoryImages" : "EntityImages";
         var renditionTable = kind == "StoryImage" ? "StoryImageRenditions" : "ImageRenditions";
-        var relative = Path.Combine("originals", encoded.Hash[..2],
-            encoded.Hash + encoded.Extension);
-        var absolute = SafeAssetPath(relative);
-        var journalInput = new
+        object journalInput;
+        if (request.File is { } file)
+        {
+            journalInput = HostImportInput(request with { File = null, Image = null }, file, image.Reference, continuity);
+            if (await coordinator.TryReplayAsync(operation, "v4.image.replace", journalInput, token).ConfigureAwait(false) is { } replay)
+                return replay;
+            if (await PreflightImportAsync(image, continuity, null, request.ExpectedVersion, token).ConfigureAwait(false) is { } failure)
+                return failure;
+            var download = await DownloadImageAsync(file, request.BackgroundColor, token).ConfigureAwait(false);
+            if (download.Failure is not null) return download.Failure;
+            encoded = download.Image!;
+        }
+        else journalInput = new
         {
             request.MutationToken, request.ImageRef, request.ExpectedVersion,
-            imageSha256 = encoded.Hash, request.Image.MediaType,
+            imageSha256 = encoded!.Hash, request.Image!.MediaType,
             request.BackgroundColor
         };
+        var relative = Path.Combine("originals", encoded!.Hash[..2], encoded.Hash + encoded.Extension);
+        var absolute = SafeAssetPath(relative);
         return await coordinator.ExecuteAsync(operation, "v4.image.replace", journalInput,
             "image_replace", session.ClientLabel, async (context, ct) =>
         {
@@ -297,7 +312,7 @@ public sealed partial class AccessV4ImageService
             return new VaultMutationOutcome(kind,
                 image.StorageKey.ToString(CultureInfo.InvariantCulture), old.Version + 1,
                 "replace", new { contentRevision = nextRevision,
-                    encoded.Width, encoded.Height }, old.Version);
+                    encoded.Width, encoded.Height, imageSha256 = encoded.Hash, hostFileId = request.File?.FileId }, old.Version);
         }, token).ConfigureAwait(false);
     }
 }

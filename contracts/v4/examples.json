@@ -606,9 +606,11 @@
       "request": {
         "mutationToken": "example-20260928-001",
         "entity": "character:aurora~ABCDEFGHJK",
-        "image": {
-          "mediaType": "image/png",
-          "dataBase64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAAB"
+        "file": {
+          "download_url": "https://host-provided.example/temporary-authorized-file",
+          "file_id": "host-provided-file-id",
+          "mime_type": "image/png",
+          "file_name": "portrait.png"
         }
       },
       "response": {
@@ -664,7 +666,12 @@
         "mutationToken": "example-20260928-001",
         "imageRef": "example",
         "expectedVersion": 1,
-        "image": null
+        "file": {
+          "download_url": "https://host-provided.example/temporary-authorized-file",
+          "file_id": "host-provided-file-id",
+          "mime_type": "image/png",
+          "file_name": "portrait.png"
+        }
       },
       "response": {
         "success": false,
@@ -1652,9 +1659,11 @@
       "request": {
         "mutationToken": "example-20260928-001",
         "owner": "example",
-        "image": {
-          "mediaType": "image/png",
-          "dataBase64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAAB"
+        "file": {
+          "download_url": "https://host-provided.example/temporary-authorized-file",
+          "file_id": "host-provided-file-id",
+          "mime_type": "image/png",
+          "file_name": "portrait.png"
         }
       },
       "response": {

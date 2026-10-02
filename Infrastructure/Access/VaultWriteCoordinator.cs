@@ -106,18 +106,7 @@ public sealed class VaultWriteCoordinator(
                     .ConfigureAwait(false);
             }
         }
-        var inputNode = JsonSerializer.SerializeToNode(input, JsonOptions)
-            ?? throw new InvalidOperationException("The request could not be serialized for idempotency.");
-        if (inputNode is JsonObject inputObject)
-        {
-            if (inputObject.ContainsKey("operationId")) inputObject["operationId"] = normalizedOperationId;
-            // Attribution is journal metadata, not semantic request input. The
-            // same readable request token may safely replay after reconnecting
-            // through another client label.
-            inputObject.Remove("clientLabel");
-        }
-        var inputJson = inputNode.ToJsonString(JsonOptions);
-        var inputHash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(inputJson)));
+        var inputHash = InputHash(input, normalizedOperationId);
 
         Interlocked.Increment(ref PendingWriteOperations);
         try { await WriteQueue.WaitAsync(cancellationToken).ConfigureAwait(false); }
@@ -238,6 +227,52 @@ public sealed class VaultWriteCoordinator(
     }
 
     public int PendingWrites => Volatile.Read(ref PendingWriteOperations);
+
+    // Preliminary lookup for operations with expensive external preparation.
+    // ExecuteAsync repeats this check atomically at commit to cover concurrent retries.
+    internal async Task<VaultMutationResult?> TryReplayAsync(string operationId, string commandType,
+        object input, CancellationToken token)
+    {
+        if (!Guid.TryParse(operationId, out var operationGuid) || operationGuid == Guid.Empty)
+            return new(false, "validation.operation_id", Message: "operationId must be a GUID.");
+        if (RequestSafetyValidator.Validate(input) is { } validationError)
+            return new(false, "validation.failed", Message: validationError);
+        var normalized = operationGuid.ToString("D");
+        var hash = InputHash(input, normalized);
+        try
+        {
+            await schemaGate.EnsureReadyAsync(token).ConfigureAwait(false);
+            return await ExecuteConsistentReadAsync<VaultMutationResult?>(async () =>
+            {
+                await using var connection = connectionFactory.Create();
+                await connection.OpenAsync(token).ConfigureAwait(false);
+                using var transaction = connection.BeginTransaction();
+                var existing = await FindOperationAsync(connection, transaction, normalized, token).ConfigureAwait(false);
+                if (existing is null) return null;
+                if (!string.Equals(existing.Value.InputHash, hash, StringComparison.OrdinalIgnoreCase) ||
+                    !string.Equals(existing.Value.CommandType, commandType, StringComparison.Ordinal))
+                    return new(false, "idempotency.input_mismatch", Message: "The operation ID was already used with different input.");
+                var replay = JsonSerializer.Deserialize<VaultMutationResult>(existing.Value.ResultReference, JsonOptions)
+                    ?? new VaultMutationResult(false, "storage.invalid_idempotency_result");
+                return replay with { Replayed = true };
+            }, token).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) { throw; }
+        catch (Exception error) { return AccessErrorClassifier.ToResult(error, commandType); }
+    }
+
+    private static string InputHash(object input, string normalizedOperationId)
+    {
+        var inputNode = JsonSerializer.SerializeToNode(input, JsonOptions)
+            ?? throw new InvalidOperationException("The request could not be serialized for idempotency.");
+        if (inputNode is JsonObject inputObject)
+        {
+            if (inputObject.ContainsKey("operationId")) inputObject["operationId"] = normalizedOperationId;
+            // Client attribution does not change a logical request after reconnection.
+            inputObject.Remove("clientLabel");
+        }
+        return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(inputNode.ToJsonString(JsonOptions))));
+    }
 
     internal async Task<T> ExecuteConsistentReadAsync<T>(Func<Task<T>> read, CancellationToken cancellationToken)
     {

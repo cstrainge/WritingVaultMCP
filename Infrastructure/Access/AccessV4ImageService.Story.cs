@@ -320,7 +320,7 @@ public sealed partial class AccessV4ImageService
     public async Task<VaultMutationResult> AttachStoryAsync(
         V4StoryImageAttachRequest request, CancellationToken token = default)
     {
-        EncodedImage encoded;
+        EncodedImage? encoded = null;
         try
         {
             ValidateText(request.Title, 255, "title");
@@ -328,7 +328,8 @@ public sealed partial class AccessV4ImageService
             ValidateText(request.AltText, V4ContractLimits.MaximumLongTextLength, "altText");
             ValidateText(request.Role, 100, "role");
             ValidateText(request.CanonStatus, 50, "canonStatus");
-            encoded = Decode(request.Image, request.BackgroundColor);
+            ValidateImageInput(request.Image, request.File, request.BackgroundColor);
+            if (request.Image is not null) encoded = Decode(request.Image, request.BackgroundColor);
         }
         catch (VaultValidationException error)
         {
@@ -340,8 +341,8 @@ public sealed partial class AccessV4ImageService
         V4ResolvedTarget? source = null;
         try
         {
-            owner = await targets.StoryImageOwnerAsync(request.Owner, continuity, token).ConfigureAwait(false);
-            if (!string.IsNullOrWhiteSpace(request.Source))
+            owner = await targets.StoryImageOwnerAsync(request.Owner, continuity, request.File is not null, token).ConfigureAwait(false);
+            if (request.File is null && !string.IsNullOrWhiteSpace(request.Source))
                 source = await targets.SourceAsync(request.Source, token).ConfigureAwait(false);
         }
         catch (V4ResolutionException error)
@@ -361,18 +362,36 @@ public sealed partial class AccessV4ImageService
         catch (ArgumentException error)
         { return new(false, "validation.mutation_token", Message: error.Message); }
 
-        var relative = Path.Combine("originals", encoded.Hash[..2], encoded.Hash + encoded.Extension);
-        var absolute = SafeAssetPath(relative);
-        var journalInput = new
+        object journalInput;
+        if (request.File is { } file)
         {
-            request.MutationToken, owner = owner.Reference, imageSha256 = encoded.Hash,
-            request.Image.MediaType, request.Title, request.Caption, request.AltText,
+            journalInput = HostImportInput(request with { File = null, Image = null }, file, owner.Reference, continuity);
+            if (await coordinator.TryReplayAsync(operation, "v4.story.image.attach", journalInput, token).ConfigureAwait(false) is { } replay)
+                return replay;
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(request.Source)) source = await targets.SourceAsync(request.Source, token).ConfigureAwait(false);
+            }
+            catch (V4ResolutionException error) { return new(false, error.Code, Message: error.Message); }
+            if (await PreflightImportAsync(owner, continuity, source, null, token).ConfigureAwait(false) is { } failure)
+                return failure;
+            var download = await DownloadImageAsync(file, request.BackgroundColor, token).ConfigureAwait(false);
+            if (download.Failure is not null) return download.Failure;
+            encoded = download.Image!;
+        }
+        else journalInput = new
+        {
+            request.MutationToken, owner = owner.Reference, imageSha256 = encoded!.Hash,
+            request.Image!.MediaType, request.Title, request.Caption, request.AltText,
             request.Role, request.CanonStatus, request.Source, request.BackgroundColor,
             request.IsPrimary
         };
+        var relative = Path.Combine("originals", encoded!.Hash[..2], encoded.Hash + encoded.Extension);
+        var absolute = SafeAssetPath(relative);
         return await coordinator.ExecuteAsync(operation, "v4.story.image.attach", journalInput,
             "story_image_attach", session.ClientLabel, async (context, ct) =>
         {
+            await RequireActiveContinuityAsync(context, continuity, ct).ConfigureAwait(false);
             var projectedBytes = new FileInfo(databasePath).Length + encoded.Display.Length + encoded.Thumbnail.Length;
             if (projectedBytes > DatabaseHardLimitBytes)
                 throw new VaultCommandException("capacity.database_limit",
@@ -475,7 +494,7 @@ public sealed partial class AccessV4ImageService
                 await revision.ExecuteNonQueryAsync(ct).ConfigureAwait(false);
             return new VaultMutationOutcome("StoryImage", id.ToString(CultureInfo.InvariantCulture),
                 1, "attach", new { owner = owner.Reference, isPrimary = effectivePrimary,
-                    encoded.Width, encoded.Height }, null);
+                    encoded.Width, encoded.Height, imageSha256 = encoded.Hash, hostFileId = request.File?.FileId }, null);
         }, token).ConfigureAwait(false);
     }
 

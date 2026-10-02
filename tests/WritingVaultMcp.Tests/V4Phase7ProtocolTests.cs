@@ -35,6 +35,19 @@ public sealed class V4Phase7ProtocolTests
             Assert.True(JsonNode.DeepEquals(frozen[tool.Name]["inputSchema"],JsonNode.Parse(tool.JsonSchema.GetRawText())),tool.Name+" schema differs from the frozen v4 contract.");
             Assert.NotNull(tool.ReturnJsonSchema);
             Assert.True(JsonNode.DeepEquals(frozen[tool.Name]["outputSchema"],JsonNode.Parse(tool.ReturnJsonSchema.Value.GetRawText())),tool.Name+" output schema differs from the frozen v4 contract.");
+            if (tool.Name is "image_attach" or "story_image_attach" or "image_replace")
+            {
+                Assert.Equal("file", tool.ProtocolTool.Meta!["openai/fileParams"]![0]!.GetValue<string>());
+                var file = tool.JsonSchema.GetProperty("properties").GetProperty("file");
+                Assert.Equal("object", file.GetProperty("type").GetString());
+                Assert.Equal(new[] { "download_url", "file_id" }, file.GetProperty("required").EnumerateArray().Select(value => value.GetString()));
+                Assert.Equal(new[] { "download_url", "file_id", "file_name", "mime_type" }, file.GetProperty("properties").EnumerateObject().Select(value => value.Name).Order());
+                foreach (var property in file.GetProperty("properties").EnumerateObject())
+                    Assert.Equal("string", property.Value.GetProperty("type").GetString());
+                var required = tool.JsonSchema.GetProperty("required").EnumerateArray().Select(value => value.GetString()).ToArray();
+                Assert.DoesNotContain("image", required);
+                Assert.DoesNotContain("file", required);
+            }
         }
         var create=all.Single(x=>x.Name=="continuity_create");
         Assert.True(create.JsonSchema.TryGetProperty("properties",out var properties));
@@ -49,6 +62,41 @@ public sealed class V4Phase7ProtocolTests
         var (storageReads, _, _) = vault.V4();
         var stored = await storageReads.ContinuitiesAsync(new());
         Assert.DoesNotContain(stored.Items, item => item.Name == "Must Not Exist");
+    }
+
+    [Fact]
+    public async Task HostFileArgumentsReachAllImportToolsThroughRealMcpAdapter()
+    {
+        await using var vault = await TestVault.CreateAsync();
+        var continuity = int.Parse((await vault.Service.CreateContinuityAsync(new(Guid.NewGuid().ToString(), "File protocol", "UTC"))).ResourceKey!);
+        await vault.Service.CreateEntityAsync(new(Guid.NewGuid().ToString(), continuity, CanonEntityType.Character, "File owner"));
+        await using var client = await Client(vault, false);
+        await client.CallToolAsync("session_set", new Dictionary<string, object?> { ["continuityName"] = "File protocol" });
+        var health = await client.CallToolAsync("vault_health", new Dictionary<string, object?>());
+        using var healthJson = JsonDocument.Parse(health.StructuredContent!.ToString()!);
+        Assert.True(healthJson.RootElement.GetProperty("imageImportReady").GetBoolean());
+        var seed = await client.CallToolAsync("image_attach", new Dictionary<string, object?>
+        {
+            ["mutationToken"] = "file-protocol-seed", ["entity"] = "File owner",
+            ["image"] = new { mediaType = "image/png", dataBase64 = PngBase64() }
+        });
+        var (imageRef, version) = FirstAffected(seed);
+        foreach (var name in new[] { "image_attach", "story_image_attach", "image_replace" })
+        {
+            var arguments = new Dictionary<string, object?>
+            {
+                ["mutationToken"] = "file-protocol-" + name,
+                ["file"] = new { download_url = "https://127.0.0.1/private?secret=must-not-appear", file_id = "host-file" }
+            };
+            if (name == "image_attach") arguments["entity"] = "File owner";
+            else if (name == "story_image_attach") arguments["owner"] = "File protocol";
+            else { arguments["imageRef"] = imageRef; arguments["expectedVersion"] = version; }
+            var result = await client.CallToolAsync(name, arguments);
+            var content = result.StructuredContent!.ToString()!;
+            Assert.Contains("image.url_not_allowed", content);
+            Assert.DoesNotContain("must-not-appear", content);
+            Assert.DoesNotContain("127.0.0.1", content);
+        }
     }
 
     [Fact]
