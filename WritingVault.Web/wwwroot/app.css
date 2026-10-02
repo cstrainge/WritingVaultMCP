@@ -315,15 +315,14 @@ button.vault-card { width: 100%; text-align: left; color: var(--ink); cursor: po
 #timeline-table th { text-align: left; color: var(--muted); background: var(--surface-2); font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; }
 #timeline-table th, #timeline-table td { padding: .72rem; border-bottom: 1px solid var(--line); vertical-align: top; }
 #timeline-table .timeline-range-heading, #timeline-table .timeline-range-gutter { width: var(--range-gutter-width, 26px); min-width: var(--range-gutter-width, 26px); padding: 0; }
-#timeline-table .timeline-range-gutter { position: relative; }
-#timeline-table .timeline-range-gutter svg { position: absolute; z-index: 1; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-.timeline-range-bar { position: absolute; width: 9px; transform: translateX(-50%); border: 1px solid var(--accent); border-radius: 2px; pointer-events: none; }
+#timeline-table .timeline-range-gutter { position: relative; --range-boundary-y: calc(.72rem + .65em); }
+.timeline-range-bar { position: absolute; width: 9px; transform: translateX(-50%); border: 1px solid var(--accent); border-radius: 0; pointer-events: none; }
 .timeline-range-striped { background: repeating-linear-gradient(135deg, var(--accent) 0 3px, var(--surface) 3px 6px); }
 .timeline-range-solid { background: var(--accent); }
 .timeline-range-checkered { background: conic-gradient(var(--accent) 25%, var(--surface) 0 50%, var(--accent) 0 75%, var(--surface) 0) 0 0 / 8px 8px; }
-.timeline-range-arrow { fill: none; stroke: var(--accent); stroke-width: 2; vector-effect: non-scaling-stroke; }
-.timeline-range-arrow-halo { fill: none; stroke: var(--surface); stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
-.timeline-range-arrow { stroke-linecap: round; stroke-linejoin: round; stroke-width: 2.5; }
+.timeline-range-arrow { position: absolute; z-index: 1; width: 14px; height: 8px; fill: var(--accent); pointer-events: none; }
+.timeline-range-arrow-start { top: var(--range-boundary-y); }
+.timeline-range-arrow-end { top: calc(var(--range-boundary-y) - 8px); }
 #timeline-table th:nth-child(2), #timeline-table .timeline-calendar-year { width: 5.2rem; }
 #timeline-table th:nth-child(3), #timeline-table .timeline-calendar-month { width: 7.5rem; }
 #timeline-table th:nth-child(4), #timeline-table .timeline-calendar-day { width: 8rem; }

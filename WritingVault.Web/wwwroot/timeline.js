@@ -846,7 +846,7 @@
       byId('timeline-order-note').hidden = !all.some(uncertainDate);
       const tracks = this.rangeTracks(all);
       const spanByKey = new Map(tracks.spans.map(span => [span.key, span]));
-      const trackWidth = Math.max(26, tracks.lanes * 18 + 12);
+      const trackWidth = Math.max(48, tracks.lanes * 18 + 30);
       byId('timeline-table').style.setProperty('--range-gutter-width', `${trackWidth}px`);
       const starts = new Map();
       for (const span of tracks.spans) {
@@ -869,7 +869,7 @@
       const appendNow = (index, crossingSpans) => {
         const row = node('tr', undefined, 'timeline-now-row');
         row.setAttribute('aria-label', `Now: ${window.WritingVaultStoryDates.clockTime(this.clock)}`);
-        row.append(this.rangeGutter(all, crossingSpans, index - .5, trackWidth));
+        row.append(this.rangeGutter(all, crossingSpans, index - .5));
         const dateOnly = this.clock?.status === 'DateOnly';
         const date = window.WritingVaultStoryDates.chronologyDate({ kind: dateOnly ? 'ExactDate' : 'ExactInstant',
           lower: dateOnly ? localNow.slice(0, 10) : localNow,
@@ -899,7 +899,7 @@
         if (item.boundary) row.classList.add(`timeline-boundary-${item.boundary.toLowerCase()}`);
         if (uncertainDate(item)) row.classList.add('timeline-uncertain');
         if (this.highlightRef && intersects(item, this.highlightRef)) row.classList.add('highlighted');
-        row.append(this.rangeGutter(all, activeSpans, index, trackWidth));
+        row.append(this.rangeGutter(all, activeSpans, index));
         const date = window.WritingVaultStoryDates.chronologyDate(item.boundaryDate || item.occurred, previousDate);
         previousDate = date.next;
         if (date.kind === 'parts') {
@@ -1029,11 +1029,9 @@
         item.occurred?.kind, item.occurred?.lower, item.occurred?.upper]);
     }
 
-    rangeGutter(items, active, index, width) {
+    rangeGutter(items, active, index) {
       const cell = node('td', undefined, 'timeline-range-gutter');
       if (!active.length) return cell;
-      const svg = svgNode('svg', { viewBox: `0 0 ${width} 100`, preserveAspectRatio: 'none',
-        'aria-hidden': 'true', focusable: 'false' });
       for (const span of active) {
         const x = 12 + span.lane * 18;
         const starts = span.start === index, ends = span.end === index;
@@ -1041,20 +1039,20 @@
           `timeline-range-bar ${span.unknown ? 'timeline-range-checkered' :
             span.fuzzy ? 'timeline-range-striped' : 'timeline-range-solid'}`);
         bar.style.left = `${x}px`;
-        // Keep at least eight CSS pixels between the half-arrow tip and its bar.
-        bar.style.top = starts ? 'calc(60% + 8px)' : '0';
-        bar.style.bottom = ends ? 'calc(60% + 8px)' : '0';
+        // Boundary tips share a fixed offset beside the first line of text.
+        // Only the bar stretches when a row wraps onto additional lines.
+        bar.style.top = starts ? 'var(--range-boundary-y)' : '0';
+        bar.style.bottom = ends ? 'calc(100% - var(--range-boundary-y))' : '0';
         cell.append(bar);
-        // Both arrows point toward their event row. Only the half-head inside
-        // the range is drawn: below its start, or above its end.
-        const arrow = starts ? `M ${x - 6} 55 H ${x + 6} l -5 5` :
-          ends ? `M ${x - 6} 45 H ${x + 6} l -5 -5` : null;
-        if (arrow) {
-          svg.append(svgNode('path', { d: arrow, class: 'timeline-range-arrow-halo' }));
-          svg.append(svgNode('path', { d: arrow, class: 'timeline-range-arrow' }));
+        if (starts || ends) {
+          const arrow = svgNode('svg', { viewBox: '0 0 14 8',
+            class: `timeline-range-arrow ${starts ? 'timeline-range-arrow-start' : 'timeline-range-arrow-end'}`,
+            'aria-hidden': 'true', focusable: 'false' });
+          arrow.style.left = `${x - 4.5}px`;
+          arrow.append(svgNode('path', { d: starts ? 'M 0 0 H 14 L 0 8 Z' : 'M 0 8 H 14 L 0 0 Z' }));
+          cell.append(arrow);
         }
       }
-      cell.append(svg);
       const here = items[index];
       if (!here?.isMembershipTransition &&
           (here?.boundary === 'Start' || here?.boundary === 'End'))
