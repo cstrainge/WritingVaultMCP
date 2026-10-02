@@ -32,18 +32,18 @@ public sealed class V4Phase4ReadModelTests
 
         var page = await reads.SearchAsync(new(Text: "  sTaR  ", Kinds: [V4RecordKind.Character],
             Limit: 1, IncludeContent: includeContent));
-        Assert.Equal("Morgan", Assert.Single(page.Items).Label);
+        Assert.Equal("\"Starbright\" Robin", Assert.Single(page.Items).Label);
         Assert.True(page.HasMore);
         var next = await reads.SearchAsync(new(Text: "  sTaR  ", Kinds: [V4RecordKind.Character],
             Cursor: page.NextCursor, Limit: 1, IncludeContent: includeContent));
-        Assert.Equal("Robin", Assert.Single(next.Items).Label);
+        Assert.Equal("\"Starling\" Morgan", Assert.Single(next.Items).Label);
         Assert.False(next.HasMore);
         var alias = await reads.SearchAsync(new(Text: "captain", Kinds: [V4RecordKind.Character], IncludeContent: includeContent));
         var name = await reads.SearchAsync(new(Text: "Morgan", Kinds: [V4RecordKind.Character], IncludeContent: includeContent));
         var aliasRecord = await reads.GetAsync(new(Assert.Single(alias.Items).Ref));
-        var preferredRecord = await reads.GetAsync(new(page.Items[0].Ref));
+        var preferredRecord = await reads.GetAsync(new(next.Items[0].Ref));
         Assert.Equal(preferredRecord.Summary.Ref, aliasRecord.Summary.Ref);
-        Assert.Equal(page.Items[0].Ref, Assert.Single(name.Items).Ref);
+        Assert.Equal(next.Items[0].Ref, Assert.Single(name.Items).Ref);
     }
 
     [Fact]

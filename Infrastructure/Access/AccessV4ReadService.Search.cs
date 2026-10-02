@@ -28,6 +28,8 @@ public sealed partial class AccessV4ReadService
                 : Enum.GetValues<V4RecordKind>().Where(kind => kind is V4RecordKind.Project or V4RecordKind.Location or
                     V4RecordKind.Character or V4RecordKind.Organization or V4RecordKind.Object or V4RecordKind.WorldEvent or
                     V4RecordKind.Source or V4RecordKind.Tag).ToArray();
+            if (kinds.Length == 1 && kinds[0] == V4RecordKind.Character)
+                return await SearchCharactersByNameAsync(request, continuity, revision, token).ConfigureAwait(false);
             var scope = SearchScope(continuity, request, kinds);
             var after = request.Cursor is null ? -1L : cursors.Decode(request.Cursor, "search", scope).Position;
             var candidates = new List<(long Key, V4ReferenceSummary Summary)>();
