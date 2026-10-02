@@ -35,3 +35,6 @@ usability/
 *.bak
 **/__pycache__/
 *.pyc
+
+# Reproducible browser dependency builds; served bundles are checked in.
+**/node_modules/

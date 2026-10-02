@@ -40,7 +40,9 @@ var app = builder.Build();
 
 app.Use(async (context, next) =>
 {
-    context.Response.Headers.ContentSecurityPolicy = "default-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'none'; img-src 'self' data: blob:; font-src 'self'; style-src 'self'; script-src 'self'; connect-src 'self'";
+    // KaTeX and Mermaid generate presentation styles. Scripts remain local-only;
+    // Markdown HTML is sanitized before insertion and cannot supply stylesheets.
+    context.Response.Headers.ContentSecurityPolicy = "default-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'none'; img-src 'self' data: blob: https: http:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'";
     context.Response.Headers.XContentTypeOptions = "nosniff";
     context.Response.Headers["Referrer-Policy"] = "no-referrer";
     context.Response.Headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=(), payment=(), usb=()";

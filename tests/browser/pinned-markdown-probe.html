@@ -1,4 +1,5 @@
 <!doctype html><meta charset="utf-8"><title>Pinned Markdown probe</title>
+<script src="../../WritingVault.Web/wwwroot/vendor/markdown/vendor.js"></script>
 <script src="../../WritingVault.Web/wwwroot/markdown.js"></script>
 <div id="note"></div><pre id="result"></pre>
 <script>
@@ -22,6 +23,6 @@
     images: note.querySelectorAll('img').length,
     pinned: note.querySelector('a[href$="?v=2"] img')?.style.width,
     invalidAsText: note.textContent.includes('vault-image:story-image:portrait~ABCDEFGH?v=0'),
-    remoteAsText: note.textContent.includes('https://example.test/image.png')
+    remoteImage: !!note.querySelector('img[src="https://example.test/image.png"]')
   });
 </script>

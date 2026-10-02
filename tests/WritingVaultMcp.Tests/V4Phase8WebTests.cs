@@ -65,7 +65,7 @@ public sealed class V4Phase8WebTests
     }
 
     [Fact]
-    public void BrowserAssetsUseSafeDomAndHaveNoExternalFetchSurface()
+    public void BrowserAssetsKeepScriptsLocalAndUseSafeDom()
     {
         var root=RepositoryRoot();var web=Path.Combine(root,"WritingVault.Web");
         var html=File.ReadAllText(Path.Combine(web,"wwwroot","index.html"));
@@ -87,6 +87,7 @@ public sealed class V4Phase8WebTests
         var host=File.ReadAllText(Path.Combine(web,"Program.cs"));
         Assert.Contains("default-src 'self'",host,StringComparison.Ordinal);
         Assert.Contains("img-src 'self' data:",host,StringComparison.Ordinal);
+        Assert.Contains("script-src 'self'",host,StringComparison.Ordinal);
         Assert.Contains("Origin",host,StringComparison.Ordinal);
         Assert.Contains("X-WritingVault-Session",host,StringComparison.Ordinal);
         Assert.Contains("64 * 1024",host,StringComparison.Ordinal);

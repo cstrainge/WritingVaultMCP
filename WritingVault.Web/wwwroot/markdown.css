@@ -1,0 +1,60 @@
+.record-prose { overflow-wrap: anywhere; min-width: 0; }
+.markdown-help-page { max-width: 64rem; margin: 2rem auto; padding: 1.5rem; }
+.record-prose :is(h1,h2,h3,h4,h5,h6,[id]) { scroll-margin-top: 6rem; }
+.record-prose h1 { font-size: 1.9rem; }
+.record-prose h2 { font-size: 1.55rem; }
+.record-prose h3 { font-size: 1.3rem; }
+.record-prose h4 { font-size: 1.12rem; }
+.record-prose h5 { font-size: 1rem; }
+.record-prose h6 { font-size: .9rem; color: var(--muted); }
+.record-prose :is(ul,ol) { padding-left: 1.6rem; }
+.record-prose li + li { margin-top: .3rem; }
+.record-prose li > :is(ul,ol) { margin: .35rem 0; }
+.record-prose pre { padding: 1rem; overflow-x: auto; white-space: pre; background: var(--surface-2); border: 1px solid var(--line); border-radius: .5rem; }
+.record-prose code { font-family: ui-monospace, Consolas, monospace; font-size: .9em; }
+.record-prose :not(pre) > code { padding: .1em .3em; background: var(--surface-2); border-radius: .2rem; }
+.record-prose pre code { background: none; padding: 0; }
+.record-prose blockquote { margin-left: 0; padding: .1rem 1rem; border-left: 3px solid var(--accent); color: var(--muted); }
+.record-prose hr { border: 0; border-top: 1px solid var(--line); margin: 1.5rem 0; }
+.record-prose dt { font-weight: 700; margin-top: .6rem; }
+.record-prose dd { margin-left: 1.5rem; }
+.record-prose mark { color: var(--ink); background: color-mix(in srgb, var(--timeline-now) 35%, var(--surface)); }
+.record-prose ins { text-decoration-color: var(--good); text-underline-offset: .2em; }
+.record-prose abbr[title] { cursor: help; text-decoration: underline dotted; }
+.record-prose kbd { border: 1px solid var(--line); border-bottom-width: 2px; padding: .1rem .3rem; border-radius: .25rem; background: var(--surface-2); }
+.record-prose img { max-width: 100%; height: auto; border-radius: .5rem; }
+.record-prose .task-list-item { list-style: none; }
+.record-prose .task-list-item-checkbox { margin-right: .5rem; accent-color: var(--accent); }
+.record-prose .footnotes { font-size: .9em; }
+.record-prose .footnote-ref { line-height: 0; }
+.record-prose .footnote-backref { margin-left: .4rem; }
+.record-prose :is(.note-disclosure,details) { margin: 1rem 0; padding: .8rem 1rem; border: 1px solid var(--line); border-radius: .5rem; }
+.record-prose summary { cursor: pointer; font-weight: 650; }
+.record-prose details[open] > summary { margin-bottom: .8rem; }
+.record-prose .markdown-alert { margin: 1rem 0; padding: .5rem 1rem; border-left: 4px solid var(--accent); background: var(--surface-2); border-radius: .3rem; }
+.record-prose .markdown-alert-title { font-weight: 700; display: flex; align-items: center; gap: .5rem; }
+.record-prose .markdown-alert-title svg { fill: currentColor; flex-shrink: 0; }
+.record-prose .markdown-alert-tip { border-color: var(--good); }
+.record-prose :is(.markdown-alert-warning,.markdown-alert-caution) { border-color: var(--danger); }
+.record-prose .note-toc { background: var(--surface-2); padding: .5rem 1rem; border: 1px solid var(--line); border-radius: .5rem; }
+.record-prose .note-toc ul { list-style: none; padding: 0; }
+.record-prose .note-toc-level-2 { margin-left: .8rem; }
+.record-prose .note-toc-level-3 { margin-left: 1.6rem; }
+.record-prose .note-toc-level-4 { margin-left: 2.4rem; }
+.record-prose .note-toc-level-5 { margin-left: 3.2rem; }
+.record-prose .note-toc-level-6 { margin-left: 4rem; }
+.record-prose .note-table caption { text-align: left; font-weight: 650; padding: .5rem 0; }
+.record-prose :is(.katex-display,.note-math,eqn) { display: block; max-width: 100%; overflow-x: auto; overflow-y: hidden; padding: .5rem 0; }
+.record-prose .katex { font-size: 1.1em; overflow-wrap: normal; }
+.record-prose .note-diagram { margin: 1rem 0; padding: 1rem; border: 1px solid var(--line); border-radius: .5rem; overflow-x: auto; }
+.record-prose .note-diagram > svg { display: block; max-width: 100%; height: auto; margin: auto; }
+.record-prose .note-diagram details { border: 0; padding: .5rem 0 0; font-size: .85em; }
+.note-diagram-staging { position: absolute; left: -100000px; top: 0; width: 1200px; visibility: hidden; }
+.record-prose .note-render-error { color: var(--danger); white-space: pre-wrap; }
+.record-prose .hljs-comment,.record-prose .hljs-quote { color: var(--muted); font-style: italic; }
+.record-prose :is(.hljs-keyword,.hljs-selector-tag,.hljs-literal,.hljs-title) { color: var(--accent); font-weight: 600; }
+.record-prose :is(.hljs-string,.hljs-regexp,.hljs-addition,.hljs-attribute) { color: var(--good); }
+.record-prose :is(.hljs-number,.hljs-symbol,.hljs-bullet,.hljs-built_in) { color: var(--timeline-other); }
+.record-prose :is(.hljs-deletion,.hljs-section) { color: var(--danger); }
+.record-prose .hljs-emphasis { font-style: italic; }
+.record-prose .hljs-strong { font-weight: 700; }
