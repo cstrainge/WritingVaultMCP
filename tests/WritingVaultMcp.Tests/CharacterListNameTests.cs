@@ -32,11 +32,11 @@ public sealed class CharacterListNameTests
             foreach (var item in page.Items) { names.Add(item.Label); Assert.True(refs.Add(item.Ref)); }
             cursor = page.NextCursor;
         } while (cursor is not null);
-        Assert.Equal(new[] { "Anne", "Aurora Nyx Thyme", "Betsy Jones", "\"Frankie\" Francis Anne Bell",
-            "\"Rob\" Robert Smith", "\"Rob\" Robin Adams", "The Patron" }, names);
+        Assert.Equal(new[] { "Anne", "Aurora Nyx Thyme", "Betsy Jones", "“Frankie” Francis Anne Bell",
+            "“Rob” Robert Smith", "“Rob” Robin Adams", "The Patron" }, names);
         var full = await reads.SearchAsync(new(Text: "Aurora Nyx Thyme", Kinds: [V4RecordKind.Character]));
         Assert.Equal("Aurora Nyx Thyme", Assert.Single(full.Items).Label);
         var family = await reads.SearchAsync(new(Text: "Smith", Kinds: [V4RecordKind.Character]));
-        Assert.Equal("\"Rob\" Robert Smith", Assert.Single(family.Items).Label);
+        Assert.Equal("“Rob” Robert Smith", Assert.Single(family.Items).Label);
     }
 }

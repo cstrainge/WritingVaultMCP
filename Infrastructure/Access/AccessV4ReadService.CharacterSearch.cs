@@ -17,7 +17,7 @@ public sealed partial class AccessV4ReadService
         var preferred = row.Preferred?.Trim();
         return !string.IsNullOrWhiteSpace(preferred) &&
             !string.Equals(preferred, row.First.Trim(), StringComparison.OrdinalIgnoreCase)
-            ? $"\"{preferred}\" {full}" : full;
+            ? $"“{preferred}” {full}" : full;
     }
 
     private async Task<V4Page<V4ReferenceSummary>> SearchCharactersByNameAsync(
